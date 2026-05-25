@@ -23,12 +23,9 @@ Is to animate everything possile, i offer often updates with new UI animations:)
 
 ## How to Install
 
-1. Open Settings → Community Plugins
-2. Turn off Safe mode
-3. Click Browse
-4. Search for "Enchanted Animations"
-5. Click Install
-6. After installation, enable the plugin and configure it!
+1. Go into this link https://community.obsidian.md/plugins/enchanted-animations
+2. Click "Add to obsidian"
+3. After this, in obsidian just enable this plugin:))
 
 ## Usage
 
