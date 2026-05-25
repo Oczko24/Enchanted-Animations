@@ -73,6 +73,8 @@ body:not(.disable-modal-animation) .cm-tooltip.cm-tooltip-autocomplete {
 }
 
 
+
+
 /* ==================== Hover Popovers (link preview) ==================== */
 
 body:not(.disable-modal-animation) .popover.hover-popover {
@@ -80,7 +82,7 @@ body:not(.disable-modal-animation) .popover.hover-popover {
 }
 
 
-/* ==================== Mobile Settings Drill-Down ==================== */
+/* ==================== Mobile Settings Drill-Down & Tab Switch ==================== */
 
 body:not(.disable-modal-animation).is-phone .modal.mod-settings .vertical-tab-content-container {
   --ea-slide-start: 30px;
@@ -90,6 +92,10 @@ body:not(.disable-modal-animation).is-phone .modal.mod-settings .vertical-tab-co
 body:not(.disable-modal-animation).is-phone .modal.mod-settings .vertical-tab-header {
   --ea-slide-start: -30px;
   animation: ea-directional-slide calc(var(--enchanted-animations-speed) * 1.2) var(--enchanted-animations-easing) both;
+}
+
+body:not(.disable-modal-animation) .vertical-tab-content {
+  animation: ea-note-in calc(var(--enchanted-animations-speed) * 0.8) var(--enchanted-animations-easing);
 }
 
 
@@ -246,6 +252,11 @@ body.ea-gpu-accel .mobile-navbar {
 @keyframes ea-menu-in {
   from { opacity: 0; transform: scale(0.95); }
   to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes ea-item-fade-in {
+  from { opacity: 0; transform: translateX(-8px); }
+  to   { opacity: 1; transform: translateX(0); }
 }
 
 @keyframes ea-popover-in {
