@@ -19,7 +19,7 @@ export interface EnchantedAnimationsSettings {
 
 export const DEFAULT_SETTINGS: EnchantedAnimationsSettings = {
 	speed: 0.4,
-	easing: "cubic-bezier(0.16, 1, 0.3, 1)",
+	easing: "cubic-bezier(0.2, 0, 0, 1)",
 	enableSplashScreen: true,
 	animateNoteOpen: false,
 	enableHeaderAnimations: true,
@@ -72,9 +72,9 @@ export class EnchantedAnimationsSettingTab extends PluginSettingTab {
 			.setName("Motion Style")
 			.setDesc("Choose the acceleration curve for all animations.")
 			.addDropdown(dropdown => dropdown
-				.addOption("cubic-bezier(0.2, 0, 0, 1)", "Google Pixel (Material You)")
+				.addOption("cubic-bezier(0.2, 0, 0, 1)", "Google Pixel (Material You) - Default")
 				.addOption("cubic-bezier(0.175, 0.885, 0.32, 1.275)", "Bouncy (by Blobob)")
-				.addOption("cubic-bezier(0.16, 1, 0.3, 1)", "Enchanted Default (Silky Smooth)")
+				.addOption("cubic-bezier(0.16, 1, 0.3, 1)", "Enchanted (Silky Smooth)")
 				.addOption("cubic-bezier(0.4, 0, 0.2, 1)", "Classic Material (Balanced)")
 				.addOption("linear", "Linear (Constant Speed)")
 				.setValue(this.plugin.settings.easing)
