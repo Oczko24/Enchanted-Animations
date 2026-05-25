@@ -419,6 +419,17 @@ body:not(.disable-native-animations) .search-input-clear-button {
   transition-timing-function: var(--enchanted-animations-easing);
 }
 
+/* ==================== Workspace Tabs Top Animations ==================== */
+body:not(.disable-native-animations) .workspace-tabs.mod-top .workspace-tab-header-container-inner,
+body:not(.disable-native-animations) .workspace-tabs.mod-top .workspace-tab-header,
+body:not(.disable-native-animations) .workspace-tabs.mod-top .workspace-tab-header-inner {
+  transition-property: transform, width, max-width, min-width, flex-basis, opacity, margin, padding;
+  transition-duration: calc(var(--enchanted-animations-speed) * 3);
+  transition-timing-function: var(--enchanted-animations-easing);
+  will-change: transform, width, max-width, min-width, flex-basis;
+  transform: translateZ(0);
+}
+
 /* ==================== Graph View & Miscellaneous ==================== */
 body:not(.disable-native-animations) .graph-color-group {
   transition-duration: var(--enchanted-animations-speed);
