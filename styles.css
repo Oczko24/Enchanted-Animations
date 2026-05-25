@@ -307,19 +307,19 @@ body.ea-status-bar-hover:not(.is-mobile) .status-bar {
 }
 
 /* File Explorer Hover Glow Fade-Out */
-/* stylelint-disable declaration-no-important */
+
 body:not(.disable-native-animations) .nav-files-container .tree-item-self,
 body:not(.disable-native-animations) .nav-files-container .nav-folder-title,
 body:not(.disable-native-animations) .nav-files-container .nav-file-title {
-  transition: background-color var(--enchanted-animations-speed) var(--enchanted-animations-easing), color var(--enchanted-animations-speed) var(--enchanted-animations-easing) !important;
+  transition: background-color var(--enchanted-animations-speed) var(--enchanted-animations-easing), color var(--enchanted-animations-speed) var(--enchanted-animations-easing);
 }
 
 /* Szybkie pojawianie się poświaty przy najechaniu (żeby nie było efektu spóźnionej wody) */
 body:not(.disable-native-animations) .nav-files-container .tree-item-self:hover,
 body:not(.disable-native-animations) .nav-files-container .nav-folder-title:hover,
 body:not(.disable-native-animations) .nav-files-container .nav-file-title:hover {
-  transition-duration: 0s !important;
-  transition-delay: 0s !important;
+  transition-duration: 0s;
+  transition-delay: 0s;
 }
 
 /* Kiedy najedziemy na cały interfejs z obszarem dolnym (app-container jest duży, więc zrobimy hover na workspace albo dodamy obszar docelowy).
@@ -376,7 +376,7 @@ body.ea-card-hover:not(.is-mobile) .bookmark:hover {
 
 body:not(.disable-native-animations) .workspace-drawer-inner,
 body:not(.disable-native-animations) .workspace-drawer-backdrop {
-  transition: all var(--enchanted-animations-speed) var(--enchanted-animations-easing) !important;
+  transition: all var(--enchanted-animations-speed) var(--enchanted-animations-easing);
 }
 
 body:not(.disable-native-animations) .modal,
@@ -385,7 +385,7 @@ body:not(.disable-native-animations) .menu,
 body:not(.disable-native-animations) .prompt,
 body:not(.disable-native-animations) .suggestion-container,
 body:not(.disable-native-animations) .notice {
-  transition-duration: var(--enchanted-animations-speed) !important;
+  transition-duration: var(--enchanted-animations-speed);
 }
 
 /* ==================== Checkboxes Override ==================== */
@@ -399,7 +399,7 @@ body:not(.disable-native-animations) input[type="checkbox"]:before,
 body:not(.disable-native-animations) .task-list-item-checkbox,
 body:not(.disable-native-animations) .task-list-item-checkbox:after,
 body:not(.disable-native-animations) .task-list-item-checkbox:before {
-  transition: all var(--enchanted-animations-speed) var(--enchanted-animations-easing) !important;
+  transition: all var(--enchanted-animations-speed) var(--enchanted-animations-easing);
 }
 
 /* ==================== Hardcoded CSS Timings Override (app.css) ==================== */
@@ -415,14 +415,14 @@ body:not(.disable-native-animations) .progress-bar .progress-bar-subline,
 body:not(.disable-native-animations) .pdf-sidebar-resizer,
 body:not(.disable-native-animations) .workspace-leaf-resize-handle,
 body:not(.disable-native-animations) .search-input-clear-button {
-  transition-duration: var(--enchanted-animations-speed) !important;
-  transition-timing-function: var(--enchanted-animations-easing) !important;
+  transition-duration: var(--enchanted-animations-speed);
+  transition-timing-function: var(--enchanted-animations-easing);
 }
 
 /* ==================== Graph View & Miscellaneous ==================== */
 body:not(.disable-native-animations) .graph-color-group {
-  transition-duration: var(--enchanted-animations-speed) !important;
-  transition-timing-function: var(--enchanted-animations-easing) !important;
+  transition-duration: var(--enchanted-animations-speed);
+  transition-timing-function: var(--enchanted-animations-easing);
 }
 
 /* ==================== Velocity-Based Sidebar Animations (Math) ==================== */
@@ -435,6 +435,6 @@ body:not(.disable-native-animations) .graph-color-group {
 body:not(.disable-native-animations) .workspace-split.mod-sidedock {
   transition: width calc( (var(--ea-sidebar-width, 300) / (300 / var(--enchanted-animations-speed-num, 0.4))) * 1s ) var(--enchanted-animations-easing),
               min-width calc( (var(--ea-sidebar-width, 300) / (300 / var(--enchanted-animations-speed-num, 0.4))) * 1s ) var(--enchanted-animations-easing),
-              flex-basis calc( (var(--ea-sidebar-width, 300) / (300 / var(--enchanted-animations-speed-num, 0.4))) * 1s ) var(--enchanted-animations-easing) !important;
+              flex-basis calc( (var(--ea-sidebar-width, 300) / (300 / var(--enchanted-animations-speed-num, 0.4))) * 1s ) var(--enchanted-animations-easing);
 }
-/* stylelint-enable declaration-no-important */
+
