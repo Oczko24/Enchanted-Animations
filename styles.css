@@ -1,98 +1,95 @@
-/* Smooth Obsidian – main stylesheet
-   CSS vars injected by JS: --smooth-obsidian-speed, --smooth-obsidian-easing */
+/* Enchanted Animations – main stylesheet
+   CSS vars injected by JS: --enchanted-animations-speed, --enchanted-animations-easing */
 
 
 /* ==================== Notifications ==================== */
 
 .notice {
-  animation: so-slide-right var(--smooth-obsidian-speed) var(--smooth-obsidian-easing);
+  animation: ea-slide-right var(--enchanted-animations-speed) var(--enchanted-animations-easing);
 }
 
 .is-phone .notice {
-  animation: so-slide-up var(--smooth-obsidian-speed) var(--smooth-obsidian-easing);
+  animation: ea-slide-up var(--enchanted-animations-speed) var(--enchanted-animations-easing);
 }
 
 
 /* ==================== Modals (settings, community plugins, etc.) ==================== */
 
 body:not(.disable-modal-animation) .modal {
-  animation: so-modal-in calc(var(--smooth-obsidian-speed) * 0.7) var(--smooth-obsidian-easing) forwards;
+  animation: ea-modal-in calc(var(--enchanted-animations-speed) * 0.7) var(--enchanted-animations-easing) forwards;
 }
 
 body:not(.disable-modal-animation) .modal-bg {
-  animation: so-fade-in calc(var(--smooth-obsidian-speed) * 0.7) var(--smooth-obsidian-easing) forwards;
+  animation: ea-fade-in calc(var(--enchanted-animations-speed) * 0.7) var(--enchanted-animations-easing) forwards;
 }
 
 body:not(.disable-modal-animation) .modal-container.is-closing .modal {
-  animation: so-modal-out calc(var(--smooth-obsidian-speed) * 0.7) var(--smooth-obsidian-easing) forwards;
+  animation: ea-modal-out calc(var(--enchanted-animations-speed) * 0.7) var(--enchanted-animations-easing) forwards;
 }
 
 body:not(.disable-modal-animation) .modal-container.is-closing .prompt {
-  animation: so-prompt-out calc(var(--smooth-obsidian-speed) * 0.7) var(--smooth-obsidian-easing) forwards;
+  animation: ea-prompt-out calc(var(--enchanted-animations-speed) * 0.7) var(--enchanted-animations-easing) forwards;
 }
 
 body:not(.disable-modal-animation) .modal-container.is-closing .modal-bg {
-  animation: so-fade-out calc(var(--smooth-obsidian-speed) * 0.7) var(--smooth-obsidian-easing) forwards;
+  animation: ea-fade-out calc(var(--enchanted-animations-speed) * 0.7) var(--enchanted-animations-easing) forwards;
 }
 
 
 /* ==================== Command Palette / Quick Switcher (Ctrl+P, Ctrl+O) ==================== */
 
 body:not(.disable-modal-animation):not(.is-mobile) .prompt {
-  animation: so-prompt-in var(--smooth-obsidian-speed) var(--smooth-obsidian-easing);
+  animation: ea-prompt-in var(--enchanted-animations-speed) var(--enchanted-animations-easing);
 }
 
 body:not(.disable-modal-animation) .is-mobile .prompt {
-  animation: so-slide-up var(--smooth-obsidian-speed) var(--smooth-obsidian-easing);
+  animation: ea-slide-up var(--enchanted-animations-speed) var(--enchanted-animations-easing);
 }
 
 body:not(.disable-modal-animation) .is-phone .prompt {
-  animation: so-slide-up calc(var(--smooth-obsidian-speed) * 1.2) var(--smooth-obsidian-easing);
+  animation: ea-slide-up calc(var(--enchanted-animations-speed) * 1.2) var(--enchanted-animations-easing);
 }
 
 
 /* ==================== Context Menus ==================== */
 
 body:not(.disable-modal-animation):not(.is-mobile) .menu {
-  animation: so-menu-in calc(var(--smooth-obsidian-speed) * 0.6) var(--smooth-obsidian-easing);
+  animation: ea-menu-in calc(var(--enchanted-animations-speed) * 0.6) var(--enchanted-animations-easing);
 }
 
 body:not(.disable-modal-animation) .is-phone .menu {
-  animation: so-slide-up calc(var(--smooth-obsidian-speed) * 1.2) var(--smooth-obsidian-easing);
+  animation: ea-slide-up calc(var(--enchanted-animations-speed) * 1.2) var(--enchanted-animations-easing);
 }
-
-
-
 
 
 /* ==================== Suggestion / Autocomplete Popups ==================== */
 
 body:not(.disable-modal-animation) .suggestion-container {
-  animation: so-menu-in calc(var(--smooth-obsidian-speed) * 0.5) var(--smooth-obsidian-easing);
+  animation: ea-menu-in calc(var(--enchanted-animations-speed) * 0.5) var(--enchanted-animations-easing);
 }
 
 body:not(.disable-modal-animation) .cm-tooltip.cm-tooltip-autocomplete {
-  animation: so-menu-in calc(var(--smooth-obsidian-speed) * 0.5) var(--smooth-obsidian-easing);
+  animation: ea-menu-in calc(var(--enchanted-animations-speed) * 0.5) var(--enchanted-animations-easing);
 }
 
 
 /* ==================== Hover Popovers (link preview) ==================== */
 
 body:not(.disable-modal-animation) .popover.hover-popover {
-  animation: so-popover-in calc(var(--smooth-obsidian-speed) * 0.6) var(--smooth-obsidian-easing);
+  animation: ea-popover-in calc(var(--enchanted-animations-speed) * 0.6) var(--enchanted-animations-easing);
 }
 
 
 /* ==================== Mobile Settings Drill-Down ==================== */
 
 body:not(.disable-modal-animation).is-phone .modal.mod-settings .vertical-tab-content-container {
-  --so-slide-start: 30px;
-  animation: so-directional-slide calc(var(--smooth-obsidian-speed) * 1.2) var(--smooth-obsidian-easing) both;
+  --ea-slide-start: 30px;
+  animation: ea-directional-slide calc(var(--enchanted-animations-speed) * 1.2) var(--enchanted-animations-easing) both;
 }
 
 body:not(.disable-modal-animation).is-phone .modal.mod-settings .vertical-tab-header {
-  --so-slide-start: -30px;
-  animation: so-directional-slide calc(var(--smooth-obsidian-speed) * 1.2) var(--smooth-obsidian-easing) both;
+  --ea-slide-start: -30px;
+  animation: ea-directional-slide calc(var(--enchanted-animations-speed) * 1.2) var(--enchanted-animations-easing) both;
 }
 
 
@@ -102,24 +99,24 @@ body.animate-note-open .workspace-split.mod-root .workspace-leaf-content[data-ty
 body.animate-note-open .workspace-split.mod-root .workspace-leaf-content[data-type="markdown"]>.view-content>.markdown-source-view,
 body.animate-note-open .workspace-leaf.mod-active .workspace-leaf-content[data-type="markdown"]>.view-content>.markdown-reading-view,
 body.animate-note-open .workspace-leaf.mod-active .workspace-leaf-content[data-type="markdown"]>.view-content>.markdown-source-view {
-  animation: so-note-in var(--smooth-obsidian-speed) var(--smooth-obsidian-easing);
+  animation: ea-note-in var(--enchanted-animations-speed) var(--enchanted-animations-easing);
 }
 
 
 /* ==================== Startup Splash Screen ==================== */
 
-body.smooth-obsidian-startup:not(.disable-splash-screen)::before {
+body.enchanted-animations-startup:not(.disable-splash-screen)::before {
   content: "";
   position: fixed;
   inset: 0;
   z-index: 9998;
   pointer-events: none;
   background-color: var(--background-primary);
-  animation: so-splash-fade calc(var(--smooth-obsidian-speed) * 5) var(--smooth-obsidian-easing) forwards;
+  animation: ea-splash-fade calc(var(--enchanted-animations-speed) * 5) var(--enchanted-animations-easing) forwards;
 }
 
-body.smooth-obsidian-startup:not(.disable-splash-screen) .workspace {
-  animation: so-vault-reveal calc(var(--smooth-obsidian-speed) * 2.5) var(--smooth-obsidian-easing) calc(var(--smooth-obsidian-speed) * 2.5) backwards;
+body.enchanted-animations-startup:not(.disable-splash-screen) .workspace {
+  animation: ea-vault-reveal calc(var(--enchanted-animations-speed) * 2.5) var(--enchanted-animations-easing) calc(var(--enchanted-animations-speed) * 2.5) backwards;
 }
 
 
@@ -128,17 +125,17 @@ body.smooth-obsidian-startup:not(.disable-splash-screen) .workspace {
 body:not(.disable-header-animations) .markdown-source-view.mod-cm6 .cm-line.HyperMD-header .cm-formatting-header {
   position: absolute;
   top: auto;
-  animation: so-header-pop var(--smooth-obsidian-speed) var(--smooth-obsidian-easing) forwards;
+  animation: ea-header-pop var(--enchanted-animations-speed) var(--enchanted-animations-easing) forwards;
 }
 
 body:not(.disable-header-animations) .markdown-source-view.mod-cm6 .cm-line.HyperMD-header {
   position: relative;
   padding-left: 0;
-  transition: padding-left var(--smooth-obsidian-speed) var(--smooth-obsidian-easing);
+  transition: padding-left var(--enchanted-animations-speed) var(--enchanted-animations-easing);
 }
 
 body:not(.disable-header-animations) .markdown-source-view.mod-cm6 .cm-line.cm-active.HyperMD-header {
-  transition: padding-left var(--smooth-obsidian-speed) var(--smooth-obsidian-easing);
+  transition: padding-left var(--enchanted-animations-speed) var(--enchanted-animations-easing);
 }
 
 body:not(.disable-header-animations) .markdown-source-view.mod-cm6 .cm-line.cm-active {
@@ -158,7 +155,7 @@ body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-line.
   vertical-align: baseline;
   line-height: 0;
   padding-block: 0;
-  animation: so-formatting-push calc(var(--smooth-obsidian-speed) * 0.75) var(--smooth-obsidian-easing) forwards;
+  animation: ea-formatting-push calc(var(--enchanted-animations-speed) * 0.75) var(--enchanted-animations-easing) forwards;
 }
 
 
@@ -166,39 +163,39 @@ body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-line.
 
 body:not(.disable-native-animations) {
   --anim-duration-none: 0;
-  --anim-duration-superfast: calc(var(--smooth-obsidian-speed) * 0.15);
-  --anim-duration-fast: calc(var(--smooth-obsidian-speed) * 0.35);
-  --anim-duration-moderate: calc(var(--smooth-obsidian-speed) * 0.75);
-  --anim-duration-slow: var(--smooth-obsidian-speed);
+  --anim-duration-superfast: calc(var(--enchanted-animations-speed) * 0.15);
+  --anim-duration-fast: calc(var(--enchanted-animations-speed) * 0.35);
+  --anim-duration-moderate: calc(var(--enchanted-animations-speed) * 0.75);
+  --anim-duration-slow: var(--enchanted-animations-speed);
 }
 
 
 /* ==================== Smooth Scroll ==================== */
 
-body.so-smooth-scroll .markdown-reading-view,
-body.so-smooth-scroll .markdown-source-view .cm-scroller,
-body.so-smooth-scroll .nav-files-container,
-body.so-smooth-scroll .workspace-drawer-inner,
-body.so-smooth-scroll .modal .vertical-tab-content,
-body.so-smooth-scroll .search-results-container,
-body.so-smooth-scroll .suggestion-container .suggestion,
-body.so-smooth-scroll .prompt-results,
-body.so-smooth-scroll .community-modal-search-results {
+body.ea-smooth-scroll .markdown-reading-view,
+body.ea-smooth-scroll .markdown-source-view .cm-scroller,
+body.ea-smooth-scroll .nav-files-container,
+body.ea-smooth-scroll .workspace-drawer-inner,
+body.ea-smooth-scroll .modal .vertical-tab-content,
+body.ea-smooth-scroll .search-results-container,
+body.ea-smooth-scroll .suggestion-container .suggestion,
+body.ea-smooth-scroll .prompt-results,
+body.ea-smooth-scroll .community-modal-search-results {
   scroll-behavior: smooth;
 }
 
 
 /* ==================== GPU Acceleration ==================== */
 
-body.so-gpu-accel .modal,
-body.so-gpu-accel .modal-bg,
-body.so-gpu-accel .prompt,
-body.so-gpu-accel .menu,
-body.so-gpu-accel .popover,
-body.so-gpu-accel .suggestion-container,
-body.so-gpu-accel .notice,
-body.so-gpu-accel .workspace-drawer-inner,
-body.so-gpu-accel .mobile-navbar {
+body.ea-gpu-accel .modal,
+body.ea-gpu-accel .modal-bg,
+body.ea-gpu-accel .prompt,
+body.ea-gpu-accel .menu,
+body.ea-gpu-accel .popover,
+body.ea-gpu-accel .suggestion-container,
+body.ea-gpu-accel .notice,
+body.ea-gpu-accel .workspace-drawer-inner,
+body.ea-gpu-accel .mobile-navbar {
   transform: translateZ(0);
   will-change: transform, opacity;
 }
@@ -206,85 +203,83 @@ body.so-gpu-accel .mobile-navbar {
 
 /* ==================== Keyframes ==================== */
 
-@keyframes so-slide-right {
+@keyframes ea-slide-right {
   from { opacity: 0; transform: translateX(40px); }
   to   { opacity: 1; transform: translateX(0); }
 }
 
-@keyframes so-slide-up {
+@keyframes ea-slide-up {
   from { opacity: 0; transform: translateY(30px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes so-fade-in {
+@keyframes ea-fade-in {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
 
-@keyframes so-fade-out {
+@keyframes ea-fade-out {
   from { opacity: 1; }
   to   { opacity: 0; }
 }
 
-@keyframes so-modal-in {
+@keyframes ea-modal-in {
   from { opacity: 0; transform: scale(0.93) translateY(15px); }
   to   { opacity: 1; transform: scale(1) translateY(0); }
 }
 
-@keyframes so-modal-out {
+@keyframes ea-modal-out {
   from { opacity: 1; transform: scale(1) translateY(0); }
   to   { opacity: 0; transform: scale(0.93) translateY(15px); }
 }
 
-@keyframes so-prompt-in {
+@keyframes ea-prompt-in {
   from { opacity: 0; transform: translateY(24px) scale(0.98); }
   to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-@keyframes so-prompt-out {
+@keyframes ea-prompt-out {
   from { opacity: 1; transform: translateY(0) scale(1); }
   to   { opacity: 0; transform: translateY(24px) scale(0.98); }
 }
 
-@keyframes so-menu-in {
+@keyframes ea-menu-in {
   from { opacity: 0; transform: scale(0.95); }
   to   { opacity: 1; transform: scale(1); }
 }
 
-
-
-@keyframes so-popover-in {
+@keyframes ea-popover-in {
   from { opacity: 0; transform: translateY(8px) scale(0.98); }
   to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-@keyframes so-directional-slide {
-  from { opacity: 0; transform: translateX(var(--so-slide-start)); }
+@keyframes ea-directional-slide {
+  from { opacity: 0; transform: translateX(var(--ea-slide-start)); }
   to   { opacity: 1; transform: translateX(0); }
 }
 
-@keyframes so-note-in {
+@keyframes ea-note-in {
   from { opacity: 0; transform: translateY(18px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes so-vault-reveal {
+@keyframes ea-vault-reveal {
   from { opacity: 0; transform: scale(0.98); }
   to   { opacity: 1; transform: scale(1); }
 }
 
-@keyframes so-splash-fade {
+@keyframes ea-splash-fade {
   0%   { opacity: 1; }
   60%  { opacity: 1; }
   100% { opacity: 0; visibility: hidden; }
 }
 
-@keyframes so-header-pop {
+@keyframes ea-header-pop {
   from { opacity: 0; transform: translateX(-100%) scale(0.6) translateX(-10px); }
   to   { opacity: 1; transform: translateX(-100%) scale(1) translateX(0); }
 }
 
-@keyframes so-formatting-push {
+@keyframes ea-formatting-push {
   from { margin-inline: -0.25em; opacity: 0; transform: scale(0.85); }
   to   { margin-inline: 0; opacity: 1; transform: scale(1); }
 }

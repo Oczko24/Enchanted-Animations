@@ -1,7 +1,7 @@
 import { App, PluginSettingTab, Setting } from "obsidian";
-import SmoothObsidianPlugin from "./main";
+import EnchantedAnimationsPlugin from "./main";
 
-export interface SmoothObsidianSettings {
+export interface EnchantedAnimationsSettings {
 	speed: number;
 	easing: string;
 	enableSplashScreen: boolean;
@@ -14,7 +14,7 @@ export interface SmoothObsidianSettings {
 	enableGpuAcceleration: boolean;
 }
 
-export const DEFAULT_SETTINGS: SmoothObsidianSettings = {
+export const DEFAULT_SETTINGS: EnchantedAnimationsSettings = {
 	speed: 0.4,
 	easing: "cubic-bezier(0.16, 1, 0.3, 1)",
 	enableSplashScreen: true,
@@ -27,10 +27,10 @@ export const DEFAULT_SETTINGS: SmoothObsidianSettings = {
 	enableGpuAcceleration: true,
 }
 
-export class SmoothObsidianSettingTab extends PluginSettingTab {
-	plugin: SmoothObsidianPlugin;
+export class EnchantedAnimationsSettingTab extends PluginSettingTab {
+	plugin: EnchantedAnimationsPlugin;
 
-	constructor(app: App, plugin: SmoothObsidianPlugin) {
+	constructor(app: App, plugin: EnchantedAnimationsPlugin) {
 		super(app, plugin);
 		this.plugin = plugin;
 	}
@@ -40,7 +40,7 @@ export class SmoothObsidianSettingTab extends PluginSettingTab {
 
 		containerEl.empty();
 
-		containerEl.createEl("h2", { text: "Smooth Obsidian" });
+		containerEl.createEl("h2", { text: "Enchanted Animations" });
 		containerEl.createEl("p", {
 			text: "Customize the speed, easing, and individual effects of your Obsidian animations.",
 			cls: "setting-item-description"

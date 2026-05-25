@@ -1,41 +1,41 @@
 import {Plugin, Modal} from 'obsidian';
-import {DEFAULT_SETTINGS, SmoothObsidianSettings, SmoothObsidianSettingTab} from "./settings";
+import {DEFAULT_SETTINGS, EnchantedAnimationsSettings, EnchantedAnimationsSettingTab} from "./settings";
 
-export default class SmoothObsidianPlugin extends Plugin {
-	settings: SmoothObsidianSettings;
+export default class EnchantedAnimationsPlugin extends Plugin {
+	settings: EnchantedAnimationsSettings;
 	originalModalClose: Function;
 	originalSettingClose: Function;
 
 	async onload() {
-		console.log('Loading Smooth Obsidian...');
+		console.log('Loading Enchanted Animations...');
 		await this.loadSettings();
 		this.applyStyles();
 
-		const isFirstLoad = !(window as any)._smoothObsidianLoaded;
+		const isFirstLoad = !(window as any)._enchantedAnimationsLoaded;
 		if (isFirstLoad) {
-			(window as any)._smoothObsidianLoaded = true;
+			(window as any)._enchantedAnimationsLoaded = true;
 
 			if (this.settings.enableSplashScreen) {
-				document.body.classList.add('smooth-obsidian-startup');
+				document.body.classList.add('enchanted-animations-startup');
 				const animationDurationMs = Math.max(1000, this.settings.speed * 5000);
 				
 				setTimeout(() => {
-					document.body.classList.remove('smooth-obsidian-startup');
+					document.body.classList.remove('enchanted-animations-startup');
 				}, animationDurationMs);
 			}
 		}
 
 		this.patchModalClose();
-		this.addSettingTab(new SmoothObsidianSettingTab(this.app, this));
+		this.addSettingTab(new EnchantedAnimationsSettingTab(this.app, this));
 	}
 
 	onunload() {
-		console.log('Unloading Smooth Obsidian...');
+		console.log('Unloading Enchanted Animations...');
 
 		this.unpatchModalClose();
 
-		document.body.style.removeProperty('--smooth-obsidian-speed');
-		document.body.style.removeProperty('--smooth-obsidian-easing');
+		document.body.style.removeProperty('--enchanted-animations-speed');
+		document.body.style.removeProperty('--enchanted-animations-easing');
 
 		document.body.classList.remove('animate-note-open');
 		document.body.classList.remove('disable-splash-screen');
@@ -43,9 +43,9 @@ export default class SmoothObsidianPlugin extends Plugin {
 		document.body.classList.remove('disable-formatting-animations');
 		document.body.classList.remove('disable-modal-animation');
 		document.body.classList.remove('disable-native-animations');
-		document.body.classList.remove('so-smooth-scroll');
-		document.body.classList.remove('so-gpu-accel');
-		document.body.classList.remove('smooth-obsidian-startup');
+		document.body.classList.remove('ea-smooth-scroll');
+		document.body.classList.remove('ea-gpu-accel');
+		document.body.classList.remove('enchanted-animations-startup');
 	}
 
 	patchModalClose() {
@@ -114,7 +114,7 @@ export default class SmoothObsidianPlugin extends Plugin {
 	}
 
 	async loadSettings() {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData() as Partial<SmoothObsidianSettings>);
+		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData() as Partial<EnchantedAnimationsSettings>);
 	}
 
 	async saveSettings() {
@@ -122,8 +122,8 @@ export default class SmoothObsidianPlugin extends Plugin {
 	}
 
 	applyStyles() {
-		document.body.style.setProperty('--smooth-obsidian-speed', `${this.settings.speed}s`);
-		document.body.style.setProperty('--smooth-obsidian-easing', this.settings.easing);
+		document.body.style.setProperty('--enchanted-animations-speed', `${this.settings.speed}s`);
+		document.body.style.setProperty('--enchanted-animations-easing', this.settings.easing);
 
 		document.body.classList.toggle('animate-note-open', this.settings.animateNoteOpen);
 		document.body.classList.toggle('disable-splash-screen', !this.settings.enableSplashScreen);
@@ -131,7 +131,7 @@ export default class SmoothObsidianPlugin extends Plugin {
 		document.body.classList.toggle('disable-formatting-animations', !this.settings.enableFormattingAnimations);
 		document.body.classList.toggle('disable-modal-animation', !this.settings.enableModalAnimations);
 		document.body.classList.toggle('disable-native-animations', !this.settings.enableNativeAnimations);
-		document.body.classList.toggle('so-smooth-scroll', this.settings.enableSmoothScroll);
-		document.body.classList.toggle('so-gpu-accel', this.settings.enableGpuAcceleration);
+		document.body.classList.toggle('ea-smooth-scroll', this.settings.enableSmoothScroll);
+		document.body.classList.toggle('ea-gpu-accel', this.settings.enableGpuAcceleration);
 	}
 }

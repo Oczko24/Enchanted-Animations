@@ -1,4 +1,4 @@
-# Smooth-Obsidian
+# Enchanted Animations
 
 Obsidian plugin that animates everything!
 
@@ -7,7 +7,7 @@ Obsidian plugin that animates everything!
 1. Open Settings → Community Plugins
 2. Turn off Safe mode
 3. Click Browse
-4. Search for "Smooth-Obsidian"
+4. Search for "Enchanted Animations"
 5. Click Install
 6. After installation, enable the plugin and configure it!
 
