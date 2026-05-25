@@ -1,10 +1,12 @@
+
 # Enchanted Animations
 
 Obsidian plugin that animates everything!
 
 below you can see short showcase of some animations in this plugin
 
-<img width="1280" alt="gif showcase" src="https://github.com/user-attachments/assets/9f8cb247-9925-4dcf-be05-7e88d937cd42" />
+<img width="1240" alt="Screencast From 2026-05-25 21-29-12" src="https://github.com/user-attachments/assets/a46ed09f-1f82-49ff-b36f-53694476a7c3" />
+
 
 ## Features
 
