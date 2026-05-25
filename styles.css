@@ -169,10 +169,10 @@ body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-line.
 
 body:not(.disable-native-animations) {
   --anim-duration-none: 0;
-  --anim-duration-superfast: calc(var(--enchanted-animations-speed) * 0.15);
-  --anim-duration-fast: calc(var(--enchanted-animations-speed) * 0.35);
-  --anim-duration-moderate: calc(var(--enchanted-animations-speed) * 0.75);
-  --anim-duration-slow: var(--enchanted-animations-speed);
+  --anim-duration-superfast: calc(var(--enchanted-animations-speed) / 4);
+  --anim-duration-fast: calc(var(--enchanted-animations-speed) / 2);
+  --anim-duration-moderate: var(--enchanted-animations-speed);
+  --anim-duration-slow: calc(var(--enchanted-animations-speed) * 2);
 }
 
 
@@ -294,3 +294,149 @@ body.ea-gpu-accel .mobile-navbar {
   from { margin-inline: -0.25em; opacity: 0; transform: scale(0.85); }
   to   { margin-inline: 0; opacity: 1; transform: scale(1); }
 }
+
+
+/* ==================== Micro-Interactions ==================== */
+
+/* Smart Status Bar */
+body.ea-status-bar-hover:not(.is-mobile) .status-bar {
+  opacity: 0;
+  transform: translateY(100%);
+  transition: opacity var(--enchanted-animations-speed) var(--enchanted-animations-easing), transform var(--enchanted-animations-speed) var(--enchanted-animations-easing);
+  pointer-events: none;
+}
+
+/* File Explorer Hover Glow Fade-Out */
+body:not(.disable-native-animations) .nav-files-container .tree-item-self,
+body:not(.disable-native-animations) .nav-files-container .nav-folder-title,
+body:not(.disable-native-animations) .nav-files-container .nav-file-title {
+  transition: background-color var(--enchanted-animations-speed) var(--enchanted-animations-easing), color var(--enchanted-animations-speed) var(--enchanted-animations-easing) !important;
+}
+
+/* Szybkie pojawianie się poświaty przy najechaniu (żeby nie było efektu spóźnionej wody) */
+body:not(.disable-native-animations) .nav-files-container .tree-item-self:hover,
+body:not(.disable-native-animations) .nav-files-container .nav-folder-title:hover,
+body:not(.disable-native-animations) .nav-files-container .nav-file-title:hover {
+  transition-duration: 0s !important;
+  transition-delay: 0s !important;
+}
+
+/* Kiedy najedziemy na cały interfejs z obszarem dolnym (app-container jest duży, więc zrobimy hover na workspace albo dodamy obszar docelowy).
+Najlepiej po prostu wykorzystać :hover na status-bar lub na obiekty bardzo blisko dołu, ale status-bar jest niewidzialny,
+więc pointer-events: none sprawia, że mysz przez niego przechodzi. Zamiast :hover na status-bar, ustawimy pseudo-element na dole ekranu, 
+lub po prostu zrobimy :hover na .workspace:hover .status-bar (choć workspace to prawie cały ekran).
+Bezpieczniej dać pseudo-element łapiący mysz, albo zrezygnować z pointer-events. */
+body.ea-status-bar-hover:not(.is-mobile) .status-bar::before {
+  content: "";
+  position: absolute;
+  top: -40px;
+  left: 0;
+  right: 0;
+  height: 40px;
+  /* Ten pseudo element tworzy niewidzialną strefę nad ukrytym paskiem statusu, która wyłapuje myszkę */
+}
+
+body.ea-status-bar-hover:not(.is-mobile) .status-bar {
+  pointer-events: auto; /* Musi łapać mysz */
+}
+
+body.ea-status-bar-hover:not(.is-mobile) .status-bar:hover {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Premium Fold Indicators */
+body.ea-fold-hover:not(.is-mobile) .collapse-indicator {
+  transition: transform var(--enchanted-animations-speed) var(--enchanted-animations-easing);
+}
+
+body.ea-fold-hover:not(.is-mobile) .collapse-indicator:hover {
+  transform: scale(1.3);
+}
+
+/* Floating Cards (Kanban / Cards / Bookmarks) */
+body.ea-card-hover:not(.is-mobile) .kanban-plugin__item,
+body.ea-card-hover:not(.is-mobile) .cards-view-item,
+body.ea-card-hover:not(.is-mobile) .bookmark {
+  transition: transform calc(var(--enchanted-animations-speed) * 0.7) var(--enchanted-animations-easing);
+  transform-origin: center;
+}
+
+body.ea-card-hover:not(.is-mobile) .kanban-plugin__item:hover,
+body.ea-card-hover:not(.is-mobile) .cards-view-item:hover,
+body.ea-card-hover:not(.is-mobile) .bookmark:hover {
+  transform: scale(1.02);
+}
+
+
+
+/* ==================== JavaScript Inline Styles Override (Drawers, Modals, etc.) ==================== */
+/* Zmusza elementy, którym app.js wstrzykuje inline style (np. style.transition = "all 200ms ease"), do używania ustawień z pluginu */
+
+body:not(.disable-native-animations) .workspace-drawer-inner,
+body:not(.disable-native-animations) .workspace-drawer-backdrop {
+  transition: all var(--enchanted-animations-speed) var(--enchanted-animations-easing) !important;
+}
+
+body:not(.disable-native-animations) .modal,
+body:not(.disable-native-animations) .modal-bg,
+body:not(.disable-native-animations) .menu,
+body:not(.disable-native-animations) .prompt,
+body:not(.disable-native-animations) .suggestion-container,
+body:not(.disable-native-animations) .notice {
+  transition-duration: var(--enchanted-animations-speed) !important;
+  transition-timing-function: var(--enchanted-animations-easing) !important;
+}
+/* stylelint-enable declaration-no-important */
+
+/* ==================== Checkboxes Override ==================== */
+body:not(.disable-native-animations) .checkbox-container,
+body:not(.disable-native-animations) .checkbox-container:after,
+body:not(.disable-native-animations) .checkbox-container:before,
+body:not(.disable-native-animations) input[type="radio"],
+body:not(.disable-native-animations) input[type="checkbox"],
+body:not(.disable-native-animations) input[type="checkbox"]:after,
+body:not(.disable-native-animations) input[type="checkbox"]:before,
+body:not(.disable-native-animations) .task-list-item-checkbox,
+body:not(.disable-native-animations) .task-list-item-checkbox:after,
+body:not(.disable-native-animations) .task-list-item-checkbox:before {
+  transition: all var(--enchanted-animations-speed) var(--enchanted-animations-easing) !important;
+}
+
+/* ==================== Hardcoded CSS Timings Override (app.css) ==================== */
+/* Podmienia na stałe wpisane 100ms, 150ms z domyślnego app.css na wartości z pluginu */
+
+body:not(.disable-native-animations) .collapse-icon svg,
+body:not(.disable-native-animations) .callout-fold .svg-icon,
+body:not(.disable-native-animations) .workspace-drop-overlay,
+body:not(.disable-native-animations) .workspace-fake-target-overlay,
+body:not(.disable-native-animations) input[type='range']::-webkit-slider-thumb,
+body:not(.disable-native-animations) .list-bullet:after,
+body:not(.disable-native-animations) .progress-bar .progress-bar-subline,
+body:not(.disable-native-animations) .pdf-sidebar-resizer,
+body:not(.disable-native-animations) .workspace-leaf-resize-handle,
+body:not(.disable-native-animations) .search-input-clear-button {
+  transition-duration: var(--enchanted-animations-speed) !important;
+  transition-timing-function: var(--enchanted-animations-easing) !important;
+}
+
+/* ==================== Graph View & Miscellaneous ==================== */
+body:not(.disable-native-animations) .graph-color-group {
+  transition-duration: var(--enchanted-animations-speed) !important;
+  transition-timing-function: var(--enchanted-animations-easing) !important;
+}
+
+/* ==================== Velocity-Based Sidebar Animations (Math) ==================== */
+/* 
+   Zgodnie z życzeniem, obliczamy prędkość w "km/h" (pikselach na sekundę).
+   Zakładamy, że standardowy panel ma 300px.
+   Prędkość animacji (V) = 300px / ustawiony_czas (np. 0.4s)
+   Czas animacji (T) = Aktualna_Szerokość / V
+*/
+/* stylelint-disable declaration-no-important */
+body:not(.disable-native-animations) .workspace-split.mod-sidedock {
+  transition: width calc( (var(--ea-sidebar-width, 300) / (300 / var(--enchanted-animations-speed-num, 0.4))) * 1s ) var(--enchanted-animations-easing),
+              min-width calc( (var(--ea-sidebar-width, 300) / (300 / var(--enchanted-animations-speed-num, 0.4))) * 1s ) var(--enchanted-animations-easing),
+              flex-basis calc( (var(--ea-sidebar-width, 300) / (300 / var(--enchanted-animations-speed-num, 0.4))) * 1s ) var(--enchanted-animations-easing) !important;
+}
+/* stylelint-enable declaration-no-important */

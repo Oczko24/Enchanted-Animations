@@ -2,10 +2,15 @@
 
 Obsidian plugin that animates everything!
 
-below you can see short showcase of some animations in this theme
-please note this theme is in developing state and gif is really laggy. irl you see these animations in 120fps:)))
+below you can see short showcase of some animations in this plugin
 
 <img width="1280" alt="gif showcase" src="https://github.com/user-attachments/assets/9f8cb247-9925-4dcf-be05-7e88d937cd42" />
+
+## Features
+
+- Customisable animation speed and their look in whole obsidian
+- Turn on/off specific UI elements animations
+- Control over every animation you can find in obsidian
 
 ## How to Install
 
