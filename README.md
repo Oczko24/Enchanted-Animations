@@ -7,7 +7,7 @@ please note this theme is in developing state and gif is really laggy. irl you s
 
 <img width="1280" alt="gif showcase" src="https://github.com/user-attachments/assets/9f8cb247-9925-4dcf-be05-7e88d937cd42" />
 
-## Install
+## How to Install
 
 1. Open Settings → Community Plugins
 2. Turn off Safe mode
