@@ -2,6 +2,11 @@
 
 Obsidian plugin that animates everything!
 
+below you can see short showcase of some animations in this theme
+please note this theme is in developing state and gif is really laggy. irl you see these animations in 120fps:)))
+
+<img width="1280" alt="gif showcase" src="https://github.com/user-attachments/assets/9f8cb247-9925-4dcf-be05-7e88d937cd42" />
+
 ## Install
 
 1. Open Settings → Community Plugins
