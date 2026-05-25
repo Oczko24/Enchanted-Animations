@@ -1,4 +1,4 @@
-import {App, PluginSettingTab, Setting} from "obsidian";
+import { App, PluginSettingTab, Setting } from "obsidian";
 import SmoothObsidianPlugin from "./main";
 
 export interface SmoothObsidianSettings {
@@ -9,6 +9,7 @@ export interface SmoothObsidianSettings {
 	enableHeaderAnimations: boolean;
 	enableFormattingAnimations: boolean;
 	enableModalAnimations: boolean;
+	enableNativeAnimations: boolean;
 }
 
 export const DEFAULT_SETTINGS: SmoothObsidianSettings = {
@@ -19,6 +20,7 @@ export const DEFAULT_SETTINGS: SmoothObsidianSettings = {
 	enableHeaderAnimations: true,
 	enableFormattingAnimations: true,
 	enableModalAnimations: true,
+	enableNativeAnimations: true,
 }
 
 export class SmoothObsidianSettingTab extends PluginSettingTab {
@@ -30,21 +32,21 @@ export class SmoothObsidianSettingTab extends PluginSettingTab {
 	}
 
 	display(): void {
-		const {containerEl} = this;
+		const { containerEl } = this;
 
 		containerEl.empty();
 
 		containerEl.createEl("h2", { text: "Smooth Obsidian" });
 		containerEl.createEl("p", {
-			text: "Dostosuj prędkość, dynamikę oraz poszczególne efekty animacji w swojej aplikacji.",
+			text: "Customize the speed, easing, and individual effects of your Obsidian animations.",
 			cls: "setting-item-description"
 		});
 
-		containerEl.createEl("h3", { text: "Główne Ustawienia" });
+		containerEl.createEl("h3", { text: "Core Properties" });
 
 		new Setting(containerEl)
-			.setName("Prędkość Animacji (Speed)")
-			.setDesc("Określa czas trwania animacji w sekundach. Mniejsze wartości dają szybszy efekt, większe wolniejszy.")
+			.setName("Animation Slowness")
+			.setDesc("Set the duration of animations in seconds. Lower is faster, higher is slower.")
 			.addSlider(slider => slider
 				.setLimits(0.1, 2.0, 0.05)
 				.setValue(this.plugin.settings.speed)
@@ -57,14 +59,14 @@ export class SmoothObsidianSettingTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("Krzywa Przejścia (Easing)")
-			.setDesc("Wybierz rodzaj dynamiki przyspieszania animacji.")
+			.setName("Easing Curve")
+			.setDesc("Choose the acceleration curve for all animations.")
 			.addDropdown(dropdown => dropdown
-				.addOption("cubic-bezier(0.16, 1, 0.3, 1)", "Ease Out Expo (Nowoczesny & Dynamiczny)")
-				.addOption("cubic-bezier(0.34, 1.56, 0.64, 1)", "Elastic (Efekt sprężystości/pop)")
-				.addOption("cubic-bezier(0.4, 0, 0.2, 1)", "Material Design (Zbalansowany)")
-				.addOption("ease-in-out", "Ease In Out (Tradycyjny płynny)")
-				.addOption("linear", "Linear (Liniowy/stały)")
+				.addOption("cubic-bezier(0.16, 1, 0.3, 1)", "Ease Out Expo (Sleek & Fast)")
+				.addOption("cubic-bezier(0.34, 1.56, 0.64, 1)", "Elastic (Playful Pop)")
+				.addOption("cubic-bezier(0.4, 0, 0.2, 1)", "Material Design (Balanced)")
+				.addOption("ease-in-out", "Ease In Out (Traditional)")
+				.addOption("linear", "Linear (Constant)")
 				.setValue(this.plugin.settings.easing)
 				.onChange(async (value) => {
 					this.plugin.settings.easing = value;
@@ -73,11 +75,11 @@ export class SmoothObsidianSettingTab extends PluginSettingTab {
 				})
 			);
 
-		containerEl.createEl("h3", { text: "Włączane Efekty" });
+		containerEl.createEl("h3", { text: "Animation Toggles" });
 
 		new Setting(containerEl)
-			.setName("Animacja otwierania notatek")
-			.setDesc("Płynne wygaszanie (fade-in) i wsuwanie notatki przy przełączaniu lub otwieraniu plików.")
+			.setName("Animate Note Opening")
+			.setDesc("Smooth fade-in and slide-up effect when opening or switching files.")
 			.addToggle(toggle => toggle
 				.setValue(this.plugin.settings.animateNoteOpen)
 				.onChange(async (value) => {
@@ -88,8 +90,8 @@ export class SmoothObsidianSettingTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("Animacja startowa (Splash Screen)")
-			.setDesc("Płynny start aplikacji przy otwieraniu vaulta (efekt odsłaniania workspace).")
+			.setName("Startup Splash Screen")
+			.setDesc("Smooth workspace reveal animation upon vault launch.")
 			.addToggle(toggle => toggle
 				.setValue(this.plugin.settings.enableSplashScreen)
 				.onChange(async (value) => {
@@ -100,8 +102,8 @@ export class SmoothObsidianSettingTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("Pop-up nagłówków w edytorze")
-			.setDesc("Lekkie przesunięcie i wyskakujący prefiks nagłówka (#) podczas edycji aktywnej linii.")
+			.setName("Editor Header Pop")
+			.setDesc("Slight horizontal shift and animated (#) prefixes on active header lines.")
 			.addToggle(toggle => toggle
 				.setValue(this.plugin.settings.enableHeaderAnimations)
 				.onChange(async (value) => {
@@ -112,8 +114,8 @@ export class SmoothObsidianSettingTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("Animacja formatowania inline")
-			.setDesc("Delikatne, płynne wysunięcie poziomów dla pogrubień, kursywy oraz inline code podczas pisania.")
+			.setName("Inline Formatting Push")
+			.setDesc("Smooth horizontal expansion for bold, italics, and inline code while typing.")
 			.addToggle(toggle => toggle
 				.setValue(this.plugin.settings.enableFormattingAnimations)
 				.onChange(async (value) => {
@@ -124,14 +126,42 @@ export class SmoothObsidianSettingTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("Animacje okien modalnych / ustawień")
-			.setDesc("Dynamiczne wsuwanie i skalowanie okien dialogowych, ustawień i menu.")
+			.setName("Modal & Settings Animations")
+			.setDesc("Dynamic scale and slide for dialogs, settings, and menus. Includes exit animations.")
 			.addToggle(toggle => toggle
 				.setValue(this.plugin.settings.enableModalAnimations)
 				.onChange(async (value) => {
 					this.plugin.settings.enableModalAnimations = value;
 					await this.plugin.saveSettings();
 					this.plugin.applyStyles();
+				})
+			);
+
+		new Setting(containerEl)
+			.setName("Native UI Animations")
+			.setDesc("Override default Obsidian UI transitions (sidebars, tabs, ribbons) to use the custom speed and easing.")
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.enableNativeAnimations)
+				.onChange(async (value) => {
+					this.plugin.settings.enableNativeAnimations = value;
+					await this.plugin.saveSettings();
+					this.plugin.applyStyles();
+				})
+			);
+
+		containerEl.createEl("h3", { text: "System" });
+
+		new Setting(containerEl)
+			.setName("Reset Settings")
+			.setDesc("Restore all animation values and toggles to their default states.")
+			.addButton(button => button
+				.setButtonText("Reset to Defaults")
+				.setWarning()
+				.onClick(async () => {
+					this.plugin.settings = Object.assign({}, DEFAULT_SETTINGS);
+					await this.plugin.saveSettings();
+					this.plugin.applyStyles();
+					this.display();
 				})
 			);
 	}

@@ -1,8 +1,10 @@
-import {Plugin} from 'obsidian';
+import {Plugin, Modal} from 'obsidian';
 import {DEFAULT_SETTINGS, SmoothObsidianSettings, SmoothObsidianSettingTab} from "./settings";
 
 export default class SmoothObsidianPlugin extends Plugin {
 	settings: SmoothObsidianSettings;
+	originalModalClose: Function;
+	originalSettingClose: Function;
 
 	async onload() {
 		console.log('Loading Smooth Obsidian...');
@@ -23,11 +25,14 @@ export default class SmoothObsidianPlugin extends Plugin {
 			}
 		}
 
+		this.patchModalClose();
 		this.addSettingTab(new SmoothObsidianSettingTab(this.app, this));
 	}
 
 	onunload() {
 		console.log('Unloading Smooth Obsidian...');
+
+		this.unpatchModalClose();
 
 		document.body.style.removeProperty('--smooth-obsidian-speed');
 		document.body.style.removeProperty('--smooth-obsidian-easing');
@@ -37,7 +42,73 @@ export default class SmoothObsidianPlugin extends Plugin {
 		document.body.classList.remove('disable-header-animations');
 		document.body.classList.remove('disable-formatting-animations');
 		document.body.classList.remove('disable-modal-animation');
+		document.body.classList.remove('disable-native-animations');
 		document.body.classList.remove('smooth-obsidian-startup');
+	}
+
+	patchModalClose() {
+		this.originalModalClose = Modal.prototype.close;
+		const plugin = this;
+
+		Modal.prototype.close = function() {
+			if (!plugin.settings.enableModalAnimations) {
+				plugin.originalModalClose.call(this);
+				return;
+			}
+
+			let container = this.containerEl;
+			if (container && !container.classList.contains('modal-container')) {
+				container = container.closest('.modal-container') as HTMLElement;
+			}
+
+			if (container && !container.classList.contains('is-closing')) {
+				container.classList.add('is-closing');
+				const durationMs = plugin.settings.speed * 700;
+				
+				setTimeout(() => {
+					container.classList.remove('is-closing');
+					plugin.originalModalClose.call(this);
+				}, Math.max(0, durationMs - 10));
+			} else {
+				plugin.originalModalClose.call(this);
+			}
+		};
+
+		// Specific patch for the app.setting modal as it sometimes handles its own unmount
+		// wrapping it in a setTimeout for next tick in case app.setting isn't fully ready immediately.
+		setTimeout(() => {
+			if ((this.app as any).setting && (this.app as any).setting.close) {
+				this.originalSettingClose = (this.app as any).setting.close;
+				(this.app as any).setting.close = function() {
+					if (!plugin.settings.enableModalAnimations) {
+						plugin.originalSettingClose.call(this);
+						return;
+					}
+
+					let container = this.containerEl || document.querySelector('.modal-container.mod-settings');
+					if (container && !container.classList.contains('is-closing')) {
+						container.classList.add('is-closing');
+						const durationMs = plugin.settings.speed * 700;
+						
+						setTimeout(() => {
+							container.classList.remove('is-closing');
+							plugin.originalSettingClose.call(this);
+						}, Math.max(0, durationMs - 10));
+					} else {
+						plugin.originalSettingClose.call(this);
+					}
+				};
+			}
+		}, 0);
+	}
+
+	unpatchModalClose() {
+		if (this.originalModalClose) {
+			Modal.prototype.close = this.originalModalClose as any;
+		}
+		if (this.originalSettingClose && (this.app as any).setting) {
+			(this.app as any).setting.close = this.originalSettingClose as any;
+		}
 	}
 
 	async loadSettings() {
@@ -57,5 +128,6 @@ export default class SmoothObsidianPlugin extends Plugin {
 		document.body.classList.toggle('disable-header-animations', !this.settings.enableHeaderAnimations);
 		document.body.classList.toggle('disable-formatting-animations', !this.settings.enableFormattingAnimations);
 		document.body.classList.toggle('disable-modal-animation', !this.settings.enableModalAnimations);
+		document.body.classList.toggle('disable-native-animations', !this.settings.enableNativeAnimations);
 	}
 }

@@ -1,92 +1,113 @@
-/*
-   ===================================================================
-   Smooth Obsidian Plugin Stylesheet
-   Dynamically controlled via JS-injected CSS Custom Properties:
-   - --smooth-obsidian-speed
-   - --smooth-obsidian-easing
-   ===================================================================
-*/
+/* Smooth Obsidian – main stylesheet
+   CSS vars injected by JS: --smooth-obsidian-speed, --smooth-obsidian-easing */
 
-/* ==================== Notice / Notifications ==================== */
+
+/* ==================== Notifications ==================== */
+
 .notice {
-  animation: tr-notice-in-desktop var(--smooth-obsidian-speed) var(--smooth-obsidian-easing);
+  animation: so-slide-right var(--smooth-obsidian-speed) var(--smooth-obsidian-easing);
 }
 
 .is-phone .notice {
-  animation: tr-notice-in-mobile var(--smooth-obsidian-speed) var(--smooth-obsidian-easing);
+  animation: so-slide-up var(--smooth-obsidian-speed) var(--smooth-obsidian-easing);
 }
 
-@keyframes tr-notice-in-desktop {
-  from {
-    opacity: 0;
-    transform: translateX(40px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
 
-@keyframes tr-notice-in-mobile {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* ===================== Settings Modal Open Animation ===================== */
-@keyframes modal-open {
-  from {
-    opacity: 0;
-    transform: scale(0.93) translateY(15px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-@keyframes modal-bg-fade {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
+/* ==================== Modals (settings, community plugins, etc.) ==================== */
 
 body:not(.disable-modal-animation) .modal {
-  animation: modal-open calc(var(--smooth-obsidian-speed) * 0.7) var(--smooth-obsidian-easing) forwards;
+  animation: so-modal-in calc(var(--smooth-obsidian-speed) * 0.7) var(--smooth-obsidian-easing) forwards;
 }
 
 body:not(.disable-modal-animation) .modal-bg {
-  animation: modal-bg-fade calc(var(--smooth-obsidian-speed) * 0.7) var(--smooth-obsidian-easing) forwards;
+  animation: so-fade-in calc(var(--smooth-obsidian-speed) * 0.7) var(--smooth-obsidian-easing) forwards;
 }
 
-/* ===================== Animate Note Opening ===================== */
-@keyframes tr-note-fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(18px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+body:not(.disable-modal-animation) .modal-container.is-closing .modal {
+  animation: so-modal-out calc(var(--smooth-obsidian-speed) * 0.7) var(--smooth-obsidian-easing) forwards;
 }
+
+body:not(.disable-modal-animation) .modal-container.is-closing .prompt {
+  animation: so-prompt-out calc(var(--smooth-obsidian-speed) * 0.7) var(--smooth-obsidian-easing) forwards;
+}
+
+body:not(.disable-modal-animation) .modal-container.is-closing .modal-bg {
+  animation: so-fade-out calc(var(--smooth-obsidian-speed) * 0.7) var(--smooth-obsidian-easing) forwards;
+}
+
+
+/* ==================== Command Palette / Quick Switcher (Ctrl+P, Ctrl+O) ==================== */
+
+body:not(.disable-modal-animation):not(.is-mobile) .prompt {
+  animation: so-prompt-in var(--smooth-obsidian-speed) var(--smooth-obsidian-easing);
+}
+
+body:not(.disable-modal-animation) .is-mobile .prompt {
+  animation: so-slide-up var(--smooth-obsidian-speed) var(--smooth-obsidian-easing);
+}
+
+body:not(.disable-modal-animation) .is-phone .prompt {
+  animation: so-slide-up calc(var(--smooth-obsidian-speed) * 1.2) var(--smooth-obsidian-easing);
+}
+
+
+/* ==================== Context Menus ==================== */
+
+body:not(.disable-modal-animation):not(.is-mobile) .menu {
+  animation: so-menu-in calc(var(--smooth-obsidian-speed) * 0.6) var(--smooth-obsidian-easing);
+}
+
+body:not(.disable-modal-animation) .is-phone .menu {
+  animation: so-slide-up calc(var(--smooth-obsidian-speed) * 1.2) var(--smooth-obsidian-easing);
+}
+
+
+
+
+
+/* ==================== Suggestion / Autocomplete Popups ==================== */
+
+body:not(.disable-modal-animation) .suggestion-container {
+  animation: so-menu-in calc(var(--smooth-obsidian-speed) * 0.5) var(--smooth-obsidian-easing);
+}
+
+body:not(.disable-modal-animation) .cm-tooltip.cm-tooltip-autocomplete {
+  animation: so-menu-in calc(var(--smooth-obsidian-speed) * 0.5) var(--smooth-obsidian-easing);
+}
+
+
+/* ==================== Hover Popovers (link preview) ==================== */
+
+body:not(.disable-modal-animation) .popover.hover-popover {
+  animation: so-popover-in calc(var(--smooth-obsidian-speed) * 0.6) var(--smooth-obsidian-easing);
+}
+
+
+/* ==================== Mobile Settings Drill-Down ==================== */
+
+body:not(.disable-modal-animation).is-phone .modal.mod-settings .vertical-tab-content-container {
+  --so-slide-start: 30px;
+  animation: so-directional-slide calc(var(--smooth-obsidian-speed) * 1.2) var(--smooth-obsidian-easing) both;
+}
+
+body:not(.disable-modal-animation).is-phone .modal.mod-settings .vertical-tab-header {
+  --so-slide-start: -30px;
+  animation: so-directional-slide calc(var(--smooth-obsidian-speed) * 1.2) var(--smooth-obsidian-easing) both;
+}
+
+
+/* ==================== Note Opening ==================== */
 
 body.animate-note-open .workspace-split.mod-root .workspace-leaf-content[data-type="markdown"]>.view-content>.markdown-reading-view,
 body.animate-note-open .workspace-split.mod-root .workspace-leaf-content[data-type="markdown"]>.view-content>.markdown-source-view,
 body.animate-note-open .workspace-leaf.mod-active .workspace-leaf-content[data-type="markdown"]>.view-content>.markdown-reading-view,
 body.animate-note-open .workspace-leaf.mod-active .workspace-leaf-content[data-type="markdown"]>.view-content>.markdown-source-view {
-  animation: tr-note-fade-in var(--smooth-obsidian-speed) var(--smooth-obsidian-easing);
+  animation: so-note-in var(--smooth-obsidian-speed) var(--smooth-obsidian-easing);
 }
 
-/* ===================== Startup Animation (Splash Screen) ===================== */
+
+/* ==================== Startup Splash Screen ==================== */
+
 body.smooth-obsidian-startup:not(.disable-splash-screen)::before {
   content: "";
   position: fixed;
@@ -94,53 +115,20 @@ body.smooth-obsidian-startup:not(.disable-splash-screen)::before {
   z-index: 9998;
   pointer-events: none;
   background-color: var(--background-primary);
-  animation: splashFade calc(var(--smooth-obsidian-speed) * 5) var(--smooth-obsidian-easing) forwards;
+  animation: so-splash-fade calc(var(--smooth-obsidian-speed) * 5) var(--smooth-obsidian-easing) forwards;
 }
 
 body.smooth-obsidian-startup:not(.disable-splash-screen) .workspace {
-  animation: vaultReveal calc(var(--smooth-obsidian-speed) * 2.5) var(--smooth-obsidian-easing) calc(var(--smooth-obsidian-speed) * 2.5) backwards;
+  animation: so-vault-reveal calc(var(--smooth-obsidian-speed) * 2.5) var(--smooth-obsidian-easing) calc(var(--smooth-obsidian-speed) * 2.5) backwards;
 }
 
-@keyframes vaultReveal {
-  from {
-    opacity: 0;
-    transform: scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
 
-@keyframes splashFade {
-  0% {
-    opacity: 1;
-  }
-  60% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-    visibility: hidden;
-  }
-}
+/* ==================== Editor Header Pop ==================== */
 
-/* ===================== Header Active-Line Animations ===================== */
 body:not(.disable-header-animations) .markdown-source-view.mod-cm6 .cm-line.HyperMD-header .cm-formatting-header {
   position: absolute;
   top: auto;
-  animation: materialPopHeader var(--smooth-obsidian-speed) var(--smooth-obsidian-easing) forwards;
-}
-
-@keyframes materialPopHeader {
-  0% {
-    opacity: 0;
-    transform: translateX(-100%) scale(0.6) translateX(-10px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateX(-100%) scale(1) translateX(0);
-  }
+  animation: so-header-pop var(--smooth-obsidian-speed) var(--smooth-obsidian-easing) forwards;
 }
 
 body:not(.disable-header-animations) .markdown-source-view.mod-cm6 .cm-line.HyperMD-header {
@@ -154,44 +142,121 @@ body:not(.disable-header-animations) .markdown-source-view.mod-cm6 .cm-line.cm-a
 }
 
 body:not(.disable-header-animations) .markdown-source-view.mod-cm6 .cm-line.cm-active {
-  &.HyperMD-header-1 {
-    padding-left: 20px;
-  }
-  &.HyperMD-header-2 {
-    padding-left: 30px;
-  }
-  &.HyperMD-header-3 {
-    padding-left: 40px;
-  }
-  &.HyperMD-header-4 {
-    padding-left: 50px;
-  }
-  &.HyperMD-header-5 {
-    padding-left: 60px;
-  }
-  &.HyperMD-header-6 {
-    padding-left: 70px;
-  }
+  &.HyperMD-header-1 { padding-left: 20px; }
+  &.HyperMD-header-2 { padding-left: 30px; }
+  &.HyperMD-header-3 { padding-left: 40px; }
+  &.HyperMD-header-4 { padding-left: 50px; }
+  &.HyperMD-header-5 { padding-left: 60px; }
+  &.HyperMD-header-6 { padding-left: 70px; }
 }
 
-/* ===================== Inline Formatting Animations ===================== */
-@keyframes premiumHorizontalPush {
-  0% {
-    margin-inline: -0.25em;
-    opacity: 0;
-    transform: scale(0.85);
-  }
-  100% {
-    margin-inline: 0;
-    opacity: 1;
-    transform: scale(1);
-  }
-}
+
+/* ==================== Inline Formatting Push ==================== */
 
 body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-line.cm-active:not(.HyperMD-codeblock) .cm-formatting:not(.cm-formatting-header):not(.cm-formatting-list):not(.cm-formatting-task) {
   display: inline-block;
   vertical-align: baseline;
   line-height: 0;
   padding-block: 0;
-  animation: premiumHorizontalPush calc(var(--smooth-obsidian-speed) * 0.75) var(--smooth-obsidian-easing) forwards;
+  animation: so-formatting-push calc(var(--smooth-obsidian-speed) * 0.75) var(--smooth-obsidian-easing) forwards;
+}
+
+
+/* ==================== Native UI Override ==================== */
+/* Overrides Obsidian's default --anim-duration-* variables so all
+   built-in transitions (sidebars, tabs, ribbons, resize handles)
+   automatically use the plugin's speed and easing. */
+
+body:not(.disable-native-animations) {
+  --anim-duration-none: 0;
+  --anim-duration-superfast: calc(var(--smooth-obsidian-speed) * 0.15);
+  --anim-duration-fast: calc(var(--smooth-obsidian-speed) * 0.35);
+  --anim-duration-moderate: calc(var(--smooth-obsidian-speed) * 0.75);
+  --anim-duration-slow: var(--smooth-obsidian-speed);
+}
+
+
+/* ==================== Keyframes ==================== */
+
+@keyframes so-slide-right {
+  from { opacity: 0; transform: translateX(40px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes so-slide-up {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes so-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes so-fade-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+@keyframes so-modal-in {
+  from { opacity: 0; transform: scale(0.93) translateY(15px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes so-modal-out {
+  from { opacity: 1; transform: scale(1) translateY(0); }
+  to   { opacity: 0; transform: scale(0.93) translateY(15px); }
+}
+
+@keyframes so-prompt-in {
+  from { opacity: 0; transform: translateY(24px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes so-prompt-out {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to   { opacity: 0; transform: translateY(24px) scale(0.98); }
+}
+
+@keyframes so-menu-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+
+
+@keyframes so-popover-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes so-directional-slide {
+  from { opacity: 0; transform: translateX(var(--so-slide-start)); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes so-note-in {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes so-vault-reveal {
+  from { opacity: 0; transform: scale(0.98); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes so-splash-fade {
+  0%   { opacity: 1; }
+  60%  { opacity: 1; }
+  100% { opacity: 0; visibility: hidden; }
+}
+
+@keyframes so-header-pop {
+  from { opacity: 0; transform: translateX(-100%) scale(0.6) translateX(-10px); }
+  to   { opacity: 1; transform: translateX(-100%) scale(1) translateX(0); }
+}
+
+@keyframes so-formatting-push {
+  from { margin-inline: -0.25em; opacity: 0; transform: scale(0.85); }
+  to   { margin-inline: 0; opacity: 1; transform: scale(1); }
 }
