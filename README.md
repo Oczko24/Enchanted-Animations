@@ -12,6 +12,10 @@ below you can see short showcase of some animations in this plugin
 - Turn on/off specific UI elements animations
 - Control over every animation you can find in obsidian
 
+### Main objective 
+
+Is to animate everything possile, i offer often updates with new UI animations:))
+
 ## How to Install
 
 1. Open Settings → Community Plugins

@@ -307,6 +307,7 @@ body.ea-status-bar-hover:not(.is-mobile) .status-bar {
 }
 
 /* File Explorer Hover Glow Fade-Out */
+/* stylelint-disable declaration-no-important */
 body:not(.disable-native-animations) .nav-files-container .tree-item-self,
 body:not(.disable-native-animations) .nav-files-container .nav-folder-title,
 body:not(.disable-native-animations) .nav-files-container .nav-file-title {
@@ -385,9 +386,7 @@ body:not(.disable-native-animations) .prompt,
 body:not(.disable-native-animations) .suggestion-container,
 body:not(.disable-native-animations) .notice {
   transition-duration: var(--enchanted-animations-speed) !important;
-  transition-timing-function: var(--enchanted-animations-easing) !important;
 }
-/* stylelint-enable declaration-no-important */
 
 /* ==================== Checkboxes Override ==================== */
 body:not(.disable-native-animations) .checkbox-container,
@@ -433,7 +432,6 @@ body:not(.disable-native-animations) .graph-color-group {
    Prędkość animacji (V) = 300px / ustawiony_czas (np. 0.4s)
    Czas animacji (T) = Aktualna_Szerokość / V
 */
-/* stylelint-disable declaration-no-important */
 body:not(.disable-native-animations) .workspace-split.mod-sidedock {
   transition: width calc( (var(--ea-sidebar-width, 300) / (300 / var(--enchanted-animations-speed-num, 0.4))) * 1s ) var(--enchanted-animations-easing),
               min-width calc( (var(--ea-sidebar-width, 300) / (300 / var(--enchanted-animations-speed-num, 0.4))) * 1s ) var(--enchanted-animations-easing),
