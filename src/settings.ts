@@ -10,6 +10,8 @@ export interface SmoothObsidianSettings {
 	enableFormattingAnimations: boolean;
 	enableModalAnimations: boolean;
 	enableNativeAnimations: boolean;
+	enableSmoothScroll: boolean;
+	enableGpuAcceleration: boolean;
 }
 
 export const DEFAULT_SETTINGS: SmoothObsidianSettings = {
@@ -21,6 +23,8 @@ export const DEFAULT_SETTINGS: SmoothObsidianSettings = {
 	enableFormattingAnimations: true,
 	enableModalAnimations: true,
 	enableNativeAnimations: true,
+	enableSmoothScroll: true,
+	enableGpuAcceleration: true,
 }
 
 export class SmoothObsidianSettingTab extends PluginSettingTab {
@@ -144,6 +148,32 @@ export class SmoothObsidianSettingTab extends PluginSettingTab {
 				.setValue(this.plugin.settings.enableNativeAnimations)
 				.onChange(async (value) => {
 					this.plugin.settings.enableNativeAnimations = value;
+					await this.plugin.saveSettings();
+					this.plugin.applyStyles();
+				})
+			);
+
+		containerEl.createEl("h3", { text: "Performance" });
+
+		new Setting(containerEl)
+			.setName("Smooth Scroll")
+			.setDesc("Enable CSS smooth scrolling across all scrollable containers in the app.")
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.enableSmoothScroll)
+				.onChange(async (value) => {
+					this.plugin.settings.enableSmoothScroll = value;
+					await this.plugin.saveSettings();
+					this.plugin.applyStyles();
+				})
+			);
+
+		new Setting(containerEl)
+			.setName("GPU Acceleration")
+			.setDesc("Force hardware compositing on modals, menus, and animated elements to reduce rendering lag.")
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.enableGpuAcceleration)
+				.onChange(async (value) => {
+					this.plugin.settings.enableGpuAcceleration = value;
 					await this.plugin.saveSettings();
 					this.plugin.applyStyles();
 				})

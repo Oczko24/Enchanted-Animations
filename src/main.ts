@@ -43,6 +43,8 @@ export default class SmoothObsidianPlugin extends Plugin {
 		document.body.classList.remove('disable-formatting-animations');
 		document.body.classList.remove('disable-modal-animation');
 		document.body.classList.remove('disable-native-animations');
+		document.body.classList.remove('so-smooth-scroll');
+		document.body.classList.remove('so-gpu-accel');
 		document.body.classList.remove('smooth-obsidian-startup');
 	}
 
@@ -129,5 +131,7 @@ export default class SmoothObsidianPlugin extends Plugin {
 		document.body.classList.toggle('disable-formatting-animations', !this.settings.enableFormattingAnimations);
 		document.body.classList.toggle('disable-modal-animation', !this.settings.enableModalAnimations);
 		document.body.classList.toggle('disable-native-animations', !this.settings.enableNativeAnimations);
+		document.body.classList.toggle('so-smooth-scroll', this.settings.enableSmoothScroll);
+		document.body.classList.toggle('so-gpu-accel', this.settings.enableGpuAcceleration);
 	}
 }

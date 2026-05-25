@@ -163,9 +163,6 @@ body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-line.
 
 
 /* ==================== Native UI Override ==================== */
-/* Overrides Obsidian's default --anim-duration-* variables so all
-   built-in transitions (sidebars, tabs, ribbons, resize handles)
-   automatically use the plugin's speed and easing. */
 
 body:not(.disable-native-animations) {
   --anim-duration-none: 0;
@@ -173,6 +170,37 @@ body:not(.disable-native-animations) {
   --anim-duration-fast: calc(var(--smooth-obsidian-speed) * 0.35);
   --anim-duration-moderate: calc(var(--smooth-obsidian-speed) * 0.75);
   --anim-duration-slow: var(--smooth-obsidian-speed);
+}
+
+
+/* ==================== Smooth Scroll ==================== */
+
+body.so-smooth-scroll .markdown-reading-view,
+body.so-smooth-scroll .markdown-source-view .cm-scroller,
+body.so-smooth-scroll .nav-files-container,
+body.so-smooth-scroll .workspace-drawer-inner,
+body.so-smooth-scroll .modal .vertical-tab-content,
+body.so-smooth-scroll .search-results-container,
+body.so-smooth-scroll .suggestion-container .suggestion,
+body.so-smooth-scroll .prompt-results,
+body.so-smooth-scroll .community-modal-search-results {
+  scroll-behavior: smooth;
+}
+
+
+/* ==================== GPU Acceleration ==================== */
+
+body.so-gpu-accel .modal,
+body.so-gpu-accel .modal-bg,
+body.so-gpu-accel .prompt,
+body.so-gpu-accel .menu,
+body.so-gpu-accel .popover,
+body.so-gpu-accel .suggestion-container,
+body.so-gpu-accel .notice,
+body.so-gpu-accel .workspace-drawer-inner,
+body.so-gpu-accel .mobile-navbar {
+  transform: translateZ(0);
+  will-change: transform, opacity;
 }
 
 
