@@ -1,0 +1,197 @@
+/*
+   ===================================================================
+   Smooth Obsidian Plugin Stylesheet
+   Dynamically controlled via JS-injected CSS Custom Properties:
+   - --smooth-obsidian-speed
+   - --smooth-obsidian-easing
+   ===================================================================
+*/
+
+/* ==================== Notice / Notifications ==================== */
+.notice {
+  animation: tr-notice-in-desktop var(--smooth-obsidian-speed) var(--smooth-obsidian-easing);
+}
+
+.is-phone .notice {
+  animation: tr-notice-in-mobile var(--smooth-obsidian-speed) var(--smooth-obsidian-easing);
+}
+
+@keyframes tr-notice-in-desktop {
+  from {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes tr-notice-in-mobile {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===================== Settings Modal Open Animation ===================== */
+@keyframes modal-open {
+  from {
+    opacity: 0;
+    transform: scale(0.93) translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes modal-bg-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+body:not(.disable-modal-animation) .modal {
+  animation: modal-open calc(var(--smooth-obsidian-speed) * 0.7) var(--smooth-obsidian-easing) forwards;
+}
+
+body:not(.disable-modal-animation) .modal-bg {
+  animation: modal-bg-fade calc(var(--smooth-obsidian-speed) * 0.7) var(--smooth-obsidian-easing) forwards;
+}
+
+/* ===================== Animate Note Opening ===================== */
+@keyframes tr-note-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+body.animate-note-open .workspace-split.mod-root .workspace-leaf-content[data-type="markdown"]>.view-content>.markdown-reading-view,
+body.animate-note-open .workspace-split.mod-root .workspace-leaf-content[data-type="markdown"]>.view-content>.markdown-source-view,
+body.animate-note-open .workspace-leaf.mod-active .workspace-leaf-content[data-type="markdown"]>.view-content>.markdown-reading-view,
+body.animate-note-open .workspace-leaf.mod-active .workspace-leaf-content[data-type="markdown"]>.view-content>.markdown-source-view {
+  animation: tr-note-fade-in var(--smooth-obsidian-speed) var(--smooth-obsidian-easing);
+}
+
+/* ===================== Startup Animation (Splash Screen) ===================== */
+body.smooth-obsidian-startup:not(.disable-splash-screen)::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  pointer-events: none;
+  background-color: var(--background-primary);
+  animation: splashFade calc(var(--smooth-obsidian-speed) * 5) var(--smooth-obsidian-easing) forwards;
+}
+
+body.smooth-obsidian-startup:not(.disable-splash-screen) .workspace {
+  animation: vaultReveal calc(var(--smooth-obsidian-speed) * 2.5) var(--smooth-obsidian-easing) calc(var(--smooth-obsidian-speed) * 2.5) backwards;
+}
+
+@keyframes vaultReveal {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes splashFade {
+  0% {
+    opacity: 1;
+  }
+  60% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+/* ===================== Header Active-Line Animations ===================== */
+body:not(.disable-header-animations) .markdown-source-view.mod-cm6 .cm-line.HyperMD-header .cm-formatting-header {
+  position: absolute;
+  top: auto;
+  animation: materialPopHeader var(--smooth-obsidian-speed) var(--smooth-obsidian-easing) forwards;
+}
+
+@keyframes materialPopHeader {
+  0% {
+    opacity: 0;
+    transform: translateX(-100%) scale(0.6) translateX(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(-100%) scale(1) translateX(0);
+  }
+}
+
+body:not(.disable-header-animations) .markdown-source-view.mod-cm6 .cm-line.HyperMD-header {
+  position: relative;
+  padding-left: 0;
+  transition: padding-left var(--smooth-obsidian-speed) var(--smooth-obsidian-easing);
+}
+
+body:not(.disable-header-animations) .markdown-source-view.mod-cm6 .cm-line.cm-active.HyperMD-header {
+  transition: padding-left var(--smooth-obsidian-speed) var(--smooth-obsidian-easing);
+}
+
+body:not(.disable-header-animations) .markdown-source-view.mod-cm6 .cm-line.cm-active {
+  &.HyperMD-header-1 {
+    padding-left: 20px;
+  }
+  &.HyperMD-header-2 {
+    padding-left: 30px;
+  }
+  &.HyperMD-header-3 {
+    padding-left: 40px;
+  }
+  &.HyperMD-header-4 {
+    padding-left: 50px;
+  }
+  &.HyperMD-header-5 {
+    padding-left: 60px;
+  }
+  &.HyperMD-header-6 {
+    padding-left: 70px;
+  }
+}
+
+/* ===================== Inline Formatting Animations ===================== */
+@keyframes premiumHorizontalPush {
+  0% {
+    margin-inline: -0.25em;
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  100% {
+    margin-inline: 0;
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-line.cm-active:not(.HyperMD-codeblock) .cm-formatting:not(.cm-formatting-header):not(.cm-formatting-list):not(.cm-formatting-task) {
+  display: inline-block;
+  vertical-align: baseline;
+  line-height: 0;
+  padding-block: 0;
+  animation: premiumHorizontalPush calc(var(--smooth-obsidian-speed) * 0.75) var(--smooth-obsidian-easing) forwards;
+}
