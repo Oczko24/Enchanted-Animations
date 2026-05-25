@@ -6,9 +6,11 @@ Obsidian plugin that animates everything!
 below you can see short showcase of some animations in this plugin
 
 <img width="1240" alt="Screencast From 2026-05-25 21-29-12" src="https://github.com/user-attachments/assets/a46ed09f-1f82-49ff-b36f-53694476a7c3" />
-<div align="center">
-<img width="640" alt="Screencast From 2026-05-25 21-33-24" src="https://github.com/user-attachments/assets/6d29c0c3-ec8e-459d-83a9-5cbab30bbf71" />
-</div>
+
+This plugin adds also nice animated formating;))
+
+<img width="320" alt="Screencast From 2026-05-25 21-33-24" src="https://github.com/user-attachments/assets/6d29c0c3-ec8e-459d-83a9-5cbab30bbf71" />
+
 ## Features
 
 - Customisable animation speed and their look in whole obsidian
