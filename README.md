@@ -21,6 +21,11 @@ This plugin adds also nice animated formating;))
 
 Is to animate everything possile, i offer often updates with new UI animations:))
 
+### Roadmap
+
+- [ ] Animate everything possible (including hovers)
+- [ ] Make animations coherent and adequate
+
 ## How to Install
 
 1. Go into this link https://community.obsidian.md/plugins/enchanted-animations

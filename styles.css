@@ -57,8 +57,16 @@ body:not(.disable-modal-animation):not(.is-mobile) .menu {
   animation: ea-menu-in calc(var(--enchanted-animations-speed) * 0.6) var(--enchanted-animations-easing);
 }
 
+body:not(.disable-modal-animation):not(.is-mobile) .menu.is-closing {
+  animation: ea-menu-out calc(var(--enchanted-animations-speed) * 0.6) var(--enchanted-animations-easing) forwards;
+}
+
 body:not(.disable-modal-animation) .is-phone .menu {
   animation: ea-slide-up calc(var(--enchanted-animations-speed) * 1.2) var(--enchanted-animations-easing);
+}
+
+body:not(.disable-modal-animation) .is-phone .menu.is-closing {
+  animation: ea-slide-down calc(var(--enchanted-animations-speed) * 1.2) var(--enchanted-animations-easing) forwards;
 }
 
 
@@ -79,6 +87,33 @@ body:not(.disable-modal-animation) .cm-tooltip.cm-tooltip-autocomplete {
 
 body:not(.disable-modal-animation) .popover.hover-popover {
   animation: ea-popover-in calc(var(--enchanted-animations-speed) * 0.6) var(--enchanted-animations-easing);
+}
+
+
+/* ==================== Graph / Canvas Controls ==================== */
+
+body:not(.disable-modal-animation) .graph-controls:not(.is-close),
+body:not(.disable-modal-animation) .canvas-controls {
+  transform-origin: top right;
+  animation: ea-graph-controls-in calc(var(--enchanted-animations-speed) * 0.8) var(--enchanted-animations-easing) both;
+}
+
+body:not(.disable-modal-animation) .graph-controls.is-closing {
+  transform-origin: top right;
+  animation: ea-graph-controls-out calc(var(--enchanted-animations-speed) * 0.6) var(--enchanted-animations-easing) forwards;
+}
+
+
+/* ==================== Document Search (Ctrl+F) ==================== */
+
+body:not(.disable-modal-animation) .document-search-container {
+  transform-origin: top;
+  animation: ea-search-in calc(var(--enchanted-animations-speed) * 0.7) var(--enchanted-animations-easing) both;
+}
+
+body:not(.disable-modal-animation) .document-search-container.is-closing {
+  transform-origin: top;
+  animation: ea-search-out calc(var(--enchanted-animations-speed) * 0.6) var(--enchanted-animations-easing) forwards;
 }
 
 
@@ -260,6 +295,11 @@ body.ea-gpu-accel .cm-tooltip.cm-tooltip-autocomplete {
   to   { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes ea-slide-down {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(30px); }
+}
+
 @keyframes ea-fade-in {
   from { opacity: 0; }
   to   { opacity: 1; }
@@ -295,6 +335,11 @@ body.ea-gpu-accel .cm-tooltip.cm-tooltip-autocomplete {
   to   { opacity: 1; transform: scale(1); }
 }
 
+@keyframes ea-menu-out {
+  from { opacity: 1; transform: scale(1); }
+  to   { opacity: 0; transform: scale(0.95); }
+}
+
 @keyframes ea-item-fade-in {
   from { opacity: 0; transform: translateX(-8px); }
   to   { opacity: 1; transform: translateX(0); }
@@ -303,6 +348,39 @@ body.ea-gpu-accel .cm-tooltip.cm-tooltip-autocomplete {
 @keyframes ea-popover-in {
   from { opacity: 0; transform: translateY(8px) scale(0.98); }
   to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes ea-graph-controls-in {
+  from { 
+    opacity: 0; 
+    transform: scale(0.85) translate(15px, -15px);
+  }
+  to { 
+    opacity: 1; 
+    transform: scale(1) translate(0, 0); 
+  }
+}
+
+@keyframes ea-graph-controls-out {
+  from { 
+    opacity: 1; 
+    transform: scale(1) translate(0, 0); 
+  }
+  to { 
+    opacity: 0; 
+    transform: scale(0.85) translate(15px, -15px); 
+  }
+}
+
+/* To jest mega fajnie zaimplementowane - margin-top płynnie odpycha resztę layoutu w dół! */
+@keyframes ea-search-in {
+  from { opacity: 0; margin-top: -46px; }
+  to   { opacity: 1; margin-top: 0; }
+}
+
+@keyframes ea-search-out {
+  from { opacity: 1; margin-top: 0; }
+  to   { opacity: 0; margin-top: -46px; }
 }
 
 @keyframes ea-directional-slide {

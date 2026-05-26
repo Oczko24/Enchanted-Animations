@@ -1,10 +1,12 @@
-import {Plugin, Modal} from 'obsidian';
+import {Plugin, Modal, Menu} from 'obsidian';
 import {DEFAULT_SETTINGS, EnchantedAnimationsSettings, EnchantedAnimationsSettingTab} from "./settings";
 
 export default class EnchantedAnimationsPlugin extends Plugin {
 	settings: EnchantedAnimationsSettings;
 	originalModalClose: Function;
 	originalSettingClose: Function;
+	originalMenuHide: Function;
+	originalMenuClose: Function;
 
 	async onload() {
 		console.log('Loading Enchanted Animations...');
@@ -48,6 +50,9 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		);
 
 		this.patchModalClose();
+		this.patchMenuClose();
+		this.patchGraphControls();
+		this.patchDocumentSearch();
 		this.addSettingTab(new EnchantedAnimationsSettingTab(this.app, this));
 	}
 
@@ -55,6 +60,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		console.log('Unloading Enchanted Animations...');
 
 		this.unpatchModalClose();
+		this.unpatchMenuClose();
 
 		document.body.style.removeProperty('--enchanted-animations-speed');
 		document.body.style.removeProperty('--enchanted-animations-easing');
@@ -138,6 +144,65 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		}
 	}
 
+	patchMenuClose() {
+		const plugin = this;
+
+		if (Menu.prototype.hide) {
+			this.originalMenuHide = Menu.prototype.hide;
+			Menu.prototype.hide = function() {
+				if (!plugin.settings.enableModalAnimations) {
+					return plugin.originalMenuHide.call(this);
+				}
+
+				let container = (this as any).dom || document.querySelector('.menu');
+				if (container && !container.classList.contains('is-closing')) {
+					container.classList.add('is-closing');
+					const durationMs = plugin.settings.speed * 600;
+					
+					setTimeout(() => {
+						container.classList.remove('is-closing');
+						plugin.originalMenuHide.call(this);
+					}, Math.max(0, durationMs - 10));
+					
+					return this;
+				} else {
+					return plugin.originalMenuHide.call(this);
+				}
+			};
+		}
+		
+		if (Menu.prototype.close) {
+			this.originalMenuClose = Menu.prototype.close;
+			Menu.prototype.close = function() {
+				if (!plugin.settings.enableModalAnimations) {
+					return plugin.originalMenuClose.call(this);
+				}
+
+				let container = (this as any).dom || document.querySelector('.menu');
+				if (container && !container.classList.contains('is-closing')) {
+					container.classList.add('is-closing');
+					const durationMs = plugin.settings.speed * 600;
+					
+					setTimeout(() => {
+						container.classList.remove('is-closing');
+						plugin.originalMenuClose.call(this);
+					}, Math.max(0, durationMs - 10));
+				} else {
+					return plugin.originalMenuClose.call(this);
+				}
+			};
+		}
+	}
+
+	unpatchMenuClose() {
+		if (this.originalMenuHide) {
+			Menu.prototype.hide = this.originalMenuHide as any;
+		}
+		if (this.originalMenuClose) {
+			Menu.prototype.close = this.originalMenuClose as any;
+		}
+	}
+
 	setupSidebarVelocity() {
 		// Calculate sidebar width and set it as a variable so CSS can calculate velocity (px/s)
 		const sidebars = document.querySelectorAll('.workspace-split.mod-sidedock');
@@ -177,5 +242,109 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		document.body.classList.toggle('ea-status-bar-hover', this.settings.enableStatusBarHover);
 		document.body.classList.toggle('ea-fold-hover', this.settings.enableFoldHover);
 		document.body.classList.toggle('ea-card-hover', this.settings.enableCardHover);
+	}
+
+	patchGraphControls() {
+		this.registerDomEvent(document, 'click', (evt: MouseEvent) => {
+			if (!this.settings.enableModalAnimations) return;
+
+			const target = evt.target as HTMLElement;
+			if (!target) return;
+			
+			const closeBtn = target.closest('.graph-controls-button.mod-close');
+			if (closeBtn) {
+				if ((closeBtn as any)._eaSimulated) {
+					(closeBtn as any)._eaSimulated = false; // Reset for next time
+					return;
+				}
+
+				const container = closeBtn.closest('.graph-controls');
+				if (container && !container.classList.contains('is-closing')) {
+					evt.preventDefault();
+					evt.stopPropagation();
+					evt.stopImmediatePropagation();
+
+					container.classList.add('is-closing');
+					const durationMs = this.settings.speed * 600;
+					
+					setTimeout(() => {
+						container.classList.remove('is-closing');
+						(closeBtn as any)._eaSimulated = true;
+						closeBtn.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+					}, Math.max(0, durationMs - 10));
+				}
+			}
+		}, true);
+	}
+
+	patchDocumentSearch() {
+		// Intercept clicks on the search close button
+		this.registerDomEvent(document, 'click', (evt: MouseEvent) => {
+			if (!this.settings.enableModalAnimations) return;
+
+			const target = evt.target as HTMLElement;
+			if (!target) return;
+			
+			const closeBtn = target.closest('.document-search-close-button, [aria-label="Close search"]');
+			if (closeBtn) {
+				if ((closeBtn as any)._eaSimulated) {
+					(closeBtn as any)._eaSimulated = false; // Reset
+					return;
+				}
+
+				const container = closeBtn.closest('.document-search-container');
+				if (container && !container.classList.contains('is-closing')) {
+					evt.preventDefault();
+					evt.stopPropagation();
+					evt.stopImmediatePropagation();
+
+					container.classList.add('is-closing');
+					const durationMs = this.settings.speed * 600;
+					
+					setTimeout(() => {
+						container.classList.remove('is-closing');
+						(closeBtn as any)._eaSimulated = true;
+						closeBtn.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+					}, Math.max(0, durationMs - 10));
+				}
+			}
+		}, true);
+
+		// Intercept Escape key press inside search container
+		this.registerDomEvent(document, 'keydown', (evt: KeyboardEvent) => {
+			if (!this.settings.enableModalAnimations) return;
+			
+			if (evt.key === 'Escape') {
+				const target = evt.target as HTMLElement;
+				if (!target) return;
+
+				const container = target.closest('.document-search-container');
+				if (container && !container.classList.contains('is-closing')) {
+					if ((evt as any)._eaSimulated) {
+						(evt as any)._eaSimulated = false;
+						return;
+					}
+
+					evt.preventDefault();
+					evt.stopPropagation();
+					evt.stopImmediatePropagation();
+
+					container.classList.add('is-closing');
+					const durationMs = this.settings.speed * 600;
+					
+					setTimeout(() => {
+						container.classList.remove('is-closing');
+						const simulatedEvent = new KeyboardEvent('keydown', { 
+							key: 'Escape', 
+							code: 'Escape',
+							bubbles: true, 
+							cancelable: true 
+						});
+						(simulatedEvent as any)._eaSimulated = true;
+						target.dispatchEvent(simulatedEvent);
+					}, Math.max(0, durationMs - 10));
+				}
+			}
+		}, true);
 	}
 }
