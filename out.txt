@@ -1,0 +1,49 @@
+=== KEYFRAMES ===
+node-inserted
+blink
+sk-cubeGridScaleDelay
+multi-select-highlight
+increase
+decrease
+pop-down
+pop-right
+rotation
+hmd-file-uploading-ani
+progress-bar
+spin
+slideIn
+
+=== TRANSITIONS ===
+animation-duration: 0.01s; animation-name: node-inserted; } .is-flashing -> color 0.25s ease, background-color 0.25s ease
+display: flex; height: 100%; width: 100%; flex-direction: column; } .app-container.no-transition * -> none !important
+display: var(--vault-profile-actions-display); align-items: center; } .workspace -> padding-left 100ms ease-in
+display: none; } .workspace-leaf-resize-handle -> background-color 200ms ease-in-out, border-color 200ms ease-in-out, opacity 200ms ease-in-out
+max-width: 100%; } .workspace-fake-target-overlay, .workspace-drop-overlay -> all 100ms ease-in-out
+content: "\200B"; } .collapse-icon svg.svg-icon -> transform 100ms ease-in-out
+background-color: var(--background-modifier-active-hover); } } .is-mobile .clickable-icon -> opacity 0.1s ease-in-out
+height: 6px; -webkit-appearance: none; } input[type='range']::-webkit-slider-thumb -> all 0.1s linear
+; } } .formula-editor:active, .formula-editor:focus, .formula-editor:focus-within -> box-shadow 0.15s ease-in-out, border 0.15s ease-in-out
+--file-margins: var(--size-4-3) var(--size-4-4); } .follow-link-popover -> opacity var(--anim-duration-fast) ease-in-out, transform var(--anim-duration-fast) ease-in-out
+animation: decrease 2s 0.5s infinite; } .progress-bar .progress-bar-subline -> transform 150ms ease-in-out
+--interactive-accent: SelectedItem; } } .checkbox-container -> box-shadow 0.15s ease-in-out, outline 0.15s ease-in-out, border 0.15s ease-in-out, opacity 0.15s ease-in-out
+display: none; } .pdf-sidebar-resizer -> background-color 200ms ease-in-out
+content: "\200B"; } .callout-fold .svg-icon -> transform 100ms ease-in-out
+opacity: 0; } } .metadata-link-flair -> opacity var(--anim-duration-fast) ease-in-out
+content: '\200B'; } .list-bullet:after -> transform 0.15s, box-shadow 0.15s
+white-space: pre; } a -> opacity var(--anim-duration-fast) ease-in-out
+opacity: 0.5; } .external-link -> opacity var(--anim-duration-fast) ease-in-out
+color: #FCC; } input[type="radio"], input[type=checkbox] -> box-shadow 0.15s ease-in-out
+position: absolute; gap: var(--size-4-3); } .bases-cards-item -> box-shadow var(--anim-duration-fast) ease-in-out
+display: none; } .graph-color-group -> top 200ms ease-in-out
+margin: 0; width: 100%; } .graph-color-group.drag-ghost -> none
+display: block; width: 100%; padding-inline-start: 36px; } .search-input-clear-button -> color var(--anim-duration-fast) ease-in-out
+width: var(--touch-size-s); height: var(--touch-size-s); } .slides-container -> -webkit-transform 0.8s ease 0s
+cursor: grabbing; } .canvas-card-menu .canvas-card-menu-button.mod-draggable svg -> 90ms transform ease-out
+pointer-events: initial; } .canvas-edges path.canvas-display-path -> stroke-width 100ms ease-out
+; } .canvas-edges path.canvas-interaction-path -> stroke 100ms ease-out
+flex-direction: column; } .mobile-option-setting-item -> transform 1000ms ease-in-out
+margin-bottom: 0; } .workspace-drawer-inner -> width ease-out 150ms
+padding: 0; width: 0; } .workspace-drawer-backdrop -> opacity ease-out 150ms
+background-color: var(--nav-item-background-selected); } .workspace-drawer-tab-options-list -> max-height 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.1), opacity 0.15s ease
+height: 100%; justify-content: center; } .mobile-navbar -> opacity 0.2s ease-in-out, margin-bottom 0.25s ease-in-out, transform 0.3s ease-out
+display: none; } .pull-action -> background-color ease-in-out 150ms

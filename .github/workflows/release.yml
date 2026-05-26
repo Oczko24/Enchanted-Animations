@@ -42,5 +42,6 @@ jobs:
             main.js
             styles.css
             manifest.json
+          generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
