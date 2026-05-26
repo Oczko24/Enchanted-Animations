@@ -191,12 +191,24 @@ body:not(.disable-header-animations) .markdown-source-view.mod-cm6 .cm-line.cm-a
 
 /* ==================== Inline Formatting Push ==================== */
 
-body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-line.cm-active:not(.HyperMD-codeblock) .cm-formatting:not(.cm-formatting-header):not(.cm-formatting-list):not(.cm-formatting-task) {
+body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-line.cm-active:not(.HyperMD-codeblock) .cm-formatting:not(.cm-formatting-header):not(.cm-formatting-list):not(.cm-formatting-task),
+body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-line.cm-active:not(.HyperMD-codeblock) .cm-formatting-link {
   display: inline-block;
   vertical-align: baseline;
   line-height: 0;
   padding-block: 0;
   animation: ea-formatting-push calc(var(--enchanted-animations-speed) * 0.75) var(--enchanted-animations-easing) forwards;
+}
+
+body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-line.cm-active:not(.HyperMD-codeblock) .cm-formatting-embed {
+  display: inline-block;
+  vertical-align: baseline;
+  animation: ea-slide-up-inline calc(var(--enchanted-animations-speed) * 0.75) var(--enchanted-animations-easing) forwards;
+}
+
+body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .internal-embed {
+  animation: ea-embed-in calc(var(--enchanted-animations-speed) * 0.8) var(--enchanted-animations-easing) backwards;
+  transform-origin: top center;
 }
 
 
@@ -413,6 +425,18 @@ body.ea-gpu-accel .cm-tooltip.cm-tooltip-autocomplete {
   from { margin-inline: -0.25em; opacity: 0; transform: scale(0.85); }
   to   { margin-inline: 0; opacity: 1; transform: scale(1); }
 }
+
+@keyframes ea-slide-up-inline {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes ea-embed-in {
+  from { opacity: 0; transform: translateY(-16px); margin-top: -16px; }
+  to   { opacity: 1; transform: translateY(0); margin-top: 0; }
+}
+
+
 
 
 /* ==================== Micro-Interactions ==================== */
