@@ -637,4 +637,183 @@ body:not(.disable-native-animations) .workspace-split.mod-sidedock {
 
 
 
+/* ==================== Animated Callouts ==================== */
+/* Inspired by the "obsidian-animated-callouts" snippet by chrisphu. */
+/* Adds subtle motion effects to callout icons on load and hover. */
+
+body:not(.disable-animated-callouts) .callout[data-callout="note"] .callout-icon svg,
+body:not(.disable-animated-callouts) .callout[data-callout="info"] .callout-icon svg {
+  animation: ea-callout-bounce 1.5s ease-out;
+  transform-origin: bottom center;
+}
+body:not(.disable-animated-callouts) .callout[data-callout="note"]:hover .callout-icon svg,
+body:not(.disable-animated-callouts) .callout[data-callout="info"]:hover .callout-icon svg {
+  animation: ea-callout-bounce-hover 1.5s ease-out;
+}
+
+body:not(.disable-animated-callouts) .callout[data-callout="warning"] .callout-icon svg,
+body:not(.disable-animated-callouts) .callout[data-callout="caution"] .callout-icon svg {
+  animation: ea-callout-shake 1.5s ease-out;
+  transform-origin: bottom center;
+}
+body:not(.disable-animated-callouts) .callout[data-callout="warning"]:hover .callout-icon svg,
+body:not(.disable-animated-callouts) .callout[data-callout="caution"]:hover .callout-icon svg {
+  animation: ea-callout-shake-hover 1.5s ease-out;
+}
+
+body:not(.disable-animated-callouts) .callout[data-callout="success"] .callout-icon svg,
+body:not(.disable-animated-callouts) .callout[data-callout="check"] .callout-icon svg {
+  animation: ea-callout-pulse 1.5s ease-out;
+}
+body:not(.disable-animated-callouts) .callout[data-callout="success"]:hover .callout-icon svg,
+body:not(.disable-animated-callouts) .callout[data-callout="check"]:hover .callout-icon svg {
+  animation: ea-callout-pulse-hover 1.5s ease-out;
+}
+
+body:not(.disable-animated-callouts) .callout[data-callout="tip"] .callout-icon svg,
+body:not(.disable-animated-callouts) .callout[data-callout="hint"] .callout-icon svg {
+  animation: ea-callout-swing 1.5s ease-out;
+  transform-origin: top center;
+}
+body:not(.disable-animated-callouts) .callout[data-callout="tip"]:hover .callout-icon svg,
+body:not(.disable-animated-callouts) .callout[data-callout="hint"]:hover .callout-icon svg {
+  animation: ea-callout-swing-hover 1.5s ease-out;
+}
+
+body:not(.disable-animated-callouts) .callout[data-callout="question"] .callout-icon svg,
+body:not(.disable-animated-callouts) .callout[data-callout="help"] .callout-icon svg,
+body:not(.disable-animated-callouts) .callout[data-callout="faq"] .callout-icon svg {
+  animation: ea-callout-wobble 1.5s ease-out;
+}
+body:not(.disable-animated-callouts) .callout[data-callout="question"]:hover .callout-icon svg,
+body:not(.disable-animated-callouts) .callout[data-callout="help"]:hover .callout-icon svg,
+body:not(.disable-animated-callouts) .callout[data-callout="faq"]:hover .callout-icon svg {
+  animation: ea-callout-wobble-hover 1.5s ease-out;
+}
+
+body:not(.disable-animated-callouts) .callout[data-callout="important"] .callout-icon svg {
+  animation: ea-callout-tada 1.5s ease-out;
+}
+body:not(.disable-animated-callouts) .callout[data-callout="important"]:hover .callout-icon svg {
+  animation: ea-callout-tada-hover 1.5s ease-out;
+}
+
+body:not(.disable-animated-callouts) .callout[data-callout="bug"] .callout-icon svg {
+  animation: ea-callout-skew 1.5s ease-out;
+}
+body:not(.disable-animated-callouts) .callout[data-callout="bug"]:hover .callout-icon svg {
+  animation: ea-callout-skew-hover 1.5s ease-out;
+}
+
+body:not(.disable-animated-callouts) .callout[data-callout="example"] .callout-icon svg {
+  animation: ea-callout-spin 1.5s ease-out;
+}
+body:not(.disable-animated-callouts) .callout[data-callout="example"]:hover .callout-icon svg {
+  animation: ea-callout-spin-hover 1.5s ease-out;
+}
+
+/* ==================== Callout Keyframes (On Load) ==================== */
+@keyframes ea-callout-bounce {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-4px); }
+  60% { transform: translateY(-2px); }
+}
+@keyframes ea-callout-shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-2px) rotate(-3deg); }
+  20%, 40%, 60%, 80% { transform: translateX(2px) rotate(3deg); }
+}
+@keyframes ea-callout-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+@keyframes ea-callout-swing {
+  20% { transform: rotate(15deg); }
+  40% { transform: rotate(-10deg); }
+  60% { transform: rotate(5deg); }
+  80% { transform: rotate(-5deg); }
+  100% { transform: rotate(0deg); }
+}
+@keyframes ea-callout-wobble {
+  0%, 100% { transform: translateX(0%); }
+  15% { transform: translateX(-15%) rotate(-5deg); }
+  30% { transform: translateX(10%) rotate(3deg); }
+  45% { transform: translateX(-10%) rotate(-3deg); }
+  60% { transform: translateX(5%) rotate(2deg); }
+  75% { transform: translateX(-5%) rotate(-1deg); }
+}
+@keyframes ea-callout-tada {
+  0% { transform: scale(1); }
+  10%, 20% { transform: scale(0.9) rotate(-3deg); }
+  30%, 50%, 70%, 90% { transform: scale(1.1) rotate(3deg); }
+  40%, 60%, 80% { transform: scale(1.1) rotate(-3deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+@keyframes ea-callout-skew {
+  0% { transform: skewX(0deg) skewY(0deg); }
+  25% { transform: skewX(-5deg) skewY(-5deg); }
+  50% { transform: skewX(5deg) skewY(5deg); }
+  75% { transform: skewX(-5deg) skewY(-5deg); }
+  100% { transform: skewX(0deg) skewY(0deg); }
+}
+@keyframes ea-callout-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ==================== Callout Keyframes (On Hover) ==================== */
+/* Keyframes are duplicated here to force the CSS animation to restart on hover without relying on JavaScript. */
+@keyframes ea-callout-bounce-hover {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-4px); }
+  60% { transform: translateY(-2px); }
+}
+@keyframes ea-callout-shake-hover {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-2px) rotate(-3deg); }
+  20%, 40%, 60%, 80% { transform: translateX(2px) rotate(3deg); }
+}
+@keyframes ea-callout-pulse-hover {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+@keyframes ea-callout-swing-hover {
+  20% { transform: rotate(15deg); }
+  40% { transform: rotate(-10deg); }
+  60% { transform: rotate(5deg); }
+  80% { transform: rotate(-5deg); }
+  100% { transform: rotate(0deg); }
+}
+@keyframes ea-callout-wobble-hover {
+  0%, 100% { transform: translateX(0%); }
+  15% { transform: translateX(-15%) rotate(-5deg); }
+  30% { transform: translateX(10%) rotate(3deg); }
+  45% { transform: translateX(-10%) rotate(-3deg); }
+  60% { transform: translateX(5%) rotate(2deg); }
+  75% { transform: translateX(-5%) rotate(-1deg); }
+}
+@keyframes ea-callout-tada-hover {
+  0% { transform: scale(1); }
+  10%, 20% { transform: scale(0.9) rotate(-3deg); }
+  30%, 50%, 70%, 90% { transform: scale(1.1) rotate(3deg); }
+  40%, 60%, 80% { transform: scale(1.1) rotate(-3deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+@keyframes ea-callout-skew-hover {
+  0% { transform: skewX(0deg) skewY(0deg); }
+  25% { transform: skewX(-5deg) skewY(-5deg); }
+  50% { transform: skewX(5deg) skewY(5deg); }
+  75% { transform: skewX(-5deg) skewY(-5deg); }
+  100% { transform: skewX(0deg) skewY(0deg); }
+}
+@keyframes ea-callout-spin-hover {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+
+
+
 
