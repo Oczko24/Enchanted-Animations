@@ -41,3 +41,7 @@ After enabling the plugin, you can configure:
 - Animation ease
 - Whether to animate specific UI elements
 - And much more!
+
+### Support
+
+If you like this plugin you can drop me a star on it's [repositorium](https://github.com/Oczko24/Enchanted-Animations/) or just put some pull request to help me with doing it:)))
