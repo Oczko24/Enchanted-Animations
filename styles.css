@@ -61,7 +61,7 @@ body:not(.disable-modal-animation):not(.is-mobile) .menu.is-closing {
   animation: ea-menu-out calc(var(--enchanted-animations-speed) * 0.4) cubic-bezier(0.3, 0, 1, 1) forwards;
 }
 
-/* Ograniczenie wielkości dla zhiackowanych dropdownów, żeby nie wyjeżdżały poza ekran */
+/* Size limit for hijacked dropdowns to prevent them from extending beyond the screen */
 body .menu.ea-select-menu {
   max-height: 60vh;
   max-width: 320px;
@@ -410,7 +410,7 @@ body.ea-gpu-accel .cm-tooltip.cm-tooltip-autocomplete {
   }
 }
 
-/* To jest mega fajnie zaimplementowane - margin-top płynnie odpycha resztę layoutu w dół! */
+/* This is implemented really nicely - margin-top smoothly pushes the rest of the layout down! */
 @keyframes ea-search-in {
   from { opacity: 0; margin-top: -46px; }
   to   { opacity: 1; margin-top: 0; }
@@ -503,7 +503,7 @@ body:not(.disable-native-animations) .nav-files-container .nav-file-title {
   transition: background-color var(--enchanted-animations-speed) var(--enchanted-animations-easing), color var(--enchanted-animations-speed) var(--enchanted-animations-easing);
 }
 
-/* Szybkie pojawianie się poświaty przy najechaniu (żeby nie było efektu spóźnionej wody) */
+/* Fast appearance of glow on hover (to avoid delayed effect) */
 body:not(.disable-native-animations) .nav-files-container .tree-item-self:hover,
 body:not(.disable-native-animations) .nav-files-container .nav-folder-title:hover,
 body:not(.disable-native-animations) .nav-files-container .nav-file-title:hover {
@@ -511,11 +511,11 @@ body:not(.disable-native-animations) .nav-files-container .nav-file-title:hover 
   transition-delay: 0s;
 }
 
-/* Kiedy najedziemy na cały interfejs z obszarem dolnym (app-container jest duży, więc zrobimy hover na workspace albo dodamy obszar docelowy).
-Najlepiej po prostu wykorzystać :hover na status-bar lub na obiekty bardzo blisko dołu, ale status-bar jest niewidzialny,
-więc pointer-events: none sprawia, że mysz przez niego przechodzi. Zamiast :hover na status-bar, ustawimy pseudo-element na dole ekranu, 
-lub po prostu zrobimy :hover na .workspace:hover .status-bar (choć workspace to prawie cały ekran).
-Bezpieczniej dać pseudo-element łapiący mysz, albo zrezygnować z pointer-events. */
+/* When we hover over the entire interface with the bottom area (app-container is large, so we hover on the workspace or add a target area).
+It is best to simply use :hover on the status-bar or on objects very close to the bottom, but the status-bar is invisible,
+so pointer-events: none makes the mouse pass through it. Instead of :hover on the status-bar, we will set a pseudo-element at the bottom of the screen, 
+or we just do :hover on .workspace:hover .status-bar (although workspace is almost the entire screen).
+It's safer to add a pseudo-element catching the mouse, or drop pointer-events. */
 body.ea-status-bar-hover:not(.is-mobile) .status-bar::before {
   content: "";
   position: absolute;
@@ -523,11 +523,11 @@ body.ea-status-bar-hover:not(.is-mobile) .status-bar::before {
   left: 0;
   right: 0;
   height: 40px;
-  /* Ten pseudo element tworzy niewidzialną strefę nad ukrytym paskiem statusu, która wyłapuje myszkę */
+  /* This pseudo-element creates an invisible zone above the hidden status bar that catches the mouse */
 }
 
 body.ea-status-bar-hover:not(.is-mobile) .status-bar {
-  pointer-events: auto; /* Musi łapać mysz */
+  pointer-events: auto; /* Must catch the mouse */
 }
 
 body.ea-status-bar-hover:not(.is-mobile) .status-bar:hover {
@@ -561,7 +561,7 @@ body.ea-card-hover:not(.is-mobile) .bookmark:hover {
 
 
 /* ==================== JavaScript Inline Styles Override (Drawers, Modals, etc.) ==================== */
-/* Zmusza elementy, którym app.js wstrzykuje inline style (np. style.transition = "all 200ms ease"), do używania ustawień z pluginu */
+/* Forces elements injected with inline styles by app.js (e.g., style.transition = "all 200ms ease") to use plugin settings */
 
 body:not(.disable-native-animations) .workspace-drawer-inner,
 body:not(.disable-native-animations) .workspace-drawer-backdrop {
@@ -589,7 +589,7 @@ body:not(.disable-native-animations) .task-list-item-checkbox:before {
 }
 
 /* ==================== Hardcoded CSS Timings Override (app.css) ==================== */
-/* Podmienia na stałe wpisane 100ms, 150ms z domyślnego app.css na wartości z pluginu */
+/* Replaces hardcoded 100ms, 150ms from default app.css with plugin values */
 
 body:not(.disable-native-animations) .collapse-icon svg,
 body:not(.disable-native-animations) .callout-fold .svg-icon,
@@ -624,10 +624,10 @@ body:not(.disable-native-animations) .graph-color-group {
 
 /* ==================== Velocity-Based Sidebar Animations (Math) ==================== */
 /* 
-   Zgodnie z życzeniem, obliczamy prędkość w "km/h" (pikselach na sekundę).
-   Zakładamy, że standardowy panel ma 300px.
-   Prędkość animacji (V) = 300px / ustawiony_czas (np. 0.4s)
-   Czas animacji (T) = Aktualna_Szerokość / V
+   As requested, we calculate the speed in "km/h" (pixels per second).
+   We assume a standard panel is 300px.
+   Animation speed (V) = 300px / set_time (e.g. 0.4s)
+   Animation time (T) = Current_Width / V
 */
 body:not(.disable-native-animations) .workspace-split.mod-sidedock {
   transition: width calc( (var(--ea-sidebar-width, 300) / (300 / var(--enchanted-animations-speed-num, 0.4))) * 1s ) var(--enchanted-animations-easing),

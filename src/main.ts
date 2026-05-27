@@ -459,7 +459,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 	}
 
 	hijackSelectDropdowns() {
-		// 1. Blokujemy natywny dropdown z OS już przy mousedown
+		// 1. Block the native OS dropdown already on mousedown
 		this.registerDomEvent(document.body, 'mousedown', (evt: MouseEvent) => {
 			if (!this.settings.enableModalAnimations) return;
 			const target = evt.target as HTMLElement;
@@ -470,7 +470,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 			}
 		}, true);
 
-		// 2. Tworzymy i pokazujemy nasze animowane menu dopiero przy pełnym kliknięciu
+		// 2. Create and show our animated menu only on a full click
 		this.registerDomEvent(document.body, 'click', (evt: MouseEvent) => {
 			if (!this.settings.enableModalAnimations) return;
 
@@ -479,12 +479,12 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 			
 			if (selectElement && evt.button === 0) {
 				evt.preventDefault();
-				evt.stopPropagation(); // Blokujemy propagację, żeby kliknięcie nie zamknęło od razu menu!
+				evt.stopPropagation(); // Block propagation so the click doesn't close the menu immediately!
 
 				const menu = new Menu();
 				
-				// Dodajemy klasę ZANIM wyświetlimy menu, żeby Obsidian mógł wziąć pod uwagę 
-				// nasze ograniczenia CSS (max-width) podczas obliczania kolizji z krawędziami ekranu!
+				// Add class BEFORE showing the menu so Obsidian can take into account
+				// our CSS restrictions (max-width) when calculating screen edge collisions!
 				const dom = (menu as any).dom as HTMLElement;
 				if (dom) {
 					dom.classList.add('ea-select-menu');
@@ -494,30 +494,30 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 					menu.addItem((item) => {
 						item.setTitle(opt.text);
 						
-						// Zaznaczamy aktualnie wybraną opcję
+						// Mark the currently selected option
 						if (opt.value === selectElement.value) {
 							item.setChecked(true);
 						}
 
 						item.onClick(() => {
 							selectElement.value = opt.value;
-							// Wysyłamy zdarzenie 'change', żeby Obsidian zapisał ustawienie
+							// Dispatch a 'change' event so Obsidian saves the setting
 							selectElement.dispatchEvent(new Event('change', { bubbles: true }));
 						});
 					});
 				});
 
-				// Wyświetlamy customowe menu używając bounding rect, co pozwala Obsidianowi lepiej je ustawić
+				// Show the custom menu using the bounding rect, which allows Obsidian to position it better
 				const rect = selectElement.getBoundingClientRect();
 				menu.showAtPosition({ x: rect.left, y: rect.bottom });
 
-				// Wymuszamy, aby menu miało przynajmniej taką samą szerokość jak przycisk
+				// Force the menu to be at least as wide as the button
 				setTimeout(() => {
 					if (dom) {
 						dom.style.minWidth = `${rect.width}px`;
 					}
 				}, 0);
 			}
-		}, true); // Używamy fazy capture
+		}, true); // Use capture phase
 	}
 }
