@@ -43,5 +43,6 @@ jobs:
             styles.css
             manifest.json
           generate_release_notes: true
+          draft: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
