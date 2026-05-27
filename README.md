@@ -16,6 +16,8 @@ This plugin adds also nice animated formating;))
 - Customisable animation speed and their look in whole obsidian
 - Turn on/off specific UI elements animations
 - Control over every animation you can find in obsidian
+- Custom, better look of some spaces in obsidian for example:
+<img width="592" alt="result" src="https://github.com/user-attachments/assets/8aaa9888-51b3-45e6-8cf4-925a4fead10b" />
 
 ### Main objective 
 
