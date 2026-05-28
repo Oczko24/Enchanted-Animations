@@ -52,7 +52,7 @@ export const DEFAULT_SETTINGS: EnchantedAnimationsSettings = {
 	autoHideScrollbars: false,
 	enableBlockquoteAnimations: true,
 	enableTooltipAnimations: true,
-	enableMenuCascadeAnimations: true,
+	enableMenuCascadeAnimations: false,
 }
 
 export class EnchantedAnimationsSettingTab extends PluginSettingTab {

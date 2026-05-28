@@ -248,11 +248,11 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 
 					plugin._animating.add(el);
 
-					// Override Obsidian's !important hiding so the element stays visible during anim
-					el.style.setProperty('font-size', 'inherit', 'important');
-					el.style.setProperty('letter-spacing', 'normal', 'important');
-					el.style.setProperty('color', 'inherit', 'important');
-					el.style.setProperty('font-family', 'inherit', 'important');
+					// Override Obsidian's hiding so the element stays visible during anim
+					el.style.setProperty('font-size', 'inherit');
+					el.style.setProperty('letter-spacing', 'normal');
+					el.style.setProperty('color', 'inherit');
+					el.style.setProperty('font-family', 'inherit');
 					el.style.display = 'inline-block';
 					el.style.verticalAlign = 'baseline';
 
