@@ -26,7 +26,8 @@ Is to animate everything possile, i offer often updates with new UI animations:)
 ### Roadmap
 
 - [ ] Animate everything possible (including hovers)
-- [ ] Make animations coherent and adequate
+- [ ] Mobile-specialized animations
+- [ ] Make animations coherent and adequate & adjustable by settings one by one
 
 ## How to Install
 
