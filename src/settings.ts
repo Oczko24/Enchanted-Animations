@@ -45,14 +45,11 @@ export class EnchantedAnimationsSettingTab extends PluginSettingTab {
 		const { containerEl } = this;
 
 		containerEl.empty();
+		containerEl.addClass("enchanted-settings");
 
-		;
-		containerEl.createEl("p", {
-			text: "Customize the speed, easing, and individual effects of your Obsidian animations.",
-			cls: "setting-item-description"
-		});
-
-		new Setting(containerEl).setName("Core Properties").setHeading();
+		new Setting(containerEl)
+			.setName("Base settings")
+			.setHeading()
 
 		new Setting(containerEl)
 			.setName("Animation Flow Rate")
@@ -85,11 +82,9 @@ export class EnchantedAnimationsSettingTab extends PluginSettingTab {
 				})
 			);
 
-		new Setting(containerEl).setName("UI & Interface Animations").setHeading();
-		containerEl.createEl("p", {
-			text: "Animations for menus, dialogs, and workspace elements. If you use a custom theme that already has its own cool animations, you might want to turn these off here to prevent conflicts.",
-			cls: "setting-item-description"
-		});
+		new Setting(containerEl)
+			.setName("UI & Interface Animations")
+			.setHeading();
 
 		new Setting(containerEl)
 			.setName("Immersive Interface Menus")
@@ -128,11 +123,9 @@ export class EnchantedAnimationsSettingTab extends PluginSettingTab {
 			);
 
 
-		new Setting(containerEl).setName("Editor & Note Animations").setHeading();
-		containerEl.createEl("p", {
-			text: "Animations that happen inside your notes while reading or typing. These rarely conflict with custom themes.",
-			cls: "setting-item-description"
-		});
+		new Setting(containerEl)
+			.setName("Editor & Note Animations")
+			.setHeading()
 
 		new Setting(containerEl)
 			.setName("Cinematic Note Loading (BETA)")
@@ -170,11 +163,9 @@ export class EnchantedAnimationsSettingTab extends PluginSettingTab {
 				})
 			);
 
-		new Setting(containerEl).setName("Micro-Interactions").setHeading();
-		containerEl.createEl("p", {
-			text: "Small, premium animations triggered by mouse hover.",
-			cls: "setting-item-description"
-		});
+		new Setting(containerEl)
+			.setName("Micro-Interactions")
+			.setHeading()
 
 		new Setting(containerEl)
 			.setName("Smart Status Bar")

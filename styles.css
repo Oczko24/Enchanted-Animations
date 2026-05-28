@@ -276,21 +276,10 @@ body.ea-gpu-accel .notice,
 body.ea-gpu-accel .workspace-drawer-inner,
 body.ea-gpu-accel .mobile-navbar,
 body.ea-gpu-accel .workspace-drawer-backdrop,
-body.ea-gpu-accel .checkbox-container,
-body.ea-gpu-accel .checkbox-container:after,
-body.ea-gpu-accel .checkbox-container:before,
-body.ea-gpu-accel input[type="radio"],
-body.ea-gpu-accel input[type="checkbox"],
-body.ea-gpu-accel input[type="checkbox"]:after,
-body.ea-gpu-accel input[type="checkbox"]:before,
-body.ea-gpu-accel .task-list-item-checkbox,
-body.ea-gpu-accel .task-list-item-checkbox:after,
-body.ea-gpu-accel .task-list-item-checkbox:before,
 body.ea-gpu-accel .collapse-icon svg,
 body.ea-gpu-accel .callout-fold .svg-icon,
 body.ea-gpu-accel .workspace-drop-overlay,
 body.ea-gpu-accel .workspace-fake-target-overlay,
-body.ea-gpu-accel input[type='range']::-webkit-slider-thumb,
 body.ea-gpu-accel .list-bullet:after,
 body.ea-gpu-accel .progress-bar .progress-bar-subline,
 body.ea-gpu-accel .pdf-sidebar-resizer,
@@ -317,6 +306,20 @@ body.ea-gpu-accel .cards-view-item,
 body.ea-gpu-accel .bookmark,
 body.ea-gpu-accel .cm-tooltip.cm-tooltip-autocomplete {
   transform: translateZ(0);
+  will-change: transform, opacity;
+}
+
+body.ea-gpu-accel .checkbox-container,
+body.ea-gpu-accel .checkbox-container:after,
+body.ea-gpu-accel .checkbox-container:before,
+body.ea-gpu-accel input[type="radio"],
+body.ea-gpu-accel input[type="checkbox"],
+body.ea-gpu-accel input[type="checkbox"]:after,
+body.ea-gpu-accel input[type="checkbox"]:before,
+body.ea-gpu-accel .task-list-item-checkbox,
+body.ea-gpu-accel .task-list-item-checkbox:after,
+body.ea-gpu-accel .task-list-item-checkbox:before,
+body.ea-gpu-accel input[type='range']::-webkit-slider-thumb {
   will-change: transform, opacity;
 }
 
@@ -574,7 +577,10 @@ body:not(.disable-native-animations) .notice {
   transition-duration: var(--enchanted-animations-speed);
 }
 
-/* ==================== Checkboxes Override ==================== */
+
+/* ==================== Hardcoded CSS Timings Override (app.css) ==================== */
+/* Replaces hardcoded 100ms, 150ms from default app.css with plugin values */
+
 body:not(.disable-native-animations) .checkbox-container,
 body:not(.disable-native-animations) .checkbox-container:after,
 body:not(.disable-native-animations) .checkbox-container:before,
@@ -584,18 +590,12 @@ body:not(.disable-native-animations) input[type="checkbox"]:after,
 body:not(.disable-native-animations) input[type="checkbox"]:before,
 body:not(.disable-native-animations) .task-list-item-checkbox,
 body:not(.disable-native-animations) .task-list-item-checkbox:after,
-body:not(.disable-native-animations) .task-list-item-checkbox:before {
-  transition: all var(--enchanted-animations-speed) var(--enchanted-animations-easing);
-}
-
-/* ==================== Hardcoded CSS Timings Override (app.css) ==================== */
-/* Replaces hardcoded 100ms, 150ms from default app.css with plugin values */
-
+body:not(.disable-native-animations) .task-list-item-checkbox:before,
+body:not(.disable-native-animations) input[type='range']::-webkit-slider-thumb,
 body:not(.disable-native-animations) .collapse-icon svg,
 body:not(.disable-native-animations) .callout-fold .svg-icon,
 body:not(.disable-native-animations) .workspace-drop-overlay,
 body:not(.disable-native-animations) .workspace-fake-target-overlay,
-body:not(.disable-native-animations) input[type='range']::-webkit-slider-thumb,
 body:not(.disable-native-animations) .list-bullet:after,
 body:not(.disable-native-animations) .progress-bar .progress-bar-subline,
 body:not(.disable-native-animations) .pdf-sidebar-resizer,
@@ -813,7 +813,7 @@ body:not(.disable-animated-callouts) .callout[data-callout="example"]:hover .cal
   100% { transform: rotate(360deg); }
 }
 
-
-
-
-
+/* ==================== Settings Tab Spacing ==================== */
+.enchanted-settings .setting-item-heading:not(:first-child) {
+  padding-top: 20px;
+}
