@@ -15,6 +15,16 @@ export interface EnchantedAnimationsSettings {
 	enableStatusBarHover: boolean;
 	enableFoldHover: boolean;
 	enableCardHover: boolean;
+	enableCheckboxAnimations: boolean;
+	enableTabAnimations: boolean;
+	enableButtonAnimations: boolean;
+	enableLinkAnimations: boolean;
+	enableTagAnimations: boolean;
+	enableRibbonAnimations: boolean;
+	enableImageAnimations: boolean;
+	autoHideScrollbars: boolean;
+	enableBlockquoteAnimations: boolean;
+	enableTooltipAnimations: boolean;
 }
 
 export const DEFAULT_SETTINGS: EnchantedAnimationsSettings = {
@@ -31,6 +41,16 @@ export const DEFAULT_SETTINGS: EnchantedAnimationsSettings = {
 	enableStatusBarHover: true,
 	enableFoldHover: true,
 	enableCardHover: true,
+	enableCheckboxAnimations: true,
+	enableTabAnimations: true,
+	enableButtonAnimations: true,
+	enableLinkAnimations: true,
+	enableTagAnimations: true,
+	enableRibbonAnimations: true,
+	enableImageAnimations: true,
+	autoHideScrollbars: false,
+	enableBlockquoteAnimations: true,
+	enableTooltipAnimations: true,
 }
 
 export class EnchantedAnimationsSettingTab extends PluginSettingTab {
@@ -111,6 +131,18 @@ export class EnchantedAnimationsSettingTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
+			.setName("Native Tab Animations")
+			.setDesc("Smooth transitions when switching or closing tabs, keeping the native Obsidian look.")
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.enableTabAnimations)
+				.onChange(async (value) => {
+					this.plugin.settings.enableTabAnimations = value;
+					await this.plugin.saveSettings();
+					this.plugin.applyStyles();
+				})
+			);
+
+		new Setting(containerEl)
 			.setName("Premium Vault Reveal")
 			.setDesc("Smooth workspace reveal animation upon vault launch. Usually safe to leave enabled.")
 			.addToggle(toggle => toggle
@@ -164,6 +196,42 @@ export class EnchantedAnimationsSettingTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
+			.setName("Animated Checkboxes")
+			.setDesc("Fluid strikethrough and checkmark animation for task lists.")
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.enableCheckboxAnimations)
+				.onChange(async (value) => {
+					this.plugin.settings.enableCheckboxAnimations = value;
+					await this.plugin.saveSettings();
+					this.plugin.applyStyles();
+				})
+			);
+
+		new Setting(containerEl)
+			.setName("Fluid Links")
+			.setDesc("Water-like underline expansion for links on hover.")
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.enableLinkAnimations)
+				.onChange(async (value) => {
+					this.plugin.settings.enableLinkAnimations = value;
+					await this.plugin.saveSettings();
+					this.plugin.applyStyles();
+				})
+			);
+
+		new Setting(containerEl)
+			.setName("Blockquote Accents")
+			.setDesc("Expanding left border on blockquotes upon hover.")
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.enableBlockquoteAnimations)
+				.onChange(async (value) => {
+					this.plugin.settings.enableBlockquoteAnimations = value;
+					await this.plugin.saveSettings();
+					this.plugin.applyStyles();
+				})
+			);
+
+		new Setting(containerEl)
 			.setName("Micro-Interactions")
 			.setHeading()
 
@@ -198,6 +266,66 @@ export class EnchantedAnimationsSettingTab extends PluginSettingTab {
 				.setValue(this.plugin.settings.enableCardHover)
 				.onChange(async (value) => {
 					this.plugin.settings.enableCardHover = value;
+					await this.plugin.saveSettings();
+					this.plugin.applyStyles();
+				})
+			);
+
+		new Setting(containerEl)
+			.setName("Material Buttons")
+			.setDesc("Premium click scaling effect for all buttons in the app.")
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.enableButtonAnimations)
+				.onChange(async (value) => {
+					this.plugin.settings.enableButtonAnimations = value;
+					await this.plugin.saveSettings();
+					this.plugin.applyStyles();
+				})
+			);
+
+		new Setting(containerEl)
+			.setName("Material Tags")
+			.setDesc("Smooth hover transition for tags.")
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.enableTagAnimations)
+				.onChange(async (value) => {
+					this.plugin.settings.enableTagAnimations = value;
+					await this.plugin.saveSettings();
+					this.plugin.applyStyles();
+				})
+			);
+
+		new Setting(containerEl)
+			.setName("Candy Ribbon Icons")
+			.setDesc("Premium hover effects (scale, rotate, glow) for left sidebar icons.")
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.enableRibbonAnimations)
+				.onChange(async (value) => {
+					this.plugin.settings.enableRibbonAnimations = value;
+					await this.plugin.saveSettings();
+					this.plugin.applyStyles();
+				})
+			);
+
+		new Setting(containerEl)
+			.setName("Image Hover Zoom")
+			.setDesc("Slightly zoom in images when hovering over them.")
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.enableImageAnimations)
+				.onChange(async (value) => {
+					this.plugin.settings.enableImageAnimations = value;
+					await this.plugin.saveSettings();
+					this.plugin.applyStyles();
+				})
+			);
+
+		new Setting(containerEl)
+			.setName("Animated Tooltips")
+			.setDesc("Material-style fade and slide-up for native tooltip popups.")
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.enableTooltipAnimations)
+				.onChange(async (value) => {
+					this.plugin.settings.enableTooltipAnimations = value;
 					await this.plugin.saveSettings();
 					this.plugin.applyStyles();
 				})

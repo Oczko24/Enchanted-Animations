@@ -547,19 +547,7 @@ body.ea-fold-hover:not(.is-mobile) .collapse-indicator:hover {
   transform: scale(1.3);
 }
 
-/* Floating Cards (Kanban / Cards / Bookmarks) */
-body.ea-card-hover:not(.is-mobile) .kanban-plugin__item,
-body.ea-card-hover:not(.is-mobile) .cards-view-item,
-body.ea-card-hover:not(.is-mobile) .bookmark {
-  transition: transform calc(var(--enchanted-animations-speed) * 0.7) var(--enchanted-animations-easing);
-  transform-origin: center;
-}
 
-body.ea-card-hover:not(.is-mobile) .kanban-plugin__item:hover,
-body.ea-card-hover:not(.is-mobile) .cards-view-item:hover,
-body.ea-card-hover:not(.is-mobile) .bookmark:hover {
-  transform: scale(1.02);
-}
 
 
 
@@ -816,4 +804,205 @@ body:not(.disable-animated-callouts) .callout[data-callout="example"]:hover .cal
 /* ==================== Settings Tab Spacing ==================== */
 .enchanted-settings .setting-item-heading:not(:first-child) {
   padding-top: 20px;
+}
+
+
+/* ==================== Checkboxes ==================== */
+body.ea-checkbox-animations input[type="checkbox"],
+body.ea-checkbox-animations .task-list-item-checkbox {
+  transition: transform calc(var(--enchanted-animations-speed) * 0.5) var(--enchanted-animations-easing);
+}
+
+body.ea-checkbox-animations input[type="checkbox"]:active,
+body.ea-checkbox-animations .task-list-item-checkbox:active {
+  transform: scale(0.85); /* Note: Removed !important as per guidelines */
+}
+
+body.ea-checkbox-animations input[type="checkbox"]:checked,
+body.ea-checkbox-animations .task-list-item-checkbox:checked {
+  /* Removed forwards - element returns to native styles after animation, allowing :active to work */
+  animation: ea-checkbox-pop calc(var(--enchanted-animations-speed) * 0.8) var(--enchanted-animations-easing);
+}
+
+@keyframes ea-checkbox-pop {
+  0% { transform: scale(0.8); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+/* Animation for the checkmark icon appearing inside the checkbox */
+body.ea-checkbox-animations input[type="checkbox"]::after,
+body.ea-checkbox-animations .task-list-item-checkbox::after {
+  transition: transform calc(var(--enchanted-animations-speed) * 0.5) var(--enchanted-animations-easing),
+              opacity calc(var(--enchanted-animations-speed) * 0.5) var(--enchanted-animations-easing);
+}
+
+body.ea-checkbox-animations input[type="checkbox"]:checked::after,
+body.ea-checkbox-animations .task-list-item-checkbox:checked::after {
+  animation: ea-checkmark-pop calc(var(--enchanted-animations-speed) * 0.8) var(--enchanted-animations-easing);
+  transform: scale(1);
+  opacity: 1;
+}
+
+body.ea-checkbox-animations input[type="checkbox"]:not(:checked)::after,
+body.ea-checkbox-animations .task-list-item-checkbox:not(:checked)::after {
+  transform: scale(0);
+  opacity: 0;
+}
+
+@keyframes ea-checkmark-pop {
+  0% { transform: scale(0); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Strike-through animation for checkboxes */
+body.ea-checkbox-animations .task-list-item {
+  transition: opacity calc(var(--enchanted-animations-speed) * 0.8) var(--enchanted-animations-easing);
+}
+
+body.ea-checkbox-animations .task-list-item.is-checked {
+  opacity: 0.6;
+}
+
+/* Animate the strikethrough in Live Preview */
+body.ea-checkbox-animations .cm-strikethrough {
+  display: inline-block;
+  position: relative;
+  text-decoration: none !important;
+  color: var(--text-muted);
+}
+body.ea-checkbox-animations .cm-strikethrough::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 100%;
+  height: 1px;
+  background-color: currentColor;
+  transform-origin: left center;
+  animation: ea-strikethrough-anim calc(var(--enchanted-animations-speed) * 0.8) var(--enchanted-animations-easing) forwards;
+}
+
+/* Reading mode strike-through */
+body.ea-checkbox-animations .markdown-preview-view .task-list-item.is-checked s,
+body.ea-checkbox-animations .markdown-preview-view .task-list-item.is-checked del {
+  text-decoration: none;
+  position: relative;
+  display: inline-block;
+}
+body.ea-checkbox-animations .markdown-preview-view .task-list-item.is-checked s::after,
+body.ea-checkbox-animations .markdown-preview-view .task-list-item.is-checked del::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 100%;
+  height: 1.5px;
+  background-color: currentColor;
+  transform-origin: left center;
+  animation: ea-strikethrough-anim calc(var(--enchanted-animations-speed) * 0.8) var(--enchanted-animations-easing) forwards;
+}
+
+@keyframes ea-strikethrough-anim {
+  0% { transform: scaleX(0); }
+  100% { transform: scaleX(1); }
+}
+
+
+/* ==================== Tabs ==================== */
+body.ea-tab-animations .workspace-tab-header {
+  transition: max-width calc(var(--enchanted-animations-speed) * 1.5) var(--enchanted-animations-easing),
+              min-width calc(var(--enchanted-animations-speed) * 1.5) var(--enchanted-animations-easing),
+              flex-basis calc(var(--enchanted-animations-speed) * 1.5) var(--enchanted-animations-easing),
+              opacity calc(var(--enchanted-animations-speed) * 0.8) var(--enchanted-animations-easing);
+}
+
+body.ea-tab-animations .workspace-tab-header-inner {
+  transition: opacity calc(var(--enchanted-animations-speed) * 0.5) var(--enchanted-animations-easing),
+              transform calc(var(--enchanted-animations-speed) * 0.8) var(--enchanted-animations-easing);
+}
+
+/* ==================== Buttons ==================== */
+body.ea-button-animations button:not(.clickable-icon) {
+  transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+              background-color calc(var(--enchanted-animations-speed) * 0.5) var(--enchanted-animations-easing),
+              box-shadow 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body.ea-button-animations button:not(.clickable-icon):active {
+  transform: scale(0.94);
+  box-shadow: inset 0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* ==================== Candy Ribbon Icons ==================== */
+body.ea-ribbon-animations .workspace-ribbon .clickable-icon svg {
+  transition: transform calc(var(--enchanted-animations-speed) * 0.5) var(--enchanted-animations-easing);
+}
+
+body.ea-ribbon-animations .workspace-ribbon .clickable-icon:hover svg {
+  transform: scale(1.15) rotate(5deg);
+}
+
+body.ea-ribbon-animations .workspace-ribbon .clickable-icon:active svg {
+  transform: scale(0.92) rotate(-8deg);
+}
+
+/* ==================== Image Hover Zoom ==================== */
+body.ea-image-animations .image-embed,
+body.ea-image-animations .internal-embed {
+  transition: transform calc(var(--enchanted-animations-speed) * 0.6) var(--enchanted-animations-easing);
+  display: inline-block; 
+}
+
+body.ea-image-animations .image-embed:hover,
+body.ea-image-animations .internal-embed:hover {
+  transform: scale(1.05);
+  z-index: 100;
+  position: relative;
+}
+
+body.ea-image-animations .markdown-preview-view img:not(.image-embed img) {
+  transition: transform calc(var(--enchanted-animations-speed) * 0.6) var(--enchanted-animations-easing);
+}
+
+body.ea-image-animations .markdown-preview-view img:not(.image-embed img):hover {
+  transform: scale(1.05);
+}
+
+/* Removed faulty Auto-Hide Scrollbars module */
+
+/* ==================== Blockquotes ==================== */
+body.ea-blockquote-animations .markdown-preview-view blockquote,
+body.ea-blockquote-animations .markdown-source-view.mod-cm6 .HyperMD-quote {
+  transition: transform calc(var(--enchanted-animations-speed) * 0.5) var(--enchanted-animations-easing),
+              border-left-width calc(var(--enchanted-animations-speed) * 0.5) var(--enchanted-animations-easing);
+  will-change: transform;
+}
+
+body.ea-blockquote-animations .markdown-preview-view blockquote:hover,
+body.ea-blockquote-animations .markdown-source-view.mod-cm6 .HyperMD-quote:hover {
+  transform: translateX(4px);
+  border-left-width: 4px;
+}
+
+/* ==================== Tooltips ==================== */
+body.ea-tooltip-animations .tooltip,
+body.ea-tooltip-animations .cm-tooltip {
+  opacity: 0;
+  /* Shorter entry animation: from 0.6 to 0.35 */
+  animation: ea-tooltip-in calc(var(--enchanted-animations-speed) * 0.35) var(--enchanted-animations-easing) forwards;
+  animation-delay: 0.7s;
+}
+
+@keyframes ea-tooltip-in {
+  0% { 
+    opacity: 0; 
+    transform: translateY(4px);
+    filter: blur(2px);
+  }
+  100% { 
+    opacity: 1; 
+    transform: translateY(0);
+    filter: blur(0);
+  }
 }

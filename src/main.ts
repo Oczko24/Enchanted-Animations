@@ -83,6 +83,16 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		document.body.classList.remove('ea-status-bar-hover');
 		document.body.classList.remove('ea-fold-hover');
 		document.body.classList.remove('ea-card-hover');
+		document.body.classList.remove('ea-checkbox-animations');
+		document.body.classList.remove('ea-tab-animations');
+		document.body.classList.remove('ea-button-animations');
+		document.body.classList.remove('ea-link-animations');
+		document.body.classList.remove('ea-tag-animations');
+		document.body.classList.remove('ea-ribbon-animations');
+		document.body.classList.remove('ea-image-animations');
+		document.body.classList.remove('ea-autohide-scrollbars');
+		document.body.classList.remove('ea-blockquote-animations');
+		document.body.classList.remove('ea-tooltip-animations');
 	}
 
 	patchModalClose() {
@@ -352,6 +362,16 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		document.body.classList.toggle('ea-status-bar-hover', this.settings.enableStatusBarHover);
 		document.body.classList.toggle('ea-fold-hover', this.settings.enableFoldHover);
 		document.body.classList.toggle('ea-card-hover', this.settings.enableCardHover);
+		document.body.classList.toggle('ea-checkbox-animations', this.settings.enableCheckboxAnimations);
+		document.body.classList.toggle('ea-tab-animations', this.settings.enableTabAnimations);
+		document.body.classList.toggle('ea-button-animations', this.settings.enableButtonAnimations);
+		document.body.classList.toggle('ea-link-animations', this.settings.enableLinkAnimations);
+		document.body.classList.toggle('ea-tag-animations', this.settings.enableTagAnimations);
+		document.body.classList.toggle('ea-ribbon-animations', this.settings.enableRibbonAnimations);
+		document.body.classList.toggle('ea-image-animations', this.settings.enableImageAnimations);
+		document.body.classList.toggle('ea-autohide-scrollbars', this.settings.autoHideScrollbars);
+		document.body.classList.toggle('ea-blockquote-animations', this.settings.enableBlockquoteAnimations);
+		document.body.classList.toggle('ea-tooltip-animations', this.settings.enableTooltipAnimations);
 	}
 
 	patchGraphControls() {
