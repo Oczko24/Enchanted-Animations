@@ -93,6 +93,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		document.body.classList.remove('ea-autohide-scrollbars');
 		document.body.classList.remove('ea-blockquote-animations');
 		document.body.classList.remove('ea-tooltip-animations');
+		document.body.classList.remove('ea-menu-cascade');
 	}
 
 	patchModalClose() {
@@ -372,6 +373,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		document.body.classList.toggle('ea-autohide-scrollbars', this.settings.autoHideScrollbars);
 		document.body.classList.toggle('ea-blockquote-animations', this.settings.enableBlockquoteAnimations);
 		document.body.classList.toggle('ea-tooltip-animations', this.settings.enableTooltipAnimations);
+		document.body.classList.toggle('ea-menu-cascade', this.settings.enableMenuCascadeAnimations);
 	}
 
 	patchGraphControls() {

@@ -25,6 +25,7 @@ export interface EnchantedAnimationsSettings {
 	autoHideScrollbars: boolean;
 	enableBlockquoteAnimations: boolean;
 	enableTooltipAnimations: boolean;
+	enableMenuCascadeAnimations: boolean;
 }
 
 export const DEFAULT_SETTINGS: EnchantedAnimationsSettings = {
@@ -51,6 +52,7 @@ export const DEFAULT_SETTINGS: EnchantedAnimationsSettings = {
 	autoHideScrollbars: false,
 	enableBlockquoteAnimations: true,
 	enableTooltipAnimations: true,
+	enableMenuCascadeAnimations: true,
 }
 
 export class EnchantedAnimationsSettingTab extends PluginSettingTab {
@@ -113,6 +115,18 @@ export class EnchantedAnimationsSettingTab extends PluginSettingTab {
 				.setValue(this.plugin.settings.enableModalAnimations)
 				.onChange(async (value) => {
 					this.plugin.settings.enableModalAnimations = value;
+					await this.plugin.saveSettings();
+					this.plugin.applyStyles();
+				})
+			);
+
+		new Setting(containerEl)
+			.setName("Staggered Menu Animations")
+			.setDesc("Menu items cascade smoothly when a menu opens, accompanied by a premium hover translation effect.")
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.enableMenuCascadeAnimations)
+				.onChange(async (value) => {
+					this.plugin.settings.enableMenuCascadeAnimations = value;
 					await this.plugin.saveSettings();
 					this.plugin.applyStyles();
 				})

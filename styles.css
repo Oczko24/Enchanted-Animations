@@ -480,15 +480,57 @@ body.ea-gpu-accel input[type='range']::-webkit-slider-thumb {
 
 /* ==================== Micro-Interactions ==================== */
 
-/* Premium Menu Items Feedback */
+/* Premium Menu Items Feedback & Cascade */
 body:not(.disable-native-animations) .menu-item {
-  transition: background-color 0.15s ease-out, transform 0.1s ease-out;
+  transition: background-color 0.15s ease-out, transform 0.2s var(--enchanted-animations-easing);
+}
+
+body:not(.disable-native-animations) .menu-item:hover {
+  transform: translateX(4px);
 }
 
 body:not(.disable-native-animations) .menu-item:active {
-  transform: scale(0.97);
+  transform: scale(0.97) translateX(4px);
   background-color: var(--background-modifier-active-hover);
 }
+
+/* Staggered Cascade Animation for Menu Items */
+body.ea-menu-cascade:not(.disable-modal-animation) .menu .menu-item {
+  animation: ea-item-fade-in calc(var(--enchanted-animations-speed) * 0.5) var(--enchanted-animations-easing) backwards;
+}
+
+body.ea-menu-cascade:not(.disable-modal-animation) .menu .menu-item:nth-child(1) { animation-delay: calc(var(--enchanted-animations-speed) * 0.05); }
+body.ea-menu-cascade:not(.disable-modal-animation) .menu .menu-item:nth-child(2) { animation-delay: calc(var(--enchanted-animations-speed) * 0.1); }
+body.ea-menu-cascade:not(.disable-modal-animation) .menu .menu-item:nth-child(3) { animation-delay: calc(var(--enchanted-animations-speed) * 0.15); }
+body.ea-menu-cascade:not(.disable-modal-animation) .menu .menu-item:nth-child(4) { animation-delay: calc(var(--enchanted-animations-speed) * 0.2); }
+body.ea-menu-cascade:not(.disable-modal-animation) .menu .menu-item:nth-child(5) { animation-delay: calc(var(--enchanted-animations-speed) * 0.25); }
+body.ea-menu-cascade:not(.disable-modal-animation) .menu .menu-item:nth-child(6) { animation-delay: calc(var(--enchanted-animations-speed) * 0.3); }
+body.ea-menu-cascade:not(.disable-modal-animation) .menu .menu-item:nth-child(7) { animation-delay: calc(var(--enchanted-animations-speed) * 0.35); }
+body.ea-menu-cascade:not(.disable-modal-animation) .menu .menu-item:nth-child(8) { animation-delay: calc(var(--enchanted-animations-speed) * 0.4); }
+body.ea-menu-cascade:not(.disable-modal-animation) .menu .menu-item:nth-child(9) { animation-delay: calc(var(--enchanted-animations-speed) * 0.45); }
+body.ea-menu-cascade:not(.disable-modal-animation) .menu .menu-item:nth-child(10) { animation-delay: calc(var(--enchanted-animations-speed) * 0.5); }
+body.ea-menu-cascade:not(.disable-modal-animation) .menu .menu-item:nth-child(11) { animation-delay: calc(var(--enchanted-animations-speed) * 0.55); }
+body.ea-menu-cascade:not(.disable-modal-animation) .menu .menu-item:nth-child(12) { animation-delay: calc(var(--enchanted-animations-speed) * 0.6); }
+body.ea-menu-cascade:not(.disable-modal-animation) .menu .menu-item:nth-child(n+13) { animation-delay: calc(var(--enchanted-animations-speed) * 0.65); }
+
+/* Animate icons and checkmarks inside menu items */
+body.ea-menu-cascade:not(.disable-modal-animation) .menu .menu-item-icon {
+  animation: ea-checkmark-pop calc(var(--enchanted-animations-speed) * 0.6) var(--enchanted-animations-easing) backwards;
+}
+
+body.ea-menu-cascade:not(.disable-modal-animation) .menu .menu-item:nth-child(1) .menu-item-icon { animation-delay: calc(var(--enchanted-animations-speed) * 0.15); }
+body.ea-menu-cascade:not(.disable-modal-animation) .menu .menu-item:nth-child(2) .menu-item-icon { animation-delay: calc(var(--enchanted-animations-speed) * 0.2); }
+body.ea-menu-cascade:not(.disable-modal-animation) .menu .menu-item:nth-child(3) .menu-item-icon { animation-delay: calc(var(--enchanted-animations-speed) * 0.25); }
+body.ea-menu-cascade:not(.disable-modal-animation) .menu .menu-item:nth-child(4) .menu-item-icon { animation-delay: calc(var(--enchanted-animations-speed) * 0.3); }
+body.ea-menu-cascade:not(.disable-modal-animation) .menu .menu-item:nth-child(5) .menu-item-icon { animation-delay: calc(var(--enchanted-animations-speed) * 0.35); }
+body.ea-menu-cascade:not(.disable-modal-animation) .menu .menu-item:nth-child(6) .menu-item-icon { animation-delay: calc(var(--enchanted-animations-speed) * 0.4); }
+body.ea-menu-cascade:not(.disable-modal-animation) .menu .menu-item:nth-child(7) .menu-item-icon { animation-delay: calc(var(--enchanted-animations-speed) * 0.45); }
+body.ea-menu-cascade:not(.disable-modal-animation) .menu .menu-item:nth-child(8) .menu-item-icon { animation-delay: calc(var(--enchanted-animations-speed) * 0.5); }
+body.ea-menu-cascade:not(.disable-modal-animation) .menu .menu-item:nth-child(9) .menu-item-icon { animation-delay: calc(var(--enchanted-animations-speed) * 0.55); }
+body.ea-menu-cascade:not(.disable-modal-animation) .menu .menu-item:nth-child(10) .menu-item-icon { animation-delay: calc(var(--enchanted-animations-speed) * 0.6); }
+body.ea-menu-cascade:not(.disable-modal-animation) .menu .menu-item:nth-child(11) .menu-item-icon { animation-delay: calc(var(--enchanted-animations-speed) * 0.65); }
+body.ea-menu-cascade:not(.disable-modal-animation) .menu .menu-item:nth-child(12) .menu-item-icon { animation-delay: calc(var(--enchanted-animations-speed) * 0.7); }
+body.ea-menu-cascade:not(.disable-modal-animation) .menu .menu-item:nth-child(n+13) .menu-item-icon { animation-delay: calc(var(--enchanted-animations-speed) * 0.75); }
 
 /* Smart Status Bar */
 body.ea-status-bar-hover:not(.is-mobile) .status-bar {
