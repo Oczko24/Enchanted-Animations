@@ -158,25 +158,18 @@ body:not(.disable-modal-animation) .document-search-container.is-closing {
 /* ==================== Mobile Settings Drill-Down & Tab Switch ==================== */
 
 body:not(.disable-modal-animation).is-phone .modal.mod-settings {
-  box-shadow: 5px 0 40px rgba(0,0,0,0.2); /* Premium depth when sliding in from left */
-  animation: ea-sheet-in calc(var(--enchanted-animations-speed) * 1.2) var(--enchanted-animations-easing) forwards;
+  box-shadow: 0px 10px 40px rgba(0,0,0,0.2);
+  animation: ea-mobile-modal-in calc(var(--enchanted-animations-speed) * 1.4) var(--enchanted-animations-easing) forwards;
+  transform-origin: center center;
 }
 
 body:not(.disable-modal-animation).is-phone .modal-container.is-closing .modal.mod-settings {
-  animation: ea-sheet-out calc(var(--enchanted-animations-speed) * 1.2) var(--enchanted-animations-easing) forwards;
+  animation: ea-mobile-modal-out calc(var(--enchanted-animations-speed) * 1.4) var(--enchanted-animations-easing) forwards;
+  transform-origin: center center;
 }
 
-body:not(.disable-modal-animation).is-phone .modal.mod-settings .vertical-tab-content-container {
-  --ea-slide-start: 30px;
-  animation: ea-directional-slide calc(var(--enchanted-animations-speed) * 1.2) var(--enchanted-animations-easing) both;
-}
-
-body:not(.disable-modal-animation).is-phone .modal.mod-settings .vertical-tab-header {
-  --ea-slide-start: -30px;
-  animation: ea-directional-slide calc(var(--enchanted-animations-speed) * 1.2) var(--enchanted-animations-easing) both;
-}
-
-body:not(.disable-modal-animation) .vertical-tab-content {
+/* Desktop-only settings tab content fade (excluded from phone to avoid fighting Obsidian's native drill-down) */
+body:not(.disable-modal-animation):not(.is-phone) .vertical-tab-content {
   animation: ea-note-in calc(var(--enchanted-animations-speed) * 0.8) var(--enchanted-animations-easing);
 }
 
@@ -382,14 +375,14 @@ body .ea-ghost-tab-switcher * {
   to   { opacity: 0; transform: translateY(30px); }
 }
 
-@keyframes ea-sheet-in {
-  from { transform: translateX(-100%); }
-  to   { transform: translateX(0); }
+@keyframes ea-mobile-modal-in {
+  from { opacity: 0; transform: scale(0.92) translateY(30px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
 }
 
-@keyframes ea-sheet-out {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-100%); }
+@keyframes ea-mobile-modal-out {
+  from { opacity: 1; transform: scale(1) translateY(0); }
+  to   { opacity: 0; transform: scale(0.92) translateY(30px); }
 }
 
 @keyframes ea-fade-in {
@@ -475,10 +468,6 @@ body .ea-ghost-tab-switcher * {
   to   { opacity: 0; margin-top: -46px; }
 }
 
-@keyframes ea-directional-slide {
-  from { opacity: 0; transform: translateX(var(--ea-slide-start)); }
-  to   { opacity: 1; transform: translateX(0); }
-}
 
 @keyframes ea-note-in {
   from { opacity: 0; transform: translateY(18px); }
@@ -681,7 +670,16 @@ body:not(.disable-native-animations) .list-bullet:after,
 body:not(.disable-native-animations) .progress-bar .progress-bar-subline,
 body:not(.disable-native-animations) .pdf-sidebar-resizer,
 body:not(.disable-native-animations) .workspace-leaf-resize-handle,
-body:not(.disable-native-animations) .search-input-clear-button {
+body:not(.disable-native-animations) .search-input-clear-button,
+body:not(.disable-native-animations) .is-mobile .clickable-icon,
+body:not(.disable-native-animations) .is-phone .workspace-drawer-tab-options-list,
+body:not(.disable-native-animations) .is-phone .menu-grabber,
+body:not(.disable-native-animations) .is-phone .menu .suggestion-group .suggestion-item,
+body:not(.disable-native-animations) .is-phone .menu-item,
+body:not(.disable-native-animations) .is-phone .modal.mod-settings .vertical-tab-nav-item,
+body:not(.disable-native-animations) .mobile-navbar,
+body:not(.disable-native-animations) .mobile-navbar-action,
+body:not(.disable-native-animations) .mobile-tab-switcher-menu-button {
   transition-duration: var(--enchanted-animations-speed);
   transition-timing-function: var(--enchanted-animations-easing);
 }

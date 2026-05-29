@@ -317,7 +317,7 @@ export class EnchantedAnimationsController {
 		// 3. Body observer for elements appended directly to body (like mobile tab switcher)
 		this.bodyObserver = new MutationObserver((mutations) => {
 			const isTabAnimationsEnabled = document.body.classList.contains('ea-tab-animations');
-			const dur = this.plugin.settings.speed * 1500; // * 1.5 as requested ("wolniejsza ciutkę")
+			const dur = this.plugin.settings.speed * 1200;
 			const ease = this.plugin.settings.easing;
 
 			for (const m of mutations) {
@@ -367,7 +367,7 @@ export class EnchantedAnimationsController {
 
 								document.body.appendChild(ghost);
 								
-								const exitDur = this.plugin.settings.speed * 800; // 2x longer exit animation
+								const exitDur = this.plugin.settings.speed * 1200;
 								
 								// Use Web Animations API but with a hard setTimeout fallback to guarantee removal
 								try {
@@ -409,6 +409,7 @@ export class EnchantedAnimationsController {
 		});
 
 		this.bodyObserver.observe(document.body, { childList: true });
+		document.addEventListener('click', this.onGlobalClick, true);
 	}
 	
 	private animateMobileSettingsExit(originalNode: HTMLElement, ease: string) {
@@ -426,15 +427,15 @@ export class EnchantedAnimationsController {
 		// Always append to body to prevent flex/grid layout shifts
 		document.body.appendChild(ghost);
 		
-		const exitDur = this.plugin.settings.speed * 800;
+		const exitDur = this.plugin.settings.speed * 1400;
 		const innerModal = ghost.querySelector('.modal') as HTMLElement;
 		const bg = ghost.querySelector('.modal-bg') as HTMLElement;
 		
 		if (innerModal) {
 			try {
 				const anim = innerModal.animate([
-					{ transform: 'translateX(0)' },
-					{ transform: 'translateX(-100%)' } // Full screen slide left, no opacity fade for premium feel
+					{ opacity: 1, transform: 'scale(1) translateY(0)' },
+					{ opacity: 0, transform: 'scale(0.92) translateY(30px)' } // Premium Material You scale + fade out
 				], { duration: exitDur, easing: ease, fill: 'forwards' });
 				
 				if (bg) {
@@ -466,5 +467,10 @@ export class EnchantedAnimationsController {
 
 		this.bodyObserver?.disconnect();
 		this.bodyObserver = null;
+		document.removeEventListener('click', this.onGlobalClick, true);
 	}
+	private onGlobalClick = (e: MouseEvent) => {
+		// Obsidian handles mobile settings drill-down/drill-up natively with its own Web Animations API.
+		// We intentionally do NOT add ghost animations here — they clash with native transitions.
+	};
 }
