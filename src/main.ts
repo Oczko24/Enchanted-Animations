@@ -128,6 +128,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 
 			if (container && !container.classList.contains('is-closing')) {
 				container.classList.add('is-closing');
+				container.dataset.eaAnimated = 'true'; // Permanent marker for childList observer
 				const durationMs = plugin.settings.speed * 700;
 				
 				setTimeout(() => {
@@ -153,6 +154,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 					let container = this.containerEl || document.querySelector('.modal-container.mod-settings');
 					if (container && !container.classList.contains('is-closing')) {
 						container.classList.add('is-closing');
+						container.dataset.eaAnimated = 'true'; // Permanent marker for childList observer
 						const durationMs = plugin.settings.speed * 700;
 						
 						setTimeout(() => {

@@ -1,3 +1,14 @@
+/* 
+This code was created by Oczko24.
+For more details, visit:
+https://github.com/Oczko24/Enchanted-Animations/
+
+Your feedback and suggestions are greatly appreciated! 
+I’m working to make this as polished and functional as possible. Thanks for your support!
+
+Please don't copy this code without mentioning repository link
+*/
+
 /* Enchanted Animations – main stylesheet
    CSS vars injected by JS: --enchanted-animations-speed, --enchanted-animations-easing */
 
@@ -118,6 +129,19 @@ body:not(.disable-modal-animation) .graph-controls.is-closing {
 }
 
 
+/* ==================== Modal Exit Fix ==================== */
+/* Native Obsidian sets opacity: 0 on the container, which masks our slide animations.
+   We force the container to stay visible and animate the background separately. */
+body:not(.disable-modal-animation) .modal-container.is-closing,
+.theme-dark body:not(.disable-modal-animation) .modal-container.is-closing,
+.theme-light body:not(.disable-modal-animation) .modal-container.is-closing {
+  opacity: 1;
+}
+
+body:not(.disable-modal-animation) .modal-container.is-closing .modal-bg {
+  animation: ea-fade-out calc(var(--enchanted-animations-speed) * 0.7) var(--enchanted-animations-easing) forwards;
+}
+
 /* ==================== Document Search (Ctrl+F) ==================== */
 
 body:not(.disable-modal-animation) .document-search-container {
@@ -132,6 +156,15 @@ body:not(.disable-modal-animation) .document-search-container.is-closing {
 
 
 /* ==================== Mobile Settings Drill-Down & Tab Switch ==================== */
+
+body:not(.disable-modal-animation).is-phone .modal.mod-settings {
+  box-shadow: 5px 0 40px rgba(0,0,0,0.2); /* Premium depth when sliding in from left */
+  animation: ea-sheet-in calc(var(--enchanted-animations-speed) * 1.2) var(--enchanted-animations-easing) forwards;
+}
+
+body:not(.disable-modal-animation).is-phone .modal-container.is-closing .modal.mod-settings {
+  animation: ea-sheet-out calc(var(--enchanted-animations-speed) * 1.2) var(--enchanted-animations-easing) forwards;
+}
 
 body:not(.disable-modal-animation).is-phone .modal.mod-settings .vertical-tab-content-container {
   --ea-slide-start: 30px;
@@ -321,6 +354,16 @@ body.ea-gpu-accel input[type='range']::-webkit-slider-thumb {
   will-change: transform, opacity;
 }
 
+/* ==================== Ghost Elements (DOM Caching) ==================== */
+/* Prevents entry animations from restarting on cloned nodes without using !important */
+body .ea-ghost-modal, 
+body .ea-ghost-modal *,
+body .ea-ghost-tab-switcher,
+body .ea-ghost-tab-switcher * {
+  animation: none;
+  transition: none;
+}
+
 
 /* ==================== Keyframes ==================== */
 
@@ -337,6 +380,16 @@ body.ea-gpu-accel input[type='range']::-webkit-slider-thumb {
 @keyframes ea-slide-down {
   from { opacity: 1; transform: translateY(0); }
   to   { opacity: 0; transform: translateY(30px); }
+}
+
+@keyframes ea-sheet-in {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(0); }
+}
+
+@keyframes ea-sheet-out {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-100%); }
 }
 
 @keyframes ea-fade-in {

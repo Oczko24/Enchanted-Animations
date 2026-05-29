@@ -296,6 +296,7 @@ export class EnchantedAnimationsController {
 							{ transform: 'translateY(0)' }
 						], { duration: dur, easing: ease });
 					}
+					
 				}
 			}
 		});
@@ -321,6 +322,12 @@ export class EnchantedAnimationsController {
 
 			for (const m of mutations) {
 				if (m.type === 'childList') {
+					for (const node of Array.from(m.addedNodes)) {
+						if (node instanceof HTMLElement && node.classList.contains('modal-container')) {
+							delete node.dataset.eaAnimated;
+						}
+					}
+					
 					if (isTabAnimationsEnabled && !this.plugin.settings.disableNativeAnimations) {
 						for (const node of Array.from(m.addedNodes)) {
 							if (node instanceof HTMLElement && node.classList.contains('mobile-tab-switcher') && !node.classList.contains('ea-ghost-tab-switcher')) {
@@ -383,6 +390,18 @@ export class EnchantedAnimationsController {
 									}
 								}, exitDur + 50);
 							}
+							
+							// ── Mobile Settings Modal Exit (Fallback for X button) ──
+							if (node instanceof HTMLElement && node.classList.contains('modal-container') && !node.classList.contains('ea-ghost-modal')) {
+								if (document.body.classList.contains('is-phone')) {
+									const modal = node.querySelector('.modal.mod-settings');
+									// If it has .is-closing or .eaAnimated, CSS animation already handled it (e.g. Escape).
+									// If it doesn't, it means it was instantly removed (e.g. clicking X).
+									if (modal && !node.classList.contains('is-closing') && node.dataset.eaAnimated !== 'true') {
+										this.animateMobileSettingsExit(node, ease);
+									}
+								}
+							}
 						}
 					}
 				}
@@ -390,6 +409,52 @@ export class EnchantedAnimationsController {
 		});
 
 		this.bodyObserver.observe(document.body, { childList: true });
+	}
+	
+	private animateMobileSettingsExit(originalNode: HTMLElement, ease: string) {
+		const ghost = originalNode.cloneNode(true) as HTMLElement;
+		ghost.classList.add('ea-ghost-modal');
+		
+		// Ensure ghost is visible
+		ghost.style.opacity = '1';
+		ghost.style.visibility = 'visible';
+		ghost.style.display = 'flex'; // Obsidian modals are usually flex
+		
+		ghost.style.pointerEvents = 'none';
+		ghost.style.zIndex = '99999';
+		
+		// Always append to body to prevent flex/grid layout shifts
+		document.body.appendChild(ghost);
+		
+		const exitDur = this.plugin.settings.speed * 800;
+		const innerModal = ghost.querySelector('.modal') as HTMLElement;
+		const bg = ghost.querySelector('.modal-bg') as HTMLElement;
+		
+		if (innerModal) {
+			try {
+				const anim = innerModal.animate([
+					{ transform: 'translateX(0)' },
+					{ transform: 'translateX(-100%)' } // Full screen slide left, no opacity fade for premium feel
+				], { duration: exitDur, easing: ease, fill: 'forwards' });
+				
+				if (bg) {
+					bg.animate([
+						{ opacity: 1 },
+						{ opacity: 0 }
+					], { duration: exitDur, easing: ease, fill: 'forwards' });
+				}
+				
+				anim.onfinish = () => ghost.remove();
+			} catch (e) {
+				ghost.style.opacity = '0';
+			}
+		}
+		
+		setTimeout(() => {
+			if (document.contains(ghost)) {
+				ghost.remove();
+			}
+		}, exitDur + 50);
 	}
 
 	public teardown() {
