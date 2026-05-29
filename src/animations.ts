@@ -22,6 +22,7 @@ export class EnchantedAnimationsController {
 		// 1. ResizeObserver for precise FLIP animations (Inline Title & Line Numbers)
 		this.resizeObserver = new ResizeObserver((entries) => {
 			if (!this.plugin.settings.enableLayoutAnimations) return;
+			const isTransitioning = document.body.classList.contains('ea-note-transitioning');
 			const dur = this.plugin.settings.speed * 750;
 			const ease = this.plugin.settings.easing;
 
@@ -39,8 +40,8 @@ export class EnchantedAnimationsController {
 					const newHeight = entry.contentRect.height;
 					const isNowHidden = newHeight === 0;
 
-					// Initialize state silently if we haven't seen this element before
-					if (!this.inlineTitleState.has(el)) {
+					// Initialize state silently if we haven't seen this element before, or if transitioning
+					if (!this.inlineTitleState.has(el) || isTransitioning) {
 						this.inlineTitleState.set(el, { height: el.scrollHeight, isHidden: isNowHidden });
 						continue;
 					}
@@ -110,6 +111,10 @@ export class EnchantedAnimationsController {
 
 					// Only act if the width changed significantly (ignores sub-pixel virtual scroll updates)
 					if (Math.abs(diff) > 5) {
+						if (isTransitioning) {
+							this.scrollerGutterWidth.set(scroller, newWidth);
+							continue;
+						}
 						const content = scroller.querySelector('.cm-contentContainer') as HTMLElement;
 						if (content && !this._animating.has(content)) {
 							this._animating.add(content);
@@ -129,41 +134,7 @@ export class EnchantedAnimationsController {
 								}, dur);
 							});
 
-							// Animate Numbers Appearance/Disappearance
-							if (diff > 0) {
-								// Intro (Grew)
-								const activeLineNumbers = el.querySelector('.cm-lineNumbers') as HTMLElement;
-								if (activeLineNumbers) {
-									activeLineNumbers.animate([
-										{ opacity: 0, transform: 'translateX(-15px)' },
-										{ opacity: 1, transform: 'translateX(0)' }
-									], { duration: dur, easing: ease });
-								}
-							} else if (diff < 0) {
-								// Outro (Shrunk)
-								// Create a ghost node to fade out
-								const ghost = document.createElement('div');
-								ghost.className = 'cm-gutter cm-lineNumbers ea-ghost-numbers';
-								ghost.style.position = 'absolute';
-								ghost.style.left = '0';
-								ghost.style.top = '0';
-								ghost.style.width = `${Math.abs(diff)}px`;
-								ghost.style.height = '100%';
-								ghost.style.zIndex = '0';
-								ghost.style.pointerEvents = 'none';
-								ghost.style.backgroundColor = 'transparent';
-								
-								// We fake the appearance of numbers since the real ones are gone
-								// A simple fading box is usually enough since text is sliding over it
-								
-								el.style.position = 'relative';
-								el.appendChild(ghost);
-								
-								ghost.animate([
-									{ opacity: 1, transform: 'translateX(0)' },
-									{ opacity: 0, transform: 'translateX(-15px)' }
-								], { duration: dur, easing: ease }).onfinish = () => ghost.remove();
-							}
+
 						}
 					}
 
@@ -180,8 +151,61 @@ export class EnchantedAnimationsController {
 			for (const m of mutations) {
 				// ── Observe dynamically added Title and Gutters, and Animate Line Numbers ──
 				if (m.type === 'childList') {
-					if (this.plugin.settings.enableLayoutAnimations) {
-						// Outro/Intro for line numbers is now safely handled by ResizeObserver based on real width changes!
+					const isTransitioning = document.body.classList.contains('ea-note-transitioning');
+					if (this.plugin.settings.enableLayoutAnimations && !isTransitioning) {
+						for (const node of Array.from(m.addedNodes)) {
+							if (node instanceof HTMLElement) {
+								const lineNumbers = node.classList.contains('cm-lineNumbers') ? node : node.querySelector('.cm-lineNumbers');
+								if (lineNumbers && lineNumbers instanceof HTMLElement) {
+									const scroller = lineNumbers.closest('.cm-scroller');
+									if (scroller && this.scrollerGutterWidth.has(scroller)) {
+										lineNumbers.animate([
+											{ opacity: 0, transform: 'translateX(-100%)' },
+											{ opacity: 1, transform: 'translateX(0)' }
+										], { duration: dur, easing: ease });
+									}
+								}
+							}
+						}
+						for (const node of Array.from(m.removedNodes)) {
+							if (node instanceof HTMLElement) {
+								if (node.classList.contains('cm-lineNumbers')) {
+									const gutters = m.target as HTMLElement;
+									const scroller = gutters.closest('.cm-scroller');
+									if (gutters && gutters.classList.contains('cm-gutters') && scroller && this.scrollerGutterWidth.has(scroller)) {
+										const editor = gutters.closest('.cm-editor') as HTMLElement;
+										if (editor) {
+											const ghost = node.cloneNode(true) as HTMLElement;
+											ghost.classList.add('ea-ghost-numbers');
+											
+											const editorRect = editor.getBoundingClientRect();
+											const guttersRect = gutters.getBoundingClientRect();
+											
+											const bgColor = window.getComputedStyle(gutters).backgroundColor;
+											ghost.style.backgroundColor = (bgColor && bgColor !== 'rgba(0, 0, 0, 0)') ? bgColor : 'var(--background-secondary)';
+											
+											ghost.style.position = 'absolute';
+											ghost.style.left = `${guttersRect.left - editorRect.left}px`;
+											ghost.style.top = `${guttersRect.top - editorRect.top}px`;
+											ghost.style.height = `${guttersRect.height}px`;
+											ghost.style.zIndex = '99';
+											ghost.style.pointerEvents = 'none';
+											ghost.style.overflow = 'hidden';
+											ghost.style.display = 'flex';
+											ghost.style.flexDirection = 'column';
+											ghost.style.alignItems = 'flex-end'; // Line numbers typically align right
+											
+											editor.appendChild(ghost);
+
+											ghost.animate([
+												{ opacity: 1, transform: 'translateX(0)' },
+												{ opacity: 0, transform: 'translateX(-100%)' }
+											], { duration: dur, easing: ease }).onfinish = () => ghost.remove();
+										}
+									}
+								}
+							}
+						}
 					}
 
 					m.addedNodes.forEach(node => {

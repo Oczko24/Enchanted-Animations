@@ -35,6 +35,14 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 
 		// Re-trigger note animation when switching between existing .md tabs
 		let lastActiveFile = '';
+		
+		const blockTransitions = () => {
+			document.body.classList.add('ea-note-transitioning');
+			setTimeout(() => {
+				document.body.classList.remove('ea-note-transitioning');
+			}, 400);
+		};
+
 		this.registerEvent(
 			this.app.workspace.on('active-leaf-change', () => {
 				const currentFile = this.app.workspace.getActiveFile();
@@ -50,7 +58,13 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 						document.body.classList.add('animate-note-open');
 					}
 				}
+				
+				blockTransitions();
 			})
+		);
+		
+		this.registerEvent(
+			this.app.workspace.on('layout-change', blockTransitions)
 		);
 
 		this.patchModalClose();
