@@ -1152,5 +1152,90 @@ body.ea-layout-animations .metadata-container.is-collapsed .metadata-content {
 
 body.ea-layout-animations .metadata-container:not(.is-collapsed) .metadata-content {
   max-height: 1500px;
-/* CSS layout transitions are now handled, dynamic elements (Title/Line Numbers) use precise JS in animations.ts */
+}
+
+/* ==================== Animated Links & External Link Fix ==================== */
+
+/* 1. Fix missing external link icon and weird gap */
+/* We remove the native background-image and its padding, and instead use an inline ::after element for perfect text-flow alignment */
+body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .external-link,
+body:not(.disable-formatting-animations) .markdown-reading-view .external-link {
+  padding-right: 0;
+  background-image: none; /* override default Obsidian icon to use our mask */
+}
+
+/* Recreate the external link icon using a CSS mask so it inherits color and animates perfectly */
+body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .external-link::after,
+body:not(.disable-formatting-animations) .markdown-reading-view .external-link::after {
+  content: '';
+  display: inline-block;
+  vertical-align: middle;
+  transform: translateY(-1px);
+  width: 13px;
+  height: 13px;
+  margin-left: 4px;
+  background-color: var(--text-muted);
+  -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>');
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>');
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  transition: transform calc(var(--enchanted-animations-speed) * 0.8) var(--enchanted-animations-easing),
+              background-color calc(var(--enchanted-animations-speed) * 0.8) var(--enchanted-animations-easing);
+}
+
+body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .external-link:hover::after,
+body:not(.disable-formatting-animations) .markdown-reading-view .external-link:hover::after {
+  transform: translateY(-1px) translate(2px, -2px) scale(1.1);
+  background-color: var(--text-accent);
+}
+
+/* 2. Premium Underline Animation for all links */
+/* Prevent double underlines from default themes and child elements like .cm-underline */
+body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-link:not(.cm-formatting-link),
+body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-hmd-internal-link:not(.cm-formatting-link),
+body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-url:not(.cm-formatting-link-string),
+body:not(.disable-formatting-animations) .markdown-reading-view a,
+body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-link .cm-underline,
+body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-hmd-internal-link .cm-underline,
+body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-url .cm-underline,
+body:not(.disable-formatting-animations) .markdown-reading-view a .cm-underline {
+  text-decoration: none;
+  text-decoration-line: none;
+  border-bottom: none;
+  box-shadow: none;
+}
+
+/* Fix for unresolved links in Live Preview so the underline matches the text opacity */
+body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-hmd-internal-link:has(.is-unresolved) {
+  opacity: var(--link-unresolved-opacity, 0.5);
+  filter: var(--link-unresolved-filter, none);
+}
+body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-hmd-internal-link:has(.is-unresolved) .is-unresolved {
+  opacity: 1;
+  filter: none;
+}
+
+body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-link:not(.cm-formatting-link),
+body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-hmd-internal-link:not(.cm-formatting-link),
+body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-url:not(.cm-formatting-link-string),
+body:not(.disable-formatting-animations) .markdown-reading-view a {
+  text-decoration: none;
+  text-decoration-line: none;
+  border-bottom: none;
+  box-shadow: none;
+  background-image: linear-gradient(var(--text-accent), var(--text-accent));
+  background-size: 100% 1px;
+  background-position: 0% 100%;
+  background-repeat: no-repeat;
+  transition: background-size calc(var(--enchanted-animations-speed) * 0.8) var(--enchanted-animations-easing),
+              color calc(var(--enchanted-animations-speed) * 0.8) var(--enchanted-animations-easing);
+}
+
+body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-link:not(.cm-formatting-link):hover,
+body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-hmd-internal-link:not(.cm-formatting-link):hover,
+body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-url:not(.cm-formatting-link-string):hover,
+body:not(.disable-formatting-animations) .markdown-reading-view a:hover {
+  background-size: 0% 1px;
 }
