@@ -1137,6 +1137,14 @@ body.ea-layout-animations div.markdown-source-view.mod-cm6 .cm-sizer,
 body.ea-layout-animations div.markdown-preview-view .markdown-preview-sizer {
   transition: padding calc(var(--enchanted-animations-speed) * 1.5) var(--enchanted-animations-easing);
   box-sizing: border-box;
+  /* Fix right-click bug: let clicks pass through the massive padding */
+  pointer-events: none;
+}
+
+/* Restore pointer events for actual content inside the sizer */
+body.ea-layout-animations div.markdown-source-view.mod-cm6 .cm-sizer > *,
+body.ea-layout-animations div.markdown-preview-view .markdown-preview-sizer > * {
+  pointer-events: auto;
 }
 
 /* Force max-width to 100% for BOTH states so it never restricts width natively. High specificity replaces !important. */
