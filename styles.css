@@ -285,9 +285,7 @@ body.ea-gpu-accel .progress-bar .progress-bar-subline,
 body.ea-gpu-accel .pdf-sidebar-resizer,
 body.ea-gpu-accel .workspace-leaf-resize-handle,
 body.ea-gpu-accel .search-input-clear-button,
-body.ea-gpu-accel .workspace-tabs.mod-top .workspace-tab-header-container-inner,
-body.ea-gpu-accel .workspace-tabs.mod-top .workspace-tab-header,
-body.ea-gpu-accel .workspace-tabs.mod-top .workspace-tab-header-inner,
+
 body.ea-gpu-accel .graph-color-group,
 body.ea-gpu-accel .workspace-split.mod-sidedock,
 body.ea-gpu-accel .vertical-tab-content-container,
@@ -635,16 +633,6 @@ body:not(.disable-native-animations) .search-input-clear-button {
   transition-timing-function: var(--enchanted-animations-easing);
 }
 
-/* ==================== Workspace Tabs Top Animations ==================== */
-body:not(.disable-native-animations) .workspace-tabs.mod-top .workspace-tab-header-container-inner,
-body:not(.disable-native-animations) .workspace-tabs.mod-top .workspace-tab-header,
-body:not(.disable-native-animations) .workspace-tabs.mod-top .workspace-tab-header-inner {
-  transition-property: transform, width, max-width, min-width, flex-basis, opacity, margin, padding;
-  transition-duration: calc(var(--enchanted-animations-speed) * 3);
-  transition-timing-function: var(--enchanted-animations-easing);
-  will-change: transform, width, max-width, min-width, flex-basis;
-  transform: translateZ(0);
-}
 
 /* ==================== Graph View & Miscellaneous ==================== */
 body:not(.disable-native-animations) .graph-color-group {
@@ -980,18 +968,6 @@ body.ea-checkbox-animations .markdown-preview-view .task-list-item.is-checked de
 }
 
 
-/* ==================== Tabs ==================== */
-body.ea-tab-animations .workspace-tab-header {
-  transition: max-width calc(var(--enchanted-animations-speed) * 1.5) var(--enchanted-animations-easing),
-              min-width calc(var(--enchanted-animations-speed) * 1.5) var(--enchanted-animations-easing),
-              flex-basis calc(var(--enchanted-animations-speed) * 1.5) var(--enchanted-animations-easing),
-              opacity calc(var(--enchanted-animations-speed) * 0.8) var(--enchanted-animations-easing);
-}
-
-body.ea-tab-animations .workspace-tab-header-inner {
-  transition: opacity calc(var(--enchanted-animations-speed) * 0.5) var(--enchanted-animations-easing),
-              transform calc(var(--enchanted-animations-speed) * 0.8) var(--enchanted-animations-easing);
-}
 
 /* ==================== Buttons ==================== */
 body.ea-button-animations button:not(.clickable-icon) {
