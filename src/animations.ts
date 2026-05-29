@@ -3,6 +3,7 @@ export class EnchantedAnimationsController {
 	private _animating: WeakSet<Element>;
 	private resizeObserver: ResizeObserver | null = null;
 	private mutationObserver: MutationObserver | null = null;
+	private bodyObserver: MutationObserver | null = null;
 
 	// Track previous states for FLIP
 	private inlineTitleState = new WeakMap<Element, { height: number, isHidden: boolean }>();
@@ -311,6 +312,84 @@ export class EnchantedAnimationsController {
 		document.querySelectorAll('.inline-title, .cm-gutters').forEach(el => {
 			this.resizeObserver?.observe(el);
 		});
+
+		// 3. Body observer for elements appended directly to body (like mobile tab switcher)
+		this.bodyObserver = new MutationObserver((mutations) => {
+			const isTabAnimationsEnabled = document.body.classList.contains('ea-tab-animations');
+			const dur = this.plugin.settings.speed * 1500; // * 1.5 as requested ("wolniejsza ciutkę")
+			const ease = this.plugin.settings.easing;
+
+			for (const m of mutations) {
+				if (m.type === 'childList') {
+					if (isTabAnimationsEnabled && !this.plugin.settings.disableNativeAnimations) {
+						for (const node of Array.from(m.addedNodes)) {
+							if (node instanceof HTMLElement && node.classList.contains('mobile-tab-switcher') && !node.classList.contains('ea-ghost-tab-switcher')) {
+								// Cancel Obsidian's native JS animation if any
+								node.getAnimations().forEach(a => a.cancel());
+								node.animate([
+									{ opacity: 0, transform: 'translateY(15px) scale(0.98)' },
+									{ opacity: 1, transform: 'translateY(0) scale(1)' }
+								], { duration: dur, easing: ease, fill: 'forwards' });
+							}
+						}
+						
+						for (const node of Array.from(m.removedNodes)) {
+							if (node instanceof HTMLElement && node.classList.contains('mobile-tab-switcher') && !node.classList.contains('ea-ghost-tab-switcher')) {
+								const ghost = node.cloneNode(true) as HTMLElement;
+								ghost.classList.add('ea-ghost-tab-switcher');
+								
+								// CRITICAL: Prevent the ghost from blocking any clicks
+								ghost.style.setProperty('pointer-events', 'none', 'important');
+								ghost.style.position = 'fixed';
+								ghost.style.zIndex = '99999';
+								
+								// Ensure it doesn't scroll or capture focus
+								ghost.setAttribute('aria-hidden', 'true');
+								
+								// Prevent ERR_FILE_NOT_FOUND console errors from revoked thumbnail URLs
+								// by stripping image sources before appending the ghost to the DOM.
+								ghost.querySelectorAll('img').forEach(img => {
+									// Replace with a transparent 1x1 pixel to maintain layout if it relies on img dimensions
+									img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+								});
+								ghost.querySelectorAll('*').forEach(el => {
+									if (el instanceof HTMLElement && el.style.backgroundImage) {
+										el.style.backgroundImage = 'none';
+									}
+								});
+
+								document.body.appendChild(ghost);
+								
+								const exitDur = this.plugin.settings.speed * 800; // 2x longer exit animation
+								
+								// Use Web Animations API but with a hard setTimeout fallback to guarantee removal
+								try {
+									const anim = ghost.animate([
+										{ opacity: 1, transform: 'translateY(0) scale(1)' },
+										{ opacity: 0, transform: 'translateY(15px) scale(0.98)' }
+									], { duration: exitDur, easing: ease, fill: 'forwards' });
+									
+									anim.onfinish = () => ghost.remove();
+								} catch (e) {
+									// Fallback if animate fails
+									ghost.style.opacity = '0';
+								}
+								
+								// Failsafe: ALWAYS remove the ghost from DOM after the duration + 50ms buffer
+								// This prevents the "mega bug" where the ghost stays on screen forever
+								setTimeout(() => {
+									if (document.body.contains(ghost)) {
+										ghost.remove();
+									}
+								}, exitDur + 50);
+							}
+						}
+					}
+				}
+			}
+		});
+
+		this.bodyObserver.observe(document.body, { childList: true });
 	}
 
 	public teardown() {
@@ -319,5 +398,8 @@ export class EnchantedAnimationsController {
 		
 		this.mutationObserver?.disconnect();
 		this.mutationObserver = null;
+
+		this.bodyObserver?.disconnect();
+		this.bodyObserver = null;
 	}
 }
