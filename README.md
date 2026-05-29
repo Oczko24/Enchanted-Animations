@@ -45,4 +45,4 @@ After enabling the plugin, you can configure:
 
 ### Support
 
-If you like this plugin you can drop me a star on it's [repositorium](https://github.com/Oczko24/Enchanted-Animations/) or just put some pull request to help me with doing it:)))
+If you like this plugin you can drop me a star on it's [repo](https://github.com/Oczko24/Enchanted-Animations/) or just put some pull request to help me with doing it. I will really appreciate some new animations or some improvements:)))) 
