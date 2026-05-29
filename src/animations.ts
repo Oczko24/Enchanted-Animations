@@ -420,6 +420,7 @@ export class EnchantedAnimationsController {
 		ghost.style.opacity = '1';
 		ghost.style.visibility = 'visible';
 		ghost.style.display = 'flex'; // Obsidian modals are usually flex
+		ghost.style.animation = 'none';
 		
 		ghost.style.pointerEvents = 'none';
 		ghost.style.zIndex = '99999';
@@ -432,6 +433,9 @@ export class EnchantedAnimationsController {
 		const bg = ghost.querySelector('.modal-bg') as HTMLElement;
 		
 		if (innerModal) {
+			// Disable CSS animations on the clone so it doesn't trigger the entry animation again
+			innerModal.style.animation = 'none';
+			
 			try {
 				const anim = innerModal.animate([
 					{ opacity: 1, transform: 'scale(1) translateY(0)' },
@@ -439,6 +443,7 @@ export class EnchantedAnimationsController {
 				], { duration: exitDur, easing: ease, fill: 'forwards' });
 				
 				if (bg) {
+					bg.style.animation = 'none';
 					bg.animate([
 						{ opacity: 1 },
 						{ opacity: 0 }
