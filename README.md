@@ -19,6 +19,15 @@ This plugin adds also nice animated formating;))
 - Custom, better look of some spaces in obsidian for example:
 <img width="592" alt="result" src="https://github.com/user-attachments/assets/8aaa9888-51b3-45e6-8cf4-925a4fead10b" />
 
+- Animated checkboxes
+
+<img width="320" alt="Screencast From 2026-05-29 14-55-24" src="https://github.com/user-attachments/assets/59253272-95fc-4a0a-88ba-fc24f78b0727" />
+
+
+- and some other thing for example
+
+<img width="640" alt="Screencast From 2026-05-29 17-57-36" src="https://github.com/user-attachments/assets/34035d61-2245-4c39-b25f-9330c403a76e" />
+
 ### Main objective 
 
 Is to animate everything possile, i offer often updates with new UI animations:))
