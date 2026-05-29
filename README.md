@@ -1,9 +1,9 @@
 
 # Enchanted Animations
 
-Obsidian plugin that animates everything!
+An Obsidian plugin that animates everything!
 
-below you can see short showcase of some animations in this plugin
+Below you can see a short showcase of some of the animations in this plugin:
 
 <img width="1240" alt="Screencast From 2026-05-25 21-29-12" src="https://github.com/user-attachments/assets/a46ed09f-1f82-49ff-b36f-53694476a7c3" />
 
@@ -13,10 +13,10 @@ This plugin adds also nice animated formating;))
 
 ## Features
 
-- Customisable animation speed and their look in whole obsidian
-- Turn on/off specific UI elements animations
-- Control over every animation you can find in obsidian
-- Custom, better look of some spaces in obsidian for example:
+- Customizable animation speed and appearance throughout Obsidian
+- Toggle animations for specific UI elements
+- Control over almost every animation you can find in Obsidian
+- Custom, improved look for specific areas in Obsidian, for example:
 <img width="592" alt="result" src="https://github.com/user-attachments/assets/8aaa9888-51b3-45e6-8cf4-925a4fead10b" />
 
 - Animated checkboxes
@@ -30,7 +30,7 @@ This plugin adds also nice animated formating;))
 
 ### Main objective 
 
-Is to animate everything possile, i offer often updates with new UI animations:))
+The goal is to animate everything possible! I frequently release updates with new UI animations. :)
 
 ### Roadmap
 
@@ -42,7 +42,7 @@ Is to animate everything possile, i offer often updates with new UI animations:)
 
 1. Go into this link https://community.obsidian.md/plugins/enchanted-animations
 2. Click "Add to obsidian"
-3. After this, in obsidian just enable this plugin:))
+3. After that, simply enable the plugin in your Obsidian settings. :))
 
 ## Usage
 
@@ -54,4 +54,6 @@ After enabling the plugin, you can configure:
 
 ### Support
 
-If you like this plugin you can drop me a star on it's [repo](https://github.com/Oczko24/Enchanted-Animations/) or just put some pull request to help me with doing it. I will really appreciate some new animations or some improvements:)))) 
+If you like this plugin you can drop me a ⭐ or just put some pull request to help me with doing it. I will really appreciate some new animations or some improvements:)))) 
+
+you can find a link to this repo there -> [![GitHub stars](https://img.shields.io/github/stars/Oczko24/Enchanted-Animations?style=social)](https://github.com/Oczko24/Enchanted-Animations)
