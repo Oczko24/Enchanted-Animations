@@ -217,7 +217,7 @@ body:not(.disable-formatting-animations) .markdown-reading-view .code-block-flai
   animation: ea-flair-slide-in calc(var(--enchanted-animations-speed) * 0.8) var(--enchanted-animations-easing);
 }
 
-body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-line.cm-active:not(.HyperMD-codeblock) .cm-formatting:not(.cm-formatting-header):not(.cm-formatting-list):not(.cm-formatting-task),
+body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-line.cm-active:not(.HyperMD-codeblock) .cm-formatting:not(.cm-formatting-header):not(.cm-formatting-list):not(.cm-formatting-task):not(.cm-formatting-hashtag),
 body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-line.cm-active:not(.HyperMD-codeblock) .cm-formatting-link {
   display: inline-block;
   vertical-align: baseline;
@@ -1076,4 +1076,81 @@ body.ea-tooltip-animations .cm-tooltip {
     transform: translateY(0);
     filter: blur(0);
   }
+}
+
+/* ==================== Tags ==================== */
+/* Reading Mode Tag */
+body.ea-tag-animations a.tag {
+  transition: transform calc(var(--enchanted-animations-speed) * 0.5) var(--enchanted-animations-easing),
+              filter calc(var(--enchanted-animations-speed) * 0.5) var(--enchanted-animations-easing),
+              box-shadow calc(var(--enchanted-animations-speed) * 0.5) var(--enchanted-animations-easing);
+  display: inline-block;
+}
+
+body.ea-tag-animations a.tag:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.15);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+body.ea-tag-animations a.tag:active {
+  transform: translateY(0) scale(0.96);
+  filter: brightness(0.9);
+  box-shadow: none;
+}
+
+/* ==================== Layout & View Toggles ==================== */
+/* Animating the transition of view settings like Readable Line Length and Properties */
+
+/* 1. Readable Line Length (Width Transition) */
+/* CSS cannot interpolate between 100% and 700px without jumping. Instead, we force max-width to 100% and mathematically animate the padding to squeeze the content! */
+body.ea-layout-animations div.markdown-source-view.mod-cm6 .cm-sizer,
+body.ea-layout-animations div.markdown-preview-view .markdown-preview-sizer {
+  transition: padding calc(var(--enchanted-animations-speed) * 1.5) var(--enchanted-animations-easing);
+  box-sizing: border-box;
+}
+
+/* Force max-width to 100% for BOTH states so it never restricts width natively. High specificity replaces !important. */
+body.ea-layout-animations div.markdown-source-view.mod-cm6.is-readable-line-width .cm-sizer,
+body.ea-layout-animations div.markdown-preview-view.is-readable-line-width .markdown-preview-sizer,
+body.ea-layout-animations div.markdown-source-view.mod-cm6:not(.is-readable-line-width) .cm-sizer,
+body.ea-layout-animations div.markdown-preview-view:not(.is-readable-line-width) .markdown-preview-sizer {
+  max-width: 100%; 
+  width: 100%;
+}
+
+/* Readable OFF: Use default Obsidian padding */
+body.ea-layout-animations div.markdown-source-view.mod-cm6:not(.is-readable-line-width) .cm-sizer,
+body.ea-layout-animations div.markdown-preview-view:not(.is-readable-line-width) .markdown-preview-sizer {
+  padding-left: var(--size-4-4, 16px);
+  padding-right: var(--size-4-4, 16px);
+}
+
+/* Readable ON: Calculate padding dynamically to perfectly center the text column */
+body.ea-layout-animations div.markdown-source-view.mod-cm6.is-readable-line-width .cm-sizer,
+body.ea-layout-animations div.markdown-preview-view.is-readable-line-width .markdown-preview-sizer {
+  padding-left: calc(max(var(--size-4-4, 16px), 50% - (var(--file-line-width) / 2)));
+  padding-right: calc(max(var(--size-4-4, 16px), 50% - (var(--file-line-width) / 2)));
+}
+
+/* 2. Properties (Collapse/Expand) */
+/* Animate the height using the max-height trick, since height: auto cannot be animated. */
+body.ea-layout-animations .metadata-content {
+  transition: max-height calc(var(--enchanted-animations-speed) * 1.5) var(--enchanted-animations-easing),
+              opacity calc(var(--enchanted-animations-speed) * 1.5) var(--enchanted-animations-easing),
+              padding calc(var(--enchanted-animations-speed) * 1.5) var(--enchanted-animations-easing),
+              margin calc(var(--enchanted-animations-speed) * 1.5) var(--enchanted-animations-easing);
+  overflow: hidden;
+}
+
+body.ea-layout-animations .metadata-container.is-collapsed .metadata-content {
+  max-height: 0;
+  opacity: 0;
+  margin: 0;
+  padding: 0;
+}
+
+body.ea-layout-animations .metadata-container:not(.is-collapsed) .metadata-content {
+  max-height: 1500px;
+/* CSS layout transitions are now handled, dynamic elements (Title/Line Numbers) use precise JS in animations.ts */
 }

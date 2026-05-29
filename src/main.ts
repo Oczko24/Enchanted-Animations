@@ -1,5 +1,6 @@
 import {Plugin, Modal, Menu} from 'obsidian';
 import {DEFAULT_SETTINGS, EnchantedAnimationsSettings, EnchantedAnimationsSettingTab} from "./settings";
+import {EnchantedAnimationsController} from "./animations";
 
 export default class EnchantedAnimationsPlugin extends Plugin {
 	settings: EnchantedAnimationsSettings;
@@ -7,8 +8,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 	originalSettingClose: Function;
 	originalMenuHide: Function;
 	originalMenuClose: Function;
-	editorObserver: MutationObserver | null = null;
-	private _animating = new WeakSet<Element>();
+	animationsController: EnchantedAnimationsController;
 
 	async onload() {
 		console.log('Loading Enchanted Animations...');
@@ -65,8 +65,9 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 
 		this.unpatchModalClose();
 		this.unpatchMenuClose();
-		this.editorObserver?.disconnect();
-		this.editorObserver = null;
+		if (this.animationsController) {
+			this.animationsController.teardown();
+		}
 
 		document.body.style.removeProperty('--enchanted-animations-speed');
 		document.body.style.removeProperty('--enchanted-animations-easing');
@@ -221,107 +222,10 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 	}
 
 	setupEditorAnimations() {
-		this.editorObserver?.disconnect();
-		const plugin = this;
-
-		this.editorObserver = new MutationObserver((mutations) => {
-			if (!plugin.settings.enableFormattingAnimations) return;
-
-			const dur = plugin.settings.speed * 750;
-			const ease = plugin.settings.easing;
-
-			for (const m of mutations) {
-				// ── Formatting exit (hmd-hidden-token added) ──
-				if (m.type === 'attributes' && m.attributeName === 'class') {
-					const el = m.target as HTMLElement;
-					if (!el.classList || plugin._animating.has(el)) continue;
-
-					const was = (m.oldValue || '').includes('hmd-hidden-token');
-					const is = el.classList.contains('hmd-hidden-token');
-					if (was || !is) continue;
-
-					const isFormatting = el.classList.contains('cm-formatting') || el.classList.contains('cm-formatting-link');
-					const excluded = el.classList.contains('cm-formatting-header')
-						|| el.classList.contains('cm-formatting-list')
-						|| el.classList.contains('cm-formatting-task');
-					if (!isFormatting || excluded) continue;
-
-					plugin._animating.add(el);
-
-					// Override Obsidian's hiding so the element stays visible during anim
-					el.style.setProperty('font-size', 'inherit');
-					el.style.setProperty('letter-spacing', 'normal');
-					el.style.setProperty('color', 'inherit');
-					el.style.setProperty('font-family', 'inherit');
-					el.style.display = 'inline-block';
-					el.style.verticalAlign = 'baseline';
-
-					const anim = el.animate([
-						{ marginInline: '0', opacity: 1, transform: 'scale(1)' },
-						{ marginInline: '-0.25em', opacity: 0, transform: 'scale(0.85)' }
-					], { duration: dur, easing: ease, fill: 'forwards' });
-
-					anim.onfinish = () => {
-						el.style.removeProperty('font-size');
-						el.style.removeProperty('letter-spacing');
-						el.style.removeProperty('color');
-						el.style.removeProperty('font-family');
-						el.style.removeProperty('display');
-						el.style.removeProperty('vertical-align');
-						plugin._animating.delete(el);
-					};
-				}
-
-				// ── Embed line added/removed → smooth slide ──
-				if (m.type === 'childList') {
-					for (const node of Array.from(m.addedNodes)) {
-						if (!(node instanceof HTMLElement) || !node.classList.contains('cm-line')) continue;
-						if (!node.querySelector(':scope > .cm-formatting-embed')) continue;
-
-						const embedBlock = node.nextElementSibling;
-						if (!embedBlock) continue;
-
-						const h = node.offsetHeight || 28;
-						embedBlock.animate([
-							{ transform: `translateY(-${h}px)` },
-							{ transform: 'translateY(0)' }
-						], { duration: dur, easing: ease });
-
-						node.style.overflow = 'hidden';
-						const lineAnim = node.animate([
-							{ maxHeight: '0px', opacity: 0 },
-							{ maxHeight: h + 'px', opacity: 1 }
-						], { duration: dur, easing: ease });
-						lineAnim.onfinish = () => { node.style.removeProperty('overflow'); };
-					}
-
-					for (const node of Array.from(m.removedNodes)) {
-						if (!(node instanceof HTMLElement) || !node.classList.contains('cm-line')) continue;
-						if (!node.querySelector(':scope > .cm-formatting-embed')) continue;
-
-						const embedBlock = m.nextSibling as HTMLElement;
-						if (!embedBlock || !(embedBlock instanceof HTMLElement)) continue;
-
-						const h = 28;
-						embedBlock.animate([
-							{ transform: `translateY(${h}px)` },
-							{ transform: 'translateY(0)' }
-						], { duration: dur, easing: ease });
-					}
-				}
-			}
-		});
-
-		const root = document.querySelector('.workspace');
-		if (root) {
-			this.editorObserver.observe(root, {
-				childList: true,
-				attributes: true,
-				attributeFilter: ['class'],
-				attributeOldValue: true,
-				subtree: true
-			});
+		if (!this.animationsController) {
+			this.animationsController = new EnchantedAnimationsController(this);
 		}
+		this.animationsController.setup();
 	}
 
 	setupSidebarVelocity() {
@@ -358,6 +262,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		document.body.classList.toggle('disable-formatting-animations', !this.settings.enableFormattingAnimations);
 		document.body.classList.toggle('disable-modal-animation', !this.settings.enableModalAnimations);
 		document.body.classList.toggle('disable-native-animations', !this.settings.enableNativeAnimations);
+		document.body.classList.toggle('ea-layout-animations', this.settings.enableLayoutAnimations);
 		document.body.classList.toggle('ea-smooth-scroll', this.settings.enableSmoothScroll);
 		document.body.classList.toggle('ea-gpu-accel', this.settings.enableGpuAcceleration);
 		document.body.classList.toggle('ea-status-bar-hover', this.settings.enableStatusBarHover);

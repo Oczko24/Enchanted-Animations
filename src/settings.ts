@@ -6,6 +6,7 @@ export interface EnchantedAnimationsSettings {
 	easing: string;
 	enableSplashScreen: boolean;
 	animateNoteOpen: boolean;
+	enableLayoutAnimations: boolean;
 	enableHeaderAnimations: boolean;
 	enableFormattingAnimations: boolean;
 	enableModalAnimations: boolean;
@@ -33,6 +34,7 @@ export const DEFAULT_SETTINGS: EnchantedAnimationsSettings = {
 	easing: "cubic-bezier(0.2, 0, 0, 1)",
 	enableSplashScreen: true,
 	animateNoteOpen: false,
+	enableLayoutAnimations: true,
 	enableHeaderAnimations: true,
 	enableFormattingAnimations: true,
 	enableModalAnimations: true,
@@ -172,6 +174,18 @@ export class EnchantedAnimationsSettingTab extends PluginSettingTab {
 		new Setting(containerEl)
 			.setName("Editor & Note Animations")
 			.setHeading()
+
+		new Setting(containerEl)
+			.setName("Smooth Layout Shifts")
+			.setDesc("Smoothly animates view toggles such as Readable Line Length, Line Numbers, and Inline Title.")
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.enableLayoutAnimations)
+				.onChange(async (value) => {
+					this.plugin.settings.enableLayoutAnimations = value;
+					await this.plugin.saveSettings();
+					this.plugin.applyStyles();
+				})
+			);
 
 		new Setting(containerEl)
 			.setName("Cinematic Note Loading (BETA)")
