@@ -474,8 +474,49 @@ export class EnchantedAnimationsController {
 		this.bodyObserver = null;
 		document.removeEventListener('click', this.onGlobalClick, true);
 	}
+	private showConfetti(el: HTMLElement) {
+		const animationEl = document.createElement("div");
+		animationEl.className = "ea-checkbox-animation ea-confetti";
+		document.body.appendChild(animationEl);
+		
+		const rect = el.getBoundingClientRect();
+		const x = rect.left + rect.width / 2;
+		const y = rect.top + rect.height / 2;
+		
+		animationEl.style.left = `${x}px`;
+		animationEl.style.top = `${y}px`;
+		
+		const colors = ["#ff3300", "#00ff00", "#0066ff", "#ffff00", "#ff00ff", "#00ffff"];
+		const count = 40;
+		
+		for (let i = 0; i < count; i++) {
+			const particle = document.createElement("div");
+			particle.className = "ea-particle";
+			particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)] || "#ff0000";
+			particle.style.setProperty("--tx", `${(Math.random() - 0.5) * 400}px`);
+			particle.style.setProperty("--ty", `${(Math.random() - 0.5) * 400}px`);
+			animationEl.appendChild(particle);
+		}
+		
+		setTimeout(() => {
+			if (document.body.contains(animationEl)) {
+				animationEl.remove();
+			}
+		}, 3000);
+	}
+
 	private onGlobalClick = (e: MouseEvent) => {
 		// Obsidian handles mobile settings drill-down/drill-up natively with its own Web Animations API.
 		// We intentionally do NOT add ghost animations here — they clash with native transitions.
+		
+		if (this.plugin.settings.enableConfetti) {
+			const target = e.target as HTMLElement;
+			if (target && target.classList && target.classList.contains('task-list-item-checkbox')) {
+				const checkbox = target as HTMLInputElement;
+				if (checkbox.checked) {
+					this.showConfetti(target);
+				}
+			}
+		}
 	};
 }

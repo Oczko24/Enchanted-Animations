@@ -27,6 +27,7 @@ export interface EnchantedAnimationsSettings {
 	enableBlockquoteAnimations: boolean;
 	enableTooltipAnimations: boolean;
 	enableMenuCascadeAnimations: boolean;
+	enableConfetti: boolean;
 }
 
 export const DEFAULT_SETTINGS: EnchantedAnimationsSettings = {
@@ -55,6 +56,7 @@ export const DEFAULT_SETTINGS: EnchantedAnimationsSettings = {
 	enableBlockquoteAnimations: true,
 	enableTooltipAnimations: true,
 	enableMenuCascadeAnimations: false,
+	enableConfetti: false,
 }
 
 export class EnchantedAnimationsSettingTab extends PluginSettingTab {
@@ -354,6 +356,22 @@ export class EnchantedAnimationsSettingTab extends PluginSettingTab {
 				.setValue(this.plugin.settings.enableTooltipAnimations)
 				.onChange(async (value) => {
 					this.plugin.settings.enableTooltipAnimations = value;
+					await this.plugin.saveSettings();
+					this.plugin.applyStyles();
+				})
+			);
+
+		new Setting(containerEl)
+			.setName("Productivity & Rewards")
+			.setHeading();
+
+		new Setting(containerEl)
+			.setName("Confetti Checkbox Celebration")
+			.setDesc("A satisfying burst of confetti when you complete a task. Treat yourself! (2x larger)")
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.enableConfetti)
+				.onChange(async (value) => {
+					this.plugin.settings.enableConfetti = value;
 					await this.plugin.saveSettings();
 					this.plugin.applyStyles();
 				})
