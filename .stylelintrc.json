@@ -1,0 +1,11 @@
+{
+  "plugins": [
+    "stylelint-no-unsupported-browser-features"
+  ],
+  "rules": {
+    "plugin/no-unsupported-browser-features": [true, {
+      "browsers": ["Chrome >= 114"],
+      "ignore": ["css-nesting"]
+    }]
+  }
+}
