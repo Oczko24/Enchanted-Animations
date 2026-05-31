@@ -712,73 +712,73 @@ body:not(.disable-native-animations) .workspace-split.mod-sidedock {
 
 body:not(.disable-animated-callouts) .callout[data-callout="note"] .callout-icon svg,
 body:not(.disable-animated-callouts) .callout[data-callout="info"] .callout-icon svg {
-  animation: ea-callout-bounce 1.5s ease-out;
+  animation: ea-callout-bounce calc(var(--enchanted-animations-speed) * 3.75) ease-out;
   transform-origin: bottom center;
 }
 body:not(.disable-animated-callouts) .callout[data-callout="note"]:hover .callout-icon svg,
 body:not(.disable-animated-callouts) .callout[data-callout="info"]:hover .callout-icon svg {
-  animation: ea-callout-bounce-hover 1.5s ease-out;
+  animation: ea-callout-bounce-hover calc(var(--enchanted-animations-speed) * 3.75) ease-out;
 }
 
 body:not(.disable-animated-callouts) .callout[data-callout="warning"] .callout-icon svg,
 body:not(.disable-animated-callouts) .callout[data-callout="caution"] .callout-icon svg {
-  animation: ea-callout-shake 1.5s ease-out;
+  animation: ea-callout-shake calc(var(--enchanted-animations-speed) * 3.75) ease-out;
   transform-origin: bottom center;
 }
 body:not(.disable-animated-callouts) .callout[data-callout="warning"]:hover .callout-icon svg,
 body:not(.disable-animated-callouts) .callout[data-callout="caution"]:hover .callout-icon svg {
-  animation: ea-callout-shake-hover 1.5s ease-out;
+  animation: ea-callout-shake-hover calc(var(--enchanted-animations-speed) * 3.75) ease-out;
 }
 
 body:not(.disable-animated-callouts) .callout[data-callout="success"] .callout-icon svg,
 body:not(.disable-animated-callouts) .callout[data-callout="check"] .callout-icon svg {
-  animation: ea-callout-pulse 1.5s ease-out;
+  animation: ea-callout-pulse calc(var(--enchanted-animations-speed) * 3.75) ease-out;
 }
 body:not(.disable-animated-callouts) .callout[data-callout="success"]:hover .callout-icon svg,
 body:not(.disable-animated-callouts) .callout[data-callout="check"]:hover .callout-icon svg {
-  animation: ea-callout-pulse-hover 1.5s ease-out;
+  animation: ea-callout-pulse-hover calc(var(--enchanted-animations-speed) * 3.75) ease-out;
 }
 
 body:not(.disable-animated-callouts) .callout[data-callout="tip"] .callout-icon svg,
 body:not(.disable-animated-callouts) .callout[data-callout="hint"] .callout-icon svg {
-  animation: ea-callout-swing 1.5s ease-out;
+  animation: ea-callout-swing calc(var(--enchanted-animations-speed) * 3.75) ease-out;
   transform-origin: top center;
 }
 body:not(.disable-animated-callouts) .callout[data-callout="tip"]:hover .callout-icon svg,
 body:not(.disable-animated-callouts) .callout[data-callout="hint"]:hover .callout-icon svg {
-  animation: ea-callout-swing-hover 1.5s ease-out;
+  animation: ea-callout-swing-hover calc(var(--enchanted-animations-speed) * 3.75) ease-out;
 }
 
 body:not(.disable-animated-callouts) .callout[data-callout="question"] .callout-icon svg,
 body:not(.disable-animated-callouts) .callout[data-callout="help"] .callout-icon svg,
 body:not(.disable-animated-callouts) .callout[data-callout="faq"] .callout-icon svg {
-  animation: ea-callout-wobble 1.5s ease-out;
+  animation: ea-callout-wobble calc(var(--enchanted-animations-speed) * 3.75) ease-out;
 }
 body:not(.disable-animated-callouts) .callout[data-callout="question"]:hover .callout-icon svg,
 body:not(.disable-animated-callouts) .callout[data-callout="help"]:hover .callout-icon svg,
 body:not(.disable-animated-callouts) .callout[data-callout="faq"]:hover .callout-icon svg {
-  animation: ea-callout-wobble-hover 1.5s ease-out;
+  animation: ea-callout-wobble-hover calc(var(--enchanted-animations-speed) * 3.75) ease-out;
 }
 
 body:not(.disable-animated-callouts) .callout[data-callout="important"] .callout-icon svg {
-  animation: ea-callout-tada 1.5s ease-out;
+  animation: ea-callout-tada calc(var(--enchanted-animations-speed) * 3.75) ease-out;
 }
 body:not(.disable-animated-callouts) .callout[data-callout="important"]:hover .callout-icon svg {
-  animation: ea-callout-tada-hover 1.5s ease-out;
+  animation: ea-callout-tada-hover calc(var(--enchanted-animations-speed) * 3.75) ease-out;
 }
 
 body:not(.disable-animated-callouts) .callout[data-callout="bug"] .callout-icon svg {
-  animation: ea-callout-skew 1.5s ease-out;
+  animation: ea-callout-skew calc(var(--enchanted-animations-speed) * 3.75) ease-out;
 }
 body:not(.disable-animated-callouts) .callout[data-callout="bug"]:hover .callout-icon svg {
-  animation: ea-callout-skew-hover 1.5s ease-out;
+  animation: ea-callout-skew-hover calc(var(--enchanted-animations-speed) * 3.75) ease-out;
 }
 
 body:not(.disable-animated-callouts) .callout[data-callout="example"] .callout-icon svg {
-  animation: ea-callout-spin 1.5s ease-out;
+  animation: ea-callout-spin calc(var(--enchanted-animations-speed) * 3.75) ease-out;
 }
 body:not(.disable-animated-callouts) .callout[data-callout="example"]:hover .callout-icon svg {
-  animation: ea-callout-spin-hover 1.5s ease-out;
+  animation: ea-callout-spin-hover calc(var(--enchanted-animations-speed) * 3.75) ease-out;
 }
 
 /* ==================== Callout Keyframes (On Load) ==================== */
@@ -1052,14 +1052,12 @@ body.ea-ribbon-animations .workspace-ribbon .clickable-icon:active svg {
 }
 
 /* ==================== Image Hover Zoom ==================== */
-body.ea-image-animations .image-embed,
-body.ea-image-animations .internal-embed {
+body.ea-image-animations .image-embed {
   transition: transform calc(var(--enchanted-animations-speed) * 0.6) var(--enchanted-animations-easing);
   display: inline-block; 
 }
 
-body.ea-image-animations .image-embed:hover,
-body.ea-image-animations .internal-embed:hover {
+body.ea-image-animations .image-embed:hover {
   transform: scale(1.05);
   z-index: 100;
   position: relative;
@@ -1227,15 +1225,15 @@ body:not(.disable-formatting-animations) .markdown-reading-view .external-link:h
 
 /* 2. Premium Underline Animation for all links */
 /* Prevent double underlines from default themes and child elements like .cm-underline */
-body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-link:not(.cm-formatting-link),
+body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-link:not(.cm-formatting-link):not(.cm-hmd-footnote),
 body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-hmd-internal-link:not(.cm-formatting-link),
 body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-url:not(.cm-formatting-link-string),
-body:not(.disable-formatting-animations) .markdown-reading-view a,
-body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-link .cm-underline,
+body:not(.disable-formatting-animations) .markdown-reading-view a:not(.footnote-link),
+body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-link:not(.cm-hmd-footnote) .cm-underline,
 body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-hmd-internal-link .cm-underline,
 body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-hmd-internal-link .is-unresolved,
 body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-url .cm-underline,
-body:not(.disable-formatting-animations) .markdown-reading-view a .cm-underline {
+body:not(.disable-formatting-animations) .markdown-reading-view a:not(.footnote-link) .cm-underline {
   text-decoration: none;
   border-bottom: none;
   box-shadow: none;
@@ -1243,11 +1241,11 @@ body:not(.disable-formatting-animations) .markdown-reading-view a .cm-underline 
 
 /* Apply the animated underline directly to the text spans to avoid :has() performance issues.
    This automatically inherits the 0.5 opacity for unresolved links because .is-unresolved is targeted directly. */
-body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-link .cm-underline,
+body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-link:not(.cm-hmd-footnote) .cm-underline,
 body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-hmd-internal-link .cm-underline,
 body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-hmd-internal-link .is-unresolved,
 body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-url:not(.cm-formatting-link-string),
-body:not(.disable-formatting-animations) .markdown-reading-view a {
+body:not(.disable-formatting-animations) .markdown-reading-view a:not(.footnote-link) {
   background-image: linear-gradient(var(--text-accent), var(--text-accent));
   background-size: 100% 1px;
   background-position: 0% 100%;
@@ -1257,11 +1255,11 @@ body:not(.disable-formatting-animations) .markdown-reading-view a {
 }
 
 /* Trigger hover animation when hovering over the parent link */
-body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-link:not(.cm-formatting-link):hover .cm-underline,
+body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-link:not(.cm-formatting-link):not(.cm-hmd-footnote):hover .cm-underline,
 body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-hmd-internal-link:not(.cm-formatting-link):hover .cm-underline,
 body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-hmd-internal-link:not(.cm-formatting-link):hover .is-unresolved,
 body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-url:not(.cm-formatting-link-string):hover,
-body:not(.disable-formatting-animations) .markdown-reading-view a:hover {
+body:not(.disable-formatting-animations) .markdown-reading-view a:not(.footnote-link):hover {
   background-size: 0% 1px;
 }
 
