@@ -1132,42 +1132,29 @@ body.ea-tag-animations a.tag:active {
 /* Animating the transition of view settings like Readable Line Length and Properties */
 
 /* 1. Readable Line Length (Width Transition) */
-/* CSS cannot interpolate between 100% and 700px without jumping. Instead, we force max-width to 100% and mathematically animate the padding to squeeze the content! */
+/* Animate between % and px using modern CSS @property interpolation */
+@property --ea-max-width {
+  syntax: "<length-percentage>";
+  inherits: false;
+  initial-value: 100%;
+}
+
 body.ea-layout-animations div.markdown-source-view.mod-cm6 .cm-sizer,
 body.ea-layout-animations div.markdown-preview-view .markdown-preview-sizer {
-  transition: padding calc(var(--enchanted-animations-speed) * 1.5) var(--enchanted-animations-easing);
-  box-sizing: border-box;
-  /* Fix right-click bug: let clicks pass through the massive padding */
-  pointer-events: none;
+  transition: --ea-max-width calc(var(--enchanted-animations-speed) * 1.5) var(--enchanted-animations-easing);
+  max-width: var(--ea-max-width) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
 }
 
-/* Restore pointer events for actual content inside the sizer */
-body.ea-layout-animations div.markdown-source-view.mod-cm6 .cm-sizer > *,
-body.ea-layout-animations div.markdown-preview-view .markdown-preview-sizer > * {
-  pointer-events: auto;
-}
-
-/* Force max-width to 100% for BOTH states so it never restricts width natively. High specificity replaces !important. */
-body.ea-layout-animations div.markdown-source-view.mod-cm6.is-readable-line-width .cm-sizer,
-body.ea-layout-animations div.markdown-preview-view.is-readable-line-width .markdown-preview-sizer,
 body.ea-layout-animations div.markdown-source-view.mod-cm6:not(.is-readable-line-width) .cm-sizer,
 body.ea-layout-animations div.markdown-preview-view:not(.is-readable-line-width) .markdown-preview-sizer {
-  max-width: 100%; 
-  width: 100%;
+  --ea-max-width: 100%;
 }
 
-/* Readable OFF: Use default Obsidian padding */
-body.ea-layout-animations div.markdown-source-view.mod-cm6:not(.is-readable-line-width) .cm-sizer,
-body.ea-layout-animations div.markdown-preview-view:not(.is-readable-line-width) .markdown-preview-sizer {
-  padding-left: var(--size-4-4, 16px);
-  padding-right: var(--size-4-4, 16px);
-}
-
-/* Readable ON: Calculate padding dynamically to perfectly center the text column */
 body.ea-layout-animations div.markdown-source-view.mod-cm6.is-readable-line-width .cm-sizer,
 body.ea-layout-animations div.markdown-preview-view.is-readable-line-width .markdown-preview-sizer {
-  padding-left: calc(max(var(--size-4-4, 16px), 50% - (var(--file-line-width) / 2)));
-  padding-right: calc(max(var(--size-4-4, 16px), 50% - (var(--file-line-width) / 2)));
+  --ea-max-width: var(--file-line-width, 700px);
 }
 
 /* 2. Properties (Collapse/Expand) */
