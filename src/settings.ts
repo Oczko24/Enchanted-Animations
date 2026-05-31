@@ -119,19 +119,6 @@ export class EnchantedAnimationsSettingTab extends PluginSettingTab {
 			.setHeading();
 
 		new Setting(containerEl)
-			.setName("Notice Duration Offset")
-			.setDesc("Extend or shorten the display time of native Obsidian notifications (in seconds). 0 = native time.")
-			.addSlider(slider => slider
-				.setLimits(-3, 10, 1)
-				.setValue(this.plugin.settings.noticeDurationOffset)
-				.setDynamicTooltip()
-				.onChange(async (value) => {
-					this.plugin.settings.noticeDurationOffset = value;
-					await this.plugin.saveSettings();
-				})
-			);
-
-		new Setting(containerEl)
 			.setName("Premium Vault Reveal")
 			.setDesc("Smooth workspace reveal animation upon vault launch. Usually safe to leave enabled.")
 			.addToggle(toggle => toggle
@@ -144,14 +131,12 @@ export class EnchantedAnimationsSettingTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("Progress Bar Speed")
-			.setDesc("Adjust the speed of the native loading progress bar animation (default is 2s). Higher = slower.")
-			.addSlider(slider => slider
-				.setLimits(1, 10, 0.5)
-				.setValue(this.plugin.settings.progressBarAnimationSpeed)
-				.setDynamicTooltip()
+			.setName("Deep System Integration")
+			.setDesc("Smooths out default Obsidian UI transitions (sidebars, tabs, ribbons). Turn off if your theme handles this better.")
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.enableNativeAnimations)
 				.onChange(async (value) => {
-					this.plugin.settings.progressBarAnimationSpeed = value;
+					this.plugin.settings.enableNativeAnimations = value;
 					await this.plugin.saveSettings();
 					this.plugin.applyStyles();
 				})
@@ -182,18 +167,6 @@ export class EnchantedAnimationsSettingTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("Deep System Integration")
-			.setDesc("Smooths out default Obsidian UI transitions (sidebars, tabs, ribbons). Turn off if your theme handles this better.")
-			.addToggle(toggle => toggle
-				.setValue(this.plugin.settings.enableNativeAnimations)
-				.onChange(async (value) => {
-					this.plugin.settings.enableNativeAnimations = value;
-					await this.plugin.saveSettings();
-					this.plugin.applyStyles();
-				})
-			);
-
-		new Setting(containerEl)
 			.setName("Native Tab Animations")
 			.setDesc("Smooth transitions when switching or closing tabs, keeping the native Obsidian look.")
 			.addToggle(toggle => toggle
@@ -212,6 +185,30 @@ export class EnchantedAnimationsSettingTab extends PluginSettingTab {
 				.setValue(this.plugin.settings.enableTooltipAnimations)
 				.onChange(async (value) => {
 					this.plugin.settings.enableTooltipAnimations = value;
+					await this.plugin.saveSettings();
+					this.plugin.applyStyles();
+				})
+			);
+
+		new Setting(containerEl)
+			.setName("Smart Status Bar")
+			.setDesc("Hides the status bar until you hover over the bottom of the window.")
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.enableStatusBarHover)
+				.onChange(async (value) => {
+					this.plugin.settings.enableStatusBarHover = value;
+					await this.plugin.saveSettings();
+					this.plugin.applyStyles();
+				})
+			);
+			
+		new Setting(containerEl)
+			.setName("Auto-Hide Scrollbars")
+			.setDesc("Hides the scrollbars until you hover over them for a cleaner look.")
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.autoHideScrollbars)
+				.onChange(async (value) => {
+					this.plugin.settings.autoHideScrollbars = value;
 					await this.plugin.saveSettings();
 					this.plugin.applyStyles();
 				})
@@ -394,30 +391,6 @@ export class EnchantedAnimationsSettingTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("Smart Status Bar")
-			.setDesc("Hides the status bar until you hover over the bottom of the window.")
-			.addToggle(toggle => toggle
-				.setValue(this.plugin.settings.enableStatusBarHover)
-				.onChange(async (value) => {
-					this.plugin.settings.enableStatusBarHover = value;
-					await this.plugin.saveSettings();
-					this.plugin.applyStyles();
-				})
-			);
-			
-		new Setting(containerEl)
-			.setName("Auto-Hide Scrollbars")
-			.setDesc("Hides the scrollbars until you hover over them for a cleaner look.")
-			.addToggle(toggle => toggle
-				.setValue(this.plugin.settings.autoHideScrollbars)
-				.onChange(async (value) => {
-					this.plugin.settings.autoHideScrollbars = value;
-					await this.plugin.saveSettings();
-					this.plugin.applyStyles();
-				})
-			);
-
-		new Setting(containerEl)
 			.setName("Productivity & Rewards")
 			.setHeading();
 
@@ -436,6 +409,33 @@ export class EnchantedAnimationsSettingTab extends PluginSettingTab {
 		new Setting(containerEl)
 			.setName("Performance & Advanced")
 			.setHeading();
+
+		new Setting(containerEl)
+			.setName("Notice Duration Offset")
+			.setDesc("Extend or shorten the display time of native Obsidian notifications (in seconds). 0 = native time.")
+			.addSlider(slider => slider
+				.setLimits(-3, 10, 1)
+				.setValue(this.plugin.settings.noticeDurationOffset)
+				.setDynamicTooltip()
+				.onChange(async (value) => {
+					this.plugin.settings.noticeDurationOffset = value;
+					await this.plugin.saveSettings();
+				})
+			);
+
+		new Setting(containerEl)
+			.setName("Progress Bar Speed")
+			.setDesc("Adjust the speed of the native loading progress bar animation (default is 2s). Higher = slower.")
+			.addSlider(slider => slider
+				.setLimits(1, 10, 0.5)
+				.setValue(this.plugin.settings.progressBarAnimationSpeed)
+				.setDynamicTooltip()
+				.onChange(async (value) => {
+					this.plugin.settings.progressBarAnimationSpeed = value;
+					await this.plugin.saveSettings();
+					this.plugin.applyStyles();
+				})
+			);
 
 		new Setting(containerEl)
 			.setName("Butter-Smooth Scrolling")
