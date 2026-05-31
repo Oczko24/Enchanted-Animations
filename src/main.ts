@@ -13,6 +13,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 
 	async onload() {
 		console.log('Enchanted Animations loaded!');
+		document.body.classList.add('enchanted-animations-present');
 		await this.loadSettings();
 		this.applyStyles();
 
@@ -94,6 +95,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		document.body.style.removeProperty('--enchanted-animations-speed');
 		document.body.style.removeProperty('--enchanted-animations-easing');
 
+		document.body.classList.remove('enchanted-animations-present');
 		document.body.classList.remove('animate-note-open');
 		document.body.classList.remove('disable-splash-screen');
 		document.body.classList.remove('disable-header-animations');
