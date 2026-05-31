@@ -6,8 +6,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 	settings: EnchantedAnimationsSettings;
 	originalModalClose: Function;
 	originalSettingClose: Function;
-	originalMenuHide: Function;
-	originalMenuClose: Function;
+	originalMenuUnload: Function;
 	originalNoticeHide: Function;
 	noticeObserver: MutationObserver | null;
 	animationsController: EnchantedAnimationsController;
@@ -193,59 +192,53 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 	patchMenuClose() {
 		const plugin = this;
 
-		if (Menu.prototype.hide) {
-			this.originalMenuHide = Menu.prototype.hide;
-			Menu.prototype.hide = function() {
+		// We patch unload to create a visual ghost that animates out while the real menu dies instantly,
+		// preventing Obsidian's state machine from breaking and menus accumulating.
+		if (Menu.prototype.unload) {
+			this.originalMenuUnload = Menu.prototype.unload;
+			Menu.prototype.unload = function() {
 				if (!plugin.settings.enableModalAnimations) {
-					return plugin.originalMenuHide.call(this);
+					return plugin.originalMenuUnload.call(this);
 				}
 
-				let container = (this as any).dom || document.querySelector('.menu');
-				if (container && !container.classList.contains('is-closing')) {
-					container.classList.add('is-closing');
-					const durationMs = plugin.settings.speed * 600;
+				let container = (this as any).dom as HTMLElement;
+				if (container && container.parentNode) {
+					const ghost = container.cloneNode(true) as HTMLElement;
+					const rect = container.getBoundingClientRect();
+					
+					ghost.style.position = 'fixed';
+					ghost.style.left = rect.left + 'px';
+					ghost.style.top = rect.top + 'px';
+					ghost.style.width = rect.width + 'px';
+					ghost.style.height = rect.height + 'px';
+					ghost.style.margin = '0';
+					ghost.style.pointerEvents = 'none';
+					ghost.style.zIndex = '99999';
+
+					// Prevent children from replaying entrance animations
+					ghost.querySelectorAll('*').forEach(el => {
+						(el as HTMLElement).style.animationName = 'none';
+					});
+					
+					ghost.classList.add('is-closing');
+					document.body.appendChild(ghost);
+					
+					const isMobile = document.body.classList.contains('is-phone');
+					const durationMs = plugin.settings.speed * (isMobile ? 1200 : 400);
 					
 					setTimeout(() => {
-						container.classList.remove('is-closing');
-						plugin.originalMenuHide.call(this);
-					}, Math.max(0, durationMs - 10));
-					
-					return this;
-				} else {
-					return plugin.originalMenuHide.call(this);
-				}
-			};
-		}
-		
-		if (Menu.prototype.close) {
-			this.originalMenuClose = Menu.prototype.close;
-			Menu.prototype.close = function() {
-				if (!plugin.settings.enableModalAnimations) {
-					return plugin.originalMenuClose.call(this);
+						ghost.remove();
+					}, durationMs);
 				}
 
-				let container = (this as any).dom || document.querySelector('.menu');
-				if (container && !container.classList.contains('is-closing')) {
-					container.classList.add('is-closing');
-					const durationMs = plugin.settings.speed * 600;
-					
-					setTimeout(() => {
-						container.classList.remove('is-closing');
-						plugin.originalMenuClose.call(this);
-					}, Math.max(0, durationMs - 10));
-				} else {
-					return plugin.originalMenuClose.call(this);
-				}
+				return plugin.originalMenuUnload.call(this);
 			};
 		}
 	}
 
 	unpatchMenuClose() {
-		if (this.originalMenuHide) {
-			Menu.prototype.hide = this.originalMenuHide as any;
-		}
-		if (this.originalMenuClose) {
-			Menu.prototype.close = this.originalMenuClose as any;
+		if (this.originalMenuUnload) {
+			Menu.prototype.unload = this.originalMenuUnload as any;
 		}
 	}
 
