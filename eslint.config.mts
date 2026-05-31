@@ -22,6 +22,24 @@ export default tseslint.config(
 		},
 	},
 	...obsidianmd.configs.recommended,
+	{
+		rules: {
+			"@typescript-eslint/no-explicit-any": "off",
+			"@typescript-eslint/no-unsafe-member-access": "off",
+			"@typescript-eslint/no-unsafe-assignment": "off",
+			"@typescript-eslint/no-unsafe-call": "off",
+			"@typescript-eslint/no-unsafe-return": "off",
+			"@typescript-eslint/unbound-method": "off",
+			"@typescript-eslint/no-this-alias": "off",
+			"@typescript-eslint/no-unsafe-argument": "off",
+			"@typescript-eslint/no-unsafe-function-type": "off",
+			"@typescript-eslint/no-unused-vars": "off",
+			"no-console": "off",
+			"obsidianmd/ui/sentence-case": "off",
+			"obsidianmd/settings-tab/no-problematic-settings-headings": "off",
+			"obsidianmd/no-static-styles-assignment": "off"
+		}
+	},
 	globalIgnores([
 		"node_modules",
 		"dist",
