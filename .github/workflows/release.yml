@@ -5,6 +5,10 @@ on:
     tags:
       - '*' # Uruchamia się po wypchnięciu każdego tagu
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -19,7 +23,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Install dependencies
         run: npm ci
