@@ -1143,12 +1143,12 @@ body.ea-tag-animations a.tag:active {
   initial-value: 100%;
 }
 
-body.ea-layout-animations div.markdown-source-view.mod-cm6 .cm-sizer,
-body.ea-layout-animations div.markdown-preview-view .markdown-preview-sizer {
+html body.ea-layout-animations .app-container div.markdown-source-view.mod-cm6 .cm-sizer,
+html body.ea-layout-animations .app-container div.markdown-preview-view .markdown-preview-sizer {
   transition: --ea-max-width calc(var(--enchanted-animations-speed) * 1.5) var(--enchanted-animations-easing);
-  max-width: var(--ea-max-width) !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
+  max-width: var(--ea-max-width);
+  margin-left: auto;
+  margin-right: auto;
 }
 
 body.ea-layout-animations div.markdown-source-view.mod-cm6:not(.is-readable-line-width) .cm-sizer,
