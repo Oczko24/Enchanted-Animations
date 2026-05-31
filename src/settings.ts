@@ -28,6 +28,9 @@ export interface EnchantedAnimationsSettings {
 	enableTooltipAnimations: boolean;
 	enableMenuCascadeAnimations: boolean;
 	enableConfetti: boolean;
+	enableAnimatedCallouts: boolean;
+	noticeDurationOffset: number;
+	progressBarAnimationSpeed: number;
 }
 
 export const DEFAULT_SETTINGS: EnchantedAnimationsSettings = {
@@ -57,6 +60,9 @@ export const DEFAULT_SETTINGS: EnchantedAnimationsSettings = {
 	enableTooltipAnimations: true,
 	enableMenuCascadeAnimations: false,
 	enableConfetti: false,
+	enableAnimatedCallouts: true,
+	noticeDurationOffset: 0,
+	progressBarAnimationSpeed: 2,
 }
 
 export class EnchantedAnimationsSettingTab extends PluginSettingTab {
@@ -75,7 +81,7 @@ export class EnchantedAnimationsSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName("Base settings")
-			.setHeading()
+			.setHeading();
 
 		new Setting(containerEl)
 			.setName("Animation Flow Rate")
@@ -109,8 +115,47 @@ export class EnchantedAnimationsSettingTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("UI & Interface Animations")
+			.setName("Workspace & UI")
 			.setHeading();
+
+		new Setting(containerEl)
+			.setName("Notice Duration Offset")
+			.setDesc("Extend or shorten the display time of native Obsidian notifications (in seconds). 0 = native time.")
+			.addSlider(slider => slider
+				.setLimits(-3, 10, 1)
+				.setValue(this.plugin.settings.noticeDurationOffset)
+				.setDynamicTooltip()
+				.onChange(async (value) => {
+					this.plugin.settings.noticeDurationOffset = value;
+					await this.plugin.saveSettings();
+				})
+			);
+
+		new Setting(containerEl)
+			.setName("Premium Vault Reveal")
+			.setDesc("Smooth workspace reveal animation upon vault launch. Usually safe to leave enabled.")
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.enableSplashScreen)
+				.onChange(async (value) => {
+					this.plugin.settings.enableSplashScreen = value;
+					await this.plugin.saveSettings();
+					this.plugin.applyStyles();
+				})
+			);
+
+		new Setting(containerEl)
+			.setName("Progress Bar Speed")
+			.setDesc("Adjust the speed of the native loading progress bar animation (default is 2s). Higher = slower.")
+			.addSlider(slider => slider
+				.setLimits(1, 10, 0.5)
+				.setValue(this.plugin.settings.progressBarAnimationSpeed)
+				.setDynamicTooltip()
+				.onChange(async (value) => {
+					this.plugin.settings.progressBarAnimationSpeed = value;
+					await this.plugin.saveSettings();
+					this.plugin.applyStyles();
+				})
+			);
 
 		new Setting(containerEl)
 			.setName("Immersive Interface Menus")
@@ -159,23 +204,34 @@ export class EnchantedAnimationsSettingTab extends PluginSettingTab {
 					this.plugin.applyStyles();
 				})
 			);
-
+			
 		new Setting(containerEl)
-			.setName("Premium Vault Reveal")
-			.setDesc("Smooth workspace reveal animation upon vault launch. Usually safe to leave enabled.")
+			.setName("Animated Tooltips")
+			.setDesc("Material-style fade and slide-up for native tooltip popups.")
 			.addToggle(toggle => toggle
-				.setValue(this.plugin.settings.enableSplashScreen)
+				.setValue(this.plugin.settings.enableTooltipAnimations)
 				.onChange(async (value) => {
-					this.plugin.settings.enableSplashScreen = value;
+					this.plugin.settings.enableTooltipAnimations = value;
 					await this.plugin.saveSettings();
 					this.plugin.applyStyles();
 				})
 			);
 
-
 		new Setting(containerEl)
-			.setName("Editor & Note Animations")
-			.setHeading()
+			.setName("Editor Experience")
+			.setHeading();
+			
+		new Setting(containerEl)
+			.setName("Cinematic Note Loading (BETA)")
+			.setDesc("Smooth fade-in and slide-up effect when opening or switching files. Turned off by default as it might be glitchy on some layouts.")
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.animateNoteOpen)
+				.onChange(async (value) => {
+					this.plugin.settings.animateNoteOpen = value;
+					await this.plugin.saveSettings();
+					this.plugin.applyStyles();
+				})
+			);
 
 		new Setting(containerEl)
 			.setName("Smooth Layout Shifts")
@@ -188,14 +244,14 @@ export class EnchantedAnimationsSettingTab extends PluginSettingTab {
 					this.plugin.applyStyles();
 				})
 			);
-
+			
 		new Setting(containerEl)
-			.setName("Cinematic Note Loading (BETA)")
-			.setDesc("Smooth fade-in and slide-up effect when opening or switching files. Turned off by default as it might be glitchy on some layouts.")
+			.setName("Fluid Text Formatting")
+			.setDesc("Smooth horizontal expansion for bold, italics, and inline code while typing.")
 			.addToggle(toggle => toggle
-				.setValue(this.plugin.settings.animateNoteOpen)
+				.setValue(this.plugin.settings.enableFormattingAnimations)
 				.onChange(async (value) => {
-					this.plugin.settings.animateNoteOpen = value;
+					this.plugin.settings.enableFormattingAnimations = value;
 					await this.plugin.saveSettings();
 					this.plugin.applyStyles();
 				})
@@ -212,14 +268,38 @@ export class EnchantedAnimationsSettingTab extends PluginSettingTab {
 					this.plugin.applyStyles();
 				})
 			);
-
+			
 		new Setting(containerEl)
-			.setName("Fluid Text Formatting")
-			.setDesc("Smooth horizontal expansion for bold, italics, and inline code while typing.")
+			.setName("Blockquote Accents")
+			.setDesc("Expanding left border on blockquotes upon hover.")
 			.addToggle(toggle => toggle
-				.setValue(this.plugin.settings.enableFormattingAnimations)
+				.setValue(this.plugin.settings.enableBlockquoteAnimations)
 				.onChange(async (value) => {
-					this.plugin.settings.enableFormattingAnimations = value;
+					this.plugin.settings.enableBlockquoteAnimations = value;
+					await this.plugin.saveSettings();
+					this.plugin.applyStyles();
+				})
+			);
+			
+		new Setting(containerEl)
+			.setName("Fluid Links")
+			.setDesc("Water-like underline expansion for links on hover.")
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.enableLinkAnimations)
+				.onChange(async (value) => {
+					this.plugin.settings.enableLinkAnimations = value;
+					await this.plugin.saveSettings();
+					this.plugin.applyStyles();
+				})
+			);
+			
+		new Setting(containerEl)
+			.setName("Animated Callouts")
+			.setDesc("Subtle bounce and wobble motion effects to callout icons on load and hover.")
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.enableAnimatedCallouts)
+				.onChange(async (value) => {
+					this.plugin.settings.enableAnimatedCallouts = value;
 					await this.plugin.saveSettings();
 					this.plugin.applyStyles();
 				})
@@ -238,69 +318,9 @@ export class EnchantedAnimationsSettingTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("Fluid Links")
-			.setDesc("Water-like underline expansion for links on hover.")
-			.addToggle(toggle => toggle
-				.setValue(this.plugin.settings.enableLinkAnimations)
-				.onChange(async (value) => {
-					this.plugin.settings.enableLinkAnimations = value;
-					await this.plugin.saveSettings();
-					this.plugin.applyStyles();
-				})
-			);
-
-		new Setting(containerEl)
-			.setName("Blockquote Accents")
-			.setDesc("Expanding left border on blockquotes upon hover.")
-			.addToggle(toggle => toggle
-				.setValue(this.plugin.settings.enableBlockquoteAnimations)
-				.onChange(async (value) => {
-					this.plugin.settings.enableBlockquoteAnimations = value;
-					await this.plugin.saveSettings();
-					this.plugin.applyStyles();
-				})
-			);
-
-		new Setting(containerEl)
-			.setName("Micro-Interactions")
-			.setHeading()
-
-		new Setting(containerEl)
-			.setName("Smart Status Bar")
-			.setDesc("Hides the status bar until you hover over the bottom of the window.")
-			.addToggle(toggle => toggle
-				.setValue(this.plugin.settings.enableStatusBarHover)
-				.onChange(async (value) => {
-					this.plugin.settings.enableStatusBarHover = value;
-					await this.plugin.saveSettings();
-					this.plugin.applyStyles();
-				})
-			);
-
-		new Setting(containerEl)
-			.setName("Premium Fold Indicators")
-			.setDesc("Smoothly scales up heading collapse arrows when you hover over them.")
-			.addToggle(toggle => toggle
-				.setValue(this.plugin.settings.enableFoldHover)
-				.onChange(async (value) => {
-					this.plugin.settings.enableFoldHover = value;
-					await this.plugin.saveSettings();
-					this.plugin.applyStyles();
-				})
-			);
-
-		new Setting(containerEl)
-			.setName("Floating Cards")
-			.setDesc("Lightly scales up Kanban cards and other card elements on hover.")
-			.addToggle(toggle => toggle
-				.setValue(this.plugin.settings.enableCardHover)
-				.onChange(async (value) => {
-					this.plugin.settings.enableCardHover = value;
-					await this.plugin.saveSettings();
-					this.plugin.applyStyles();
-				})
-			);
-
+			.setName("Subtle Interactions")
+			.setHeading();
+			
 		new Setting(containerEl)
 			.setName("Material Buttons")
 			.setDesc("Premium click scaling effect for all buttons in the app.")
@@ -338,6 +358,30 @@ export class EnchantedAnimationsSettingTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
+			.setName("Floating Cards")
+			.setDesc("Lightly scales up Kanban cards and other card elements on hover.")
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.enableCardHover)
+				.onChange(async (value) => {
+					this.plugin.settings.enableCardHover = value;
+					await this.plugin.saveSettings();
+					this.plugin.applyStyles();
+				})
+			);
+			
+		new Setting(containerEl)
+			.setName("Premium Fold Indicators")
+			.setDesc("Smoothly scales up heading collapse arrows when you hover over them.")
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.enableFoldHover)
+				.onChange(async (value) => {
+					this.plugin.settings.enableFoldHover = value;
+					await this.plugin.saveSettings();
+					this.plugin.applyStyles();
+				})
+			);
+			
+		new Setting(containerEl)
 			.setName("Image Hover Zoom")
 			.setDesc("Slightly zoom in images when hovering over them.")
 			.addToggle(toggle => toggle
@@ -350,12 +394,24 @@ export class EnchantedAnimationsSettingTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("Animated Tooltips")
-			.setDesc("Material-style fade and slide-up for native tooltip popups.")
+			.setName("Smart Status Bar")
+			.setDesc("Hides the status bar until you hover over the bottom of the window.")
 			.addToggle(toggle => toggle
-				.setValue(this.plugin.settings.enableTooltipAnimations)
+				.setValue(this.plugin.settings.enableStatusBarHover)
 				.onChange(async (value) => {
-					this.plugin.settings.enableTooltipAnimations = value;
+					this.plugin.settings.enableStatusBarHover = value;
+					await this.plugin.saveSettings();
+					this.plugin.applyStyles();
+				})
+			);
+			
+		new Setting(containerEl)
+			.setName("Auto-Hide Scrollbars")
+			.setDesc("Hides the scrollbars until you hover over them for a cleaner look.")
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.autoHideScrollbars)
+				.onChange(async (value) => {
+					this.plugin.settings.autoHideScrollbars = value;
 					await this.plugin.saveSettings();
 					this.plugin.applyStyles();
 				})
@@ -377,7 +433,9 @@ export class EnchantedAnimationsSettingTab extends PluginSettingTab {
 				})
 			);
 
-		new Setting(containerEl).setName("Performance Tweaks").setHeading();
+		new Setting(containerEl)
+			.setName("Performance & Advanced")
+			.setHeading();
 
 		new Setting(containerEl)
 			.setName("Butter-Smooth Scrolling")

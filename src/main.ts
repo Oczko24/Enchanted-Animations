@@ -1,4 +1,4 @@
-import {Plugin, Modal, Menu} from 'obsidian';
+import {Plugin, Modal, Menu, Notice} from 'obsidian';
 import {DEFAULT_SETTINGS, EnchantedAnimationsSettings, EnchantedAnimationsSettingTab} from "./settings";
 import {EnchantedAnimationsController} from "./animations";
 
@@ -8,10 +8,12 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 	originalSettingClose: Function;
 	originalMenuHide: Function;
 	originalMenuClose: Function;
+	originalNoticeHide: Function;
+	noticeObserver: MutationObserver | null;
 	animationsController: EnchantedAnimationsController;
 
 	async onload() {
-		console.log('Loading Enchanted Animations...');
+		console.log('Enchanted Animations loaded!');
 		await this.loadSettings();
 		this.applyStyles();
 
@@ -31,6 +33,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 			this.setupSidebarVelocity();
 			this.setupEditorAnimations();
 			this.hijackSelectDropdowns();
+			this.setupNoticeObserver();
 		});
 
 		// Re-trigger note animation when switching between existing .md tabs
@@ -71,6 +74,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		this.patchMenuClose();
 		this.patchGraphControls();
 		this.patchDocumentSearch();
+		this.patchNotice();
 		this.addSettingTab(new EnchantedAnimationsSettingTab(this.app, this));
 	}
 
@@ -79,6 +83,11 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 
 		this.unpatchModalClose();
 		this.unpatchMenuClose();
+		this.unpatchNotice();
+		if (this.noticeObserver) {
+			this.noticeObserver.disconnect();
+			this.noticeObserver = null;
+		}
 		if (this.animationsController) {
 			this.animationsController.teardown();
 		}
@@ -92,6 +101,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		document.body.classList.remove('disable-formatting-animations');
 		document.body.classList.remove('disable-modal-animation');
 		document.body.classList.remove('disable-native-animations');
+		document.body.classList.remove('disable-animated-callouts');
 		document.body.classList.remove('ea-smooth-scroll');
 		document.body.classList.remove('ea-gpu-accel');
 		document.body.classList.remove('enchanted-animations-startup');
@@ -239,6 +249,67 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		}
 	}
 
+	patchNotice() {
+		if (Notice.prototype.hide) {
+			this.originalNoticeHide = Notice.prototype.hide;
+			const plugin = this;
+
+			Notice.prototype.hide = function() {
+				// Extension logic (when offset is > 0)
+				if (plugin.settings.noticeDurationOffset > 0) {
+					if (!(this as any)._eaDelayed) {
+						(this as any)._eaDelayed = true;
+						setTimeout(() => {
+							plugin.originalNoticeHide.call(this);
+						}, plugin.settings.noticeDurationOffset * 1000);
+					} else {
+						plugin.originalNoticeHide.call(this);
+					}
+				} else {
+					plugin.originalNoticeHide.call(this);
+				}
+			};
+		}
+	}
+
+	unpatchNotice() {
+		if (this.originalNoticeHide) {
+			Notice.prototype.hide = this.originalNoticeHide as any;
+		}
+	}
+
+	setupNoticeObserver() {
+		const noticeContainer = document.body.querySelector('.notice-container');
+		if (!noticeContainer) return;
+
+		this.noticeObserver = new MutationObserver((mutations) => {
+			if (this.settings.noticeDurationOffset >= 0) return; // Only for shortening
+
+			for (const mutation of mutations) {
+				for (const node of Array.from(mutation.addedNodes)) {
+					if (node instanceof HTMLElement && node.classList.contains('notice')) {
+						const offsetMs = this.settings.noticeDurationOffset * 1000;
+						const assumedNative = 4000; // Native notice default is ~4000ms
+						let newTimeout = assumedNative + offsetMs;
+						if (newTimeout < 0) newTimeout = 0;
+						
+						setTimeout(() => {
+							// We mimic the native hide behavior directly on the DOM element
+							node.style.opacity = '0';
+							setTimeout(() => {
+								if (node.parentElement) {
+									node.remove();
+								}
+							}, 500); // Wait for transition
+						}, newTimeout);
+					}
+				}
+			}
+		});
+
+		this.noticeObserver.observe(noticeContainer, { childList: true });
+	}
+
 	setupEditorAnimations() {
 		if (!this.animationsController) {
 			this.animationsController = new EnchantedAnimationsController(this);
@@ -280,6 +351,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		document.body.classList.toggle('disable-formatting-animations', !this.settings.enableFormattingAnimations);
 		document.body.classList.toggle('disable-modal-animation', !this.settings.enableModalAnimations);
 		document.body.classList.toggle('disable-native-animations', !this.settings.enableNativeAnimations);
+		document.body.classList.toggle('disable-animated-callouts', !this.settings.enableAnimatedCallouts);
 		document.body.classList.toggle('ea-layout-animations', this.settings.enableLayoutAnimations);
 		document.body.classList.toggle('ea-smooth-scroll', this.settings.enableSmoothScroll);
 		document.body.classList.toggle('ea-gpu-accel', this.settings.enableGpuAcceleration);
@@ -294,6 +366,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		document.body.classList.toggle('ea-ribbon-animations', this.settings.enableRibbonAnimations);
 		document.body.classList.toggle('ea-image-animations', this.settings.enableImageAnimations);
 		document.body.classList.toggle('ea-autohide-scrollbars', this.settings.autoHideScrollbars);
+		document.body.style.setProperty('--ea-progress-bar-speed', `${this.settings.progressBarAnimationSpeed}s`);
 		document.body.classList.toggle('ea-blockquote-animations', this.settings.enableBlockquoteAnimations);
 		document.body.classList.toggle('ea-tooltip-animations', this.settings.enableTooltipAnimations);
 		document.body.classList.toggle('ea-menu-cascade', this.settings.enableMenuCascadeAnimations);

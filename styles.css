@@ -1319,3 +1319,22 @@ body:not(.disable-formatting-animations) .markdown-reading-view a:not(.footnote-
     opacity: 0;
   }
 }
+
+/* ==================== Auto-Hide Scrollbars ==================== */
+body.ea-autohide-scrollbars *::-webkit-scrollbar,
+body.ea-autohide-scrollbars *::-webkit-scrollbar-thumb {
+  visibility: hidden;
+}
+
+body.ea-autohide-scrollbars *:hover::-webkit-scrollbar,
+body.ea-autohide-scrollbars *:hover::-webkit-scrollbar-thumb,
+body.ea-autohide-scrollbars *::-webkit-scrollbar:hover,
+body.ea-autohide-scrollbars *::-webkit-scrollbar-thumb:hover {
+  visibility: initial;
+}
+
+/* ==================== Progress Bar Customization ==================== */
+html .progress-bar .progress-bar-subline.mod-increase,
+html .progress-bar .progress-bar-subline.mod-decrease {
+  animation-duration: var(--ea-progress-bar-speed, 2s);
+}
