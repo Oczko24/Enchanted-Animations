@@ -962,7 +962,7 @@ body.ea-checkbox-animations .markdown-source-view.mod-cm6 .HyperMD-task-line[dat
   text-decoration: none;
 }
 
-body.ea-checkbox-animations .markdown-source-view.mod-cm6 .HyperMD-task-line[data-task] span:not(.cm-formatting):not(.cm-widgetBuffer):not(.task-list-label) {
+body.ea-checkbox-animations .markdown-source-view.mod-cm6 .HyperMD-task-line[data-task] span:not(.cm-formatting):not(.cm-widgetBuffer):not(.task-list-label):not(.cm-hmd-list-indent):not(.cm-indent) {
   background-image: linear-gradient(var(--text-muted), var(--text-muted));
   background-position: left center;
   background-size: 0% 1.5px;
@@ -971,7 +971,7 @@ body.ea-checkbox-animations .markdown-source-view.mod-cm6 .HyperMD-task-line[dat
               color calc(var(--enchanted-animations-speed) * 0.8) var(--enchanted-animations-easing);
 }
 
-body.ea-checkbox-animations .markdown-source-view.mod-cm6 .HyperMD-task-line[data-task]:not([data-task=" "]) span:not(.cm-formatting):not(.cm-widgetBuffer):not(.task-list-label) {
+body.ea-checkbox-animations .markdown-source-view.mod-cm6 .HyperMD-task-line[data-task]:not([data-task=" "]) span:not(.cm-formatting):not(.cm-widgetBuffer):not(.task-list-label):not(.cm-hmd-list-indent):not(.cm-indent) {
   background-size: 100% 1.5px;
   color: var(--text-muted);
 }
