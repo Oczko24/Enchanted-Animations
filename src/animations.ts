@@ -232,7 +232,8 @@ export class EnchantedAnimationsController {
 					const isFormatting = el.classList.contains('cm-formatting') || el.classList.contains('cm-formatting-link');
 					const excluded = el.classList.contains('cm-formatting-header')
 						|| el.classList.contains('cm-formatting-list')
-						|| el.classList.contains('cm-formatting-task');
+						|| el.classList.contains('cm-formatting-task')
+						|| el.classList.contains('cm-formatting-highlight');
 					if (!isFormatting || excluded) continue;
 
 					this._animating.add(el);

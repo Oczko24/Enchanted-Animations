@@ -243,7 +243,13 @@ body:not(.disable-formatting-animations) .markdown-reading-view .code-block-flai
   animation: ea-flair-slide-in calc(var(--enchanted-animations-speed) * 0.8) var(--enchanted-animations-easing);
 }
 
-body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-line.cm-active:not(.HyperMD-codeblock) .cm-formatting:not(.cm-formatting-header):not(.cm-formatting-list):not(.cm-formatting-task):not(.cm-formatting-hashtag),
+/* Entry animation: triggered only when the line becomes active.
+   The `forwards` fill keeps the end state (margin-inline:0, opacity:1, scale:1)
+   as long as the line remains .cm-active.
+   IMPORTANT: Excludes cm-formatting-highlight (==) because the push animation starts
+   at opacity:0, which hides the yellow highlight background. == tokens get only
+   the highlight-draw animation instead (see Highlight Animations section). */
+body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-line.cm-active:not(.HyperMD-codeblock) .cm-formatting:not(.cm-formatting-header):not(.cm-formatting-list):not(.cm-formatting-task):not(.cm-formatting-hashtag):not(.cm-formatting-highlight),
 body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-line.cm-active:not(.HyperMD-codeblock) .cm-formatting-link {
   display: inline-block;
   vertical-align: baseline;
@@ -261,6 +267,51 @@ body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-line.
 body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .internal-embed {
   animation: ea-embed-in calc(var(--enchanted-animations-speed) * 0.8) var(--enchanted-animations-easing) backwards;
   transform-origin: top center;
+}
+
+/* ==================== Highlight Animations ==================== */
+
+/* Override Obsidian's native highlight background with our animated gradient.
+   We clear background/background-color to transparent so only background-image shows.
+   The ea-highlight-draw animation slides the gradient from transparent (right) to solid (left).
+   `animation-fill-mode: forwards` keeps the final state (background visible) permanently,
+   even when the line loses .cm-active. */
+html body:not(.disable-formatting-animations) div.app-container div.workspace div.markdown-source-view.mod-cm6 div.cm-scroller div.cm-line span.cm-highlight,
+html body:not(.disable-formatting-animations) div.app-container div.workspace div.markdown-source-view.mod-cm6 div.cm-scroller div.cm-line span.cm-formatting-highlight,
+html body:not(.disable-formatting-animations) div.app-container div.workspace div.markdown-source-view.mod-cm6 div.cm-scroller div.cm-line span.cm-formatting.cm-formatting-highlight,
+html body:not(.disable-formatting-animations) div.app-container div.workspace div.markdown-reading-view mark {
+  /* Wipe native background so only our gradient draws */
+  background: none;
+  /* Premium marker wipe with a 300% width.
+     0-33.3% is solid color (shown at end of animation).
+     33.3%-36% is the soft marker bleed edge.
+     36%-100% is transparent (shown at start of animation). */
+  background-image: linear-gradient(to right, var(--text-highlight-bg, #ffd00066) 0%, var(--text-highlight-bg, #ffd00066) 33.3%, transparent 36%, transparent 100%);
+  background-size: 300% 100%;
+  background-position: 100% 0;
+  background-repeat: no-repeat;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  animation: ea-highlight-draw calc(var(--enchanted-animations-speed) * 1.5) var(--enchanted-animations-easing) forwards;
+}
+
+/* Active line: CM6 recreates DOM nodes constantly, restarting ea-highlight-draw endlessly.
+   Use `background:` shorthand to wipe the animated gradient entirely and show a solid color. */
+html body:not(.disable-formatting-animations) div.app-container div.workspace div.markdown-source-view.mod-cm6 div.cm-scroller div.cm-line.cm-active span.cm-highlight,
+html body:not(.disable-formatting-animations) div.app-container div.workspace div.markdown-source-view.mod-cm6 div.cm-scroller div.cm-line.cm-active span.cm-formatting-highlight,
+html body:not(.disable-formatting-animations) div.app-container div.workspace div.markdown-source-view.mod-cm6 div.cm-scroller div.cm-line.cm-active span.cm-formatting.cm-formatting-highlight {
+  background: var(--text-highlight-bg, #ffd00066);
+  animation: none;
+}
+
+/* == tokens on active lines: inline push animation (letter-spacing + margin, no inline-block) */
+html body:not(.disable-formatting-animations) div.app-container div.workspace div.markdown-source-view.mod-cm6 div.cm-scroller div.cm-line.cm-active:not(.HyperMD-codeblock) .cm-formatting.cm-formatting-highlight {
+  animation: ea-formatting-push-highlight calc(var(--enchanted-animations-speed) * 0.75) var(--enchanted-animations-easing) forwards;
+}
+
+@keyframes ea-highlight-draw {
+  from { background-position: 100% 0; }
+  to { background-position: 0% 0; }
 }
 
 
@@ -493,6 +544,11 @@ body .ea-ghost-tab-switcher * {
 @keyframes ea-formatting-push {
   from { margin-inline: -0.25em; opacity: 0; transform: scale(0.85); }
   to   { margin-inline: 0; opacity: 1; transform: scale(1); }
+}
+
+@keyframes ea-formatting-push-highlight {
+  from { margin-inline: -0.25em; letter-spacing: -0.1em; opacity: 0; }
+  to   { margin-inline: 0; letter-spacing: normal; opacity: 1; }
 }
 
 @keyframes ea-codeblock-boundary-slide {
