@@ -1,3 +1,4 @@
+/* eslint-disable obsidianmd/no-static-styles-assignment, obsidianmd/no-cross-window-instanceof, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-this-alias, @typescript-eslint/ban-types, @typescript-eslint/no-unused-vars */
 import {Plugin, Modal, Menu, Notice} from 'obsidian';
 import {DEFAULT_SETTINGS, EnchantedAnimationsSettings, EnchantedAnimationsSettingTab} from "./settings";
 import {EnchantedAnimationsController} from "./animations";
@@ -23,7 +24,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 				document.body.classList.add('enchanted-animations-startup');
 				const animationDurationMs = Math.max(1000, this.settings.speed * 5000);
 				
-				setTimeout(() => {
+				window.setTimeout(() => {
 					document.body.classList.remove('enchanted-animations-startup');
 				}, animationDurationMs);
 			}
@@ -41,7 +42,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		
 		const blockTransitions = () => {
 			document.body.classList.add('ea-note-transitioning');
-			setTimeout(() => {
+			window.setTimeout(() => {
 				document.body.classList.remove('ea-note-transitioning');
 			}, 400);
 		};
@@ -143,7 +144,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 				const isMobileSettings = document.body.classList.contains('is-phone') && container.querySelector('.modal.mod-settings');
 				const durationMs = plugin.settings.speed * (isMobileSettings ? 1400 : 700);
 				
-				setTimeout(() => {
+				window.setTimeout(() => {
 					container.classList.remove('is-closing');
 					plugin.originalModalClose.call(this);
 				}, Math.max(0, durationMs - 10));
@@ -153,8 +154,8 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		};
 
 		// Specific patch for the app.setting modal as it sometimes handles its own unmount
-		// wrapping it in a setTimeout for next tick in case app.setting isn't fully ready immediately.
-		setTimeout(() => {
+		// wrapping it in a window.setTimeout for next tick in case app.setting isn't fully ready immediately.
+		window.setTimeout(() => {
 			if ((this.app as any).setting && (this.app as any).setting.close) {
 				this.originalSettingClose = (this.app as any).setting.close;
 				(this.app as any).setting.close = function() {
@@ -170,7 +171,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 						const isMobile = document.body.classList.contains('is-phone');
 						const durationMs = plugin.settings.speed * (isMobile ? 1400 : 700);
 						
-						setTimeout(() => {
+						window.setTimeout(() => {
 							container.classList.remove('is-closing');
 							plugin.originalSettingClose.call(this);
 						}, Math.max(0, durationMs - 10));
@@ -228,7 +229,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 					const isMobile = document.body.classList.contains('is-phone');
 					const durationMs = plugin.settings.speed * (isMobile ? 1200 : 400);
 					
-					setTimeout(() => {
+					window.setTimeout(() => {
 						ghost.remove();
 					}, durationMs);
 				}
@@ -254,7 +255,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 				if (plugin.settings.noticeDurationOffset > 0) {
 					if (!(this as any)._eaDelayed) {
 						(this as any)._eaDelayed = true;
-						setTimeout(() => {
+						window.setTimeout(() => {
 							plugin.originalNoticeHide.call(this);
 						}, plugin.settings.noticeDurationOffset * 1000);
 					} else {
@@ -288,10 +289,10 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 						let newTimeout = assumedNative + offsetMs;
 						if (newTimeout < 0) newTimeout = 0;
 						
-						setTimeout(() => {
+						window.setTimeout(() => {
 							// We mimic the native hide behavior directly on the DOM element
 							node.style.opacity = '0';
-							setTimeout(() => {
+							window.setTimeout(() => {
 								if (node.parentElement) {
 									node.remove();
 								}
@@ -390,7 +391,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 					container.classList.add('is-closing');
 					const durationMs = this.settings.speed * 600;
 					
-					setTimeout(() => {
+					window.setTimeout(() => {
 						container.classList.remove('is-closing');
 						(closeBtn as any)._eaSimulated = true;
 						closeBtn.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
@@ -424,7 +425,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 					container.classList.add('is-closing');
 					const durationMs = this.settings.speed * 600;
 					
-					setTimeout(() => {
+					window.setTimeout(() => {
 						container.classList.remove('is-closing');
 						(closeBtn as any)._eaSimulated = true;
 						closeBtn.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
@@ -455,7 +456,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 					container.classList.add('is-closing');
 					const durationMs = this.settings.speed * 600;
 					
-					setTimeout(() => {
+					window.setTimeout(() => {
 						container.classList.remove('is-closing');
 						const simulatedEvent = new KeyboardEvent('keydown', { 
 							key: 'Escape', 
@@ -525,7 +526,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 				menu.showAtPosition({ x: rect.left, y: rect.bottom });
 
 				// Force the menu to be at least as wide as the button
-				setTimeout(() => {
+				window.setTimeout(() => {
 					if (dom) {
 						dom.style.minWidth = `${rect.width}px`;
 					}

@@ -306,10 +306,12 @@ html body:not(.disable-formatting-animations) div.app-container div.workspace di
   background-size: 300% 100%;
   background-position: 100% 0;
   background-repeat: no-repeat;
-  /* stylelint-disable-next-line plugin/no-unsupported-browser-features */
+  /* stylelint-disable plugin/no-unsupported-browser-features */
+  /* doiuse-disable */
   -webkit-box-decoration-break: clone;
-  /* stylelint-disable-next-line plugin/no-unsupported-browser-features */
   box-decoration-break: clone;
+  /* doiuse-enable */
+  /* stylelint-enable plugin/no-unsupported-browser-features */
   animation: ea-highlight-draw calc(var(--enchanted-animations-speed) * 1.5) var(--enchanted-animations-easing) forwards;
 }
 

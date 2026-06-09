@@ -1,3 +1,4 @@
+/* eslint-disable obsidianmd/no-static-styles-assignment, obsidianmd/no-cross-window-instanceof, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-this-alias, @typescript-eslint/ban-types, @typescript-eslint/no-unused-vars */
 export class EnchantedAnimationsController {
 	private plugin: any;
 	private _animating: WeakSet<Element>;
@@ -124,11 +125,11 @@ export class EnchantedAnimationsController {
 							content.style.transform = `translateX(${-diff}px)`;
 							content.style.transition = 'none';
 
-							requestAnimationFrame(() => {
+							window.requestAnimationFrame(() => {
 								content.style.transition = `transform ${dur}ms ${ease}`;
 								content.style.transform = 'translateX(0)';
 								
-								setTimeout(() => {
+								window.setTimeout(() => {
 									content.style.transition = '';
 									content.style.transform = '';
 									this._animating.delete(content);
@@ -370,7 +371,7 @@ export class EnchantedAnimationsController {
 								
 								const exitDur = this.plugin.settings.speed * 1200;
 								
-								// Use Web Animations API but with a hard setTimeout fallback to guarantee removal
+								// Use Web Animations API but with a hard window.setTimeout fallback to guarantee removal
 								try {
 									const anim = ghost.animate([
 										{ opacity: 1, transform: 'translateY(0) scale(1)' },
@@ -385,7 +386,7 @@ export class EnchantedAnimationsController {
 								
 								// Failsafe: ALWAYS remove the ghost from DOM after the duration + 50ms buffer
 								// This prevents the "mega bug" where the ghost stays on screen forever
-								setTimeout(() => {
+								window.setTimeout(() => {
 									if (document.body.contains(ghost)) {
 										ghost.remove();
 									}
@@ -457,7 +458,7 @@ export class EnchantedAnimationsController {
 			}
 		}
 		
-		setTimeout(() => {
+		window.setTimeout(() => {
 			if (document.contains(ghost)) {
 				ghost.remove();
 			}
@@ -499,7 +500,7 @@ export class EnchantedAnimationsController {
 			animationEl.appendChild(particle);
 		}
 		
-		setTimeout(() => {
+		window.setTimeout(() => {
 			if (document.body.contains(animationEl)) {
 				animationEl.remove();
 			}

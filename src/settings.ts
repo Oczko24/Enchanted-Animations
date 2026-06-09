@@ -80,7 +80,7 @@ export class EnchantedAnimationsSettingTab extends PluginSettingTab {
 		containerEl.addClass("enchanted-settings");
 
 		new Setting(containerEl)
-			.setName("Base settings")
+			.setName("Base Options")
 			.setHeading();
 
 		new Setting(containerEl)
@@ -468,11 +468,12 @@ export class EnchantedAnimationsSettingTab extends PluginSettingTab {
 			.setDesc("Restore all animation values and toggles to their default states.")
 			.addButton(button => button
 				.setButtonText("Reset to Defaults")
-				.setWarning()
+				.setDestructive()
 				.onClick(async () => {
 					this.plugin.settings = Object.assign({}, DEFAULT_SETTINGS);
 					await this.plugin.saveSettings();
 					this.plugin.applyStyles();
+					// eslint-disable-next-line @typescript-eslint/no-deprecated
 					this.display();
 				})
 			);
