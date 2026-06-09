@@ -208,7 +208,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 					const ghost = container.cloneNode(true) as HTMLElement;
 					const rect = container.getBoundingClientRect();
 					
-					ghost.setCssProps({
+					Object.assign(ghost.style, {
 						position: 'fixed',
 						left: rect.left + 'px',
 						top: rect.top + 'px',
@@ -221,7 +221,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 
 					// Prevent children from replaying entrance animations
 					ghost.querySelectorAll('*').forEach(el => {
-						(el as HTMLElement).setCssProps({ animationName: 'none' });
+						Object.assign((el as HTMLElement).style, { animationName: 'none' });
 					});
 					
 					ghost.classList.add('is-closing');
@@ -292,7 +292,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 						
 						window.setTimeout(() => {
 							// We mimic the native hide behavior directly on the DOM element
-							node.setCssProps({ opacity: '0' });
+							Object.assign(node.style, { opacity: '0' });
 							window.setTimeout(() => {
 								if (node.parentElement) {
 									node.remove();
@@ -529,7 +529,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 				// Force the menu to be at least as wide as the button
 				window.setTimeout(() => {
 					if (dom) {
-						dom.setCssProps({ minWidth: `${rect.width}px` });
+						Object.assign(dom.style, { minWidth: `${rect.width}px` });
 					}
 				}, 0);
 			}
