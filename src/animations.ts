@@ -157,7 +157,7 @@ export class EnchantedAnimationsController {
 					const isTransitioning = activeDocument.body.classList.contains('ea-note-transitioning');
 					if (this.plugin.settings.enableLayoutAnimations && !isTransitioning) {
 						for (const node of Array.from(m.addedNodes)) {
-							if (node.nodeType === 1) { const el = node as HTMLElement;
+							if (node.nodeType === 1) {
 								const lineNumbers = (node as HTMLElement).classList.contains('cm-lineNumbers') ? node : (node as HTMLElement).querySelector('.cm-lineNumbers');
 								if (lineNumbers && lineNumbers.nodeType === 1) {
 									const scroller = (lineNumbers as HTMLElement).closest('.cm-scroller');
@@ -171,7 +171,7 @@ export class EnchantedAnimationsController {
 							}
 						}
 						for (const node of Array.from(m.removedNodes)) {
-							if (node.nodeType === 1) { const el = node as HTMLElement;
+							if (node.nodeType === 1) {
 								if ((node as HTMLElement).classList.contains('cm-lineNumbers')) {
 									const gutters = m.target as HTMLElement;
 									const scroller = gutters.closest('.cm-scroller');
@@ -213,7 +213,7 @@ export class EnchantedAnimationsController {
 					}
 
 					m.addedNodes.forEach(node => {
-						if (node.nodeType === 1) { const el = node as HTMLElement;
+						if (node.nodeType === 1) {
 							if ((node as HTMLElement).classList.contains('inline-title') || (node as HTMLElement).classList.contains('cm-gutters')) {
 								this.resizeObserver?.observe(node as HTMLElement);
 							}

@@ -80,7 +80,7 @@ export class EnchantedAnimationsSettingTab extends PluginSettingTab {
 		containerEl.addClass("enchanted-settings");
 
 		new Setting(containerEl)
-			.setName("Base Options")
+			.setName("Core")
 			.setHeading();
 
 		new Setting(containerEl)
