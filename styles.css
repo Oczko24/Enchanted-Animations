@@ -231,11 +231,12 @@ body:not(.disable-header-animations) .markdown-source-view.mod-cm6 .cm-line.cm-a
 
 /* ==================== Inline Formatting Push ==================== */
 
-body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-line.HyperMD-codeblock-begin .cm-formatting-code-block,
-body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-line.HyperMD-codeblock-begin .cm-hmd-codeblock,
-body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-line.HyperMD-codeblock-end .cm-formatting-code-block {
-  display: inline-block;
-  animation: ea-codeblock-boundary-slide calc(var(--enchanted-animations-speed) * 0.8) var(--enchanted-animations-easing) forwards;
+/* Container formatting push for codeblock boundaries. 
+   We cannot use absolute positioning or inline-block on CodeMirror spans, as it shatters the cursor measurement algorithm.
+   text-indent on the parent safely moves the boundaries without touching the background or breaking layout. */
+body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-line.HyperMD-codeblock-begin,
+body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-line.HyperMD-codeblock-end {
+  animation: ea-codeblock-text-slide calc(var(--enchanted-animations-speed) * 0.8) var(--enchanted-animations-easing) forwards;
 }
 
 body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .code-block-flair,
@@ -290,7 +291,9 @@ html body:not(.disable-formatting-animations) div.app-container div.workspace di
   background-size: 300% 100%;
   background-position: 100% 0;
   background-repeat: no-repeat;
+  /* stylelint-disable-next-line plugin/no-unsupported-browser-features */
   -webkit-box-decoration-break: clone;
+  /* stylelint-disable-next-line plugin/no-unsupported-browser-features */
   box-decoration-break: clone;
   animation: ea-highlight-draw calc(var(--enchanted-animations-speed) * 1.5) var(--enchanted-animations-easing) forwards;
 }
@@ -536,6 +539,13 @@ body .ea-ghost-tab-switcher * {
   100% { opacity: 0; visibility: hidden; }
 }
 
+@keyframes ea-codeblock-text-slide {
+  /* stylelint-disable-next-line plugin/no-unsupported-browser-features */
+  from { text-indent: -15px; }
+  /* stylelint-disable-next-line plugin/no-unsupported-browser-features */
+  to   { text-indent: 0; }
+}
+
 @keyframes ea-header-pop {
   from { opacity: 0; transform: translateX(-100%) scale(0.6) translateX(-10px); }
   to   { opacity: 1; transform: translateX(-100%) scale(1) translateX(0); }
@@ -551,10 +561,12 @@ body .ea-ghost-tab-switcher * {
   to   { margin-inline: 0; letter-spacing: normal; opacity: 1; }
 }
 
-@keyframes ea-codeblock-boundary-slide {
-  from { opacity: 0; transform: translateX(-15px); }
-  to   { opacity: 1; transform: translateX(0); }
+@keyframes ea-codeblock-pop {
+  from { opacity: 0; transform: scale(0.6) translateX(-10px); }
+  to   { opacity: 1; transform: scale(1) translateX(0); }
 }
+
+
 
 @keyframes ea-flair-slide-in {
   from { opacity: 0; transform: translateX(15px); }
