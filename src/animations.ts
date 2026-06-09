@@ -1,5 +1,10 @@
+import type EnchantedAnimationsPlugin from "./main";
+
+declare const activeDocument: Document;
+
+
 export class EnchantedAnimationsController {
-	private plugin: any;
+	private plugin: EnchantedAnimationsPlugin;
 	private _animating: WeakSet<Element>;
 	private resizeObserver: ResizeObserver | null = null;
 	private mutationObserver: MutationObserver | null = null;
@@ -9,7 +14,7 @@ export class EnchantedAnimationsController {
 	private inlineTitleState = new WeakMap<Element, { height: number, isHidden: boolean }>();
 	private scrollerGutterWidth = new WeakMap<Element, number>();
 
-	constructor(plugin: any) {
+	constructor(plugin: EnchantedAnimationsPlugin) {
 		this.plugin = plugin;
 		this._animating = new WeakSet<Element>();
 	}
@@ -17,13 +22,13 @@ export class EnchantedAnimationsController {
 	public setup() {
 		this.teardown();
 
-		const root = document.querySelector('.workspace');
+		const root = activeDocument.querySelector('.workspace');
 		if (!root) return;
 
 		// 1. ResizeObserver for precise FLIP animations (Inline Title & Line Numbers)
 		this.resizeObserver = new ResizeObserver((entries) => {
 			if (!this.plugin.settings.enableLayoutAnimations) return;
-			const isTransitioning = document.body.classList.contains('ea-note-transitioning');
+			const isTransitioning = activeDocument.body.classList.contains('ea-note-transitioning');
 			const dur = this.plugin.settings.speed * 750;
 			const ease = this.plugin.settings.easing;
 
@@ -149,10 +154,10 @@ export class EnchantedAnimationsController {
 			for (const m of mutations) {
 				// ── Observe dynamically added Title and Gutters, and Animate Line Numbers ──
 				if (m.type === 'childList') {
-					const isTransitioning = document.body.classList.contains('ea-note-transitioning');
+					const isTransitioning = activeDocument.body.classList.contains('ea-note-transitioning');
 					if (this.plugin.settings.enableLayoutAnimations && !isTransitioning) {
 						for (const node of Array.from(m.addedNodes)) {
-							if (node instanceof HTMLElement) {
+							if (node.nodeType === 1) {
 								const lineNumbers = node.classList.contains('cm-lineNumbers') ? node : node.querySelector('.cm-lineNumbers');
 								if (lineNumbers && lineNumbers instanceof HTMLElement) {
 									const scroller = lineNumbers.closest('.cm-scroller');
@@ -166,7 +171,7 @@ export class EnchantedAnimationsController {
 							}
 						}
 						for (const node of Array.from(m.removedNodes)) {
-							if (node instanceof HTMLElement) {
+							if (node.nodeType === 1) {
 								if (node.classList.contains('cm-lineNumbers')) {
 									const gutters = m.target as HTMLElement;
 									const scroller = gutters.closest('.cm-scroller');
@@ -208,7 +213,7 @@ export class EnchantedAnimationsController {
 					}
 
 					m.addedNodes.forEach(node => {
-						if (node instanceof HTMLElement) {
+						if (node.nodeType === 1) {
 							if (node.classList.contains('inline-title') || node.classList.contains('cm-gutters')) {
 								this.resizeObserver?.observe(node);
 							}
@@ -264,7 +269,7 @@ export class EnchantedAnimationsController {
 				// ── Embed line added/removed → smooth slide ──
 				if (this.plugin.settings.enableFormattingAnimations && m.type === 'childList') {
 					for (const node of Array.from(m.addedNodes)) {
-						if (!(node instanceof HTMLElement) || !node.classList.contains('cm-line')) continue;
+						if (!(node.nodeType === 1) || !node.classList.contains('cm-line')) continue;
 						if (!node.querySelector(':scope > .cm-formatting-embed')) continue;
 
 						const embedBlock = node.nextElementSibling;
@@ -285,11 +290,11 @@ export class EnchantedAnimationsController {
 					}
 
 					for (const node of Array.from(m.removedNodes)) {
-						if (!(node instanceof HTMLElement) || !node.classList.contains('cm-line')) continue;
+						if (!(node.nodeType === 1) || !node.classList.contains('cm-line')) continue;
 						if (!node.querySelector(':scope > .cm-formatting-embed')) continue;
 
 						const embedBlock = m.nextSibling as HTMLElement;
-						if (!embedBlock || !(embedBlock instanceof HTMLElement)) continue;
+						if (!embedBlock || !(embedBlock.instanceOf(HTMLElement))) continue;
 
 						const h = 28;
 						embedBlock.animate([
@@ -311,27 +316,27 @@ export class EnchantedAnimationsController {
 		});
 
 		// Attach ResizeObserver to already existing elements
-		document.querySelectorAll('.inline-title, .cm-gutters').forEach(el => {
+		activeDocument.querySelectorAll('.inline-title, .cm-gutters').forEach(el => {
 			this.resizeObserver?.observe(el);
 		});
 
 		// 3. Body observer for elements appended directly to body (like mobile tab switcher)
 		this.bodyObserver = new MutationObserver((mutations) => {
-			const isTabAnimationsEnabled = document.body.classList.contains('ea-tab-animations');
+			const isTabAnimationsEnabled = activeDocument.body.classList.contains('ea-tab-animations');
 			const dur = this.plugin.settings.speed * 1200;
 			const ease = this.plugin.settings.easing;
 
 			for (const m of mutations) {
 				if (m.type === 'childList') {
 					for (const node of Array.from(m.addedNodes)) {
-						if (node instanceof HTMLElement && node.classList.contains('modal-container')) {
+						if (node.nodeType === 1 && node.classList.contains('modal-container')) {
 							delete node.dataset.eaAnimated;
 						}
 					}
 					
-					if (isTabAnimationsEnabled && !this.plugin.settings.disableNativeAnimations) {
+					if (isTabAnimationsEnabled && !this.plugin.settings.enableNativeAnimations) {
 						for (const node of Array.from(m.addedNodes)) {
-							if (node instanceof HTMLElement && node.classList.contains('mobile-tab-switcher') && !node.classList.contains('ea-ghost-tab-switcher')) {
+							if (node.nodeType === 1 && node.classList.contains('mobile-tab-switcher') && !node.classList.contains('ea-ghost-tab-switcher')) {
 								// Cancel Obsidian's native JS animation if any
 								node.getAnimations().forEach(a => a.cancel());
 								node.animate([
@@ -342,7 +347,7 @@ export class EnchantedAnimationsController {
 						}
 						
 						for (const node of Array.from(m.removedNodes)) {
-							if (node instanceof HTMLElement && node.classList.contains('mobile-tab-switcher') && !node.classList.contains('ea-ghost-tab-switcher')) {
+							if (node.nodeType === 1 && node.classList.contains('mobile-tab-switcher') && !node.classList.contains('ea-ghost-tab-switcher')) {
 								const ghost = node.cloneNode(true) as HTMLElement;
 								ghost.classList.add('ea-ghost-tab-switcher');
 								
@@ -363,12 +368,12 @@ export class EnchantedAnimationsController {
 									img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 								});
 								ghost.querySelectorAll('*').forEach(el => {
-									if (el instanceof HTMLElement && el.style.backgroundImage) {
+									if (el.instanceOf(HTMLElement) && el.style.backgroundImage) {
 										Object.assign(el.style, { backgroundImage: 'none' });
 									}
 								});
 
-								document.body.appendChild(ghost);
+								activeDocument.body.appendChild(ghost);
 								
 								const exitDur = this.plugin.settings.speed * 1200;
 								
@@ -380,7 +385,7 @@ export class EnchantedAnimationsController {
 									], { duration: exitDur, easing: ease, fill: 'forwards' });
 									
 									anim.onfinish = () => ghost.remove();
-								} catch (e) {
+								} catch (_e) {
 									// Fallback if animate fails
 									Object.assign(ghost.style, { opacity: '0' });
 								}
@@ -388,15 +393,15 @@ export class EnchantedAnimationsController {
 								// Failsafe: ALWAYS remove the ghost from DOM after the duration + 50ms buffer
 								// This prevents the "mega bug" where the ghost stays on screen forever
 								window.setTimeout(() => {
-									if (document.body.contains(ghost)) {
+									if (activeDocument.body.contains(ghost)) {
 										ghost.remove();
 									}
 								}, exitDur + 50);
 							}
 							
 							// ── Mobile Settings Modal Exit (Fallback for X button) ──
-							if (node instanceof HTMLElement && node.classList.contains('modal-container') && !node.classList.contains('ea-ghost-modal')) {
-								if (document.body.classList.contains('is-phone')) {
+							if (node.nodeType === 1 && node.classList.contains('modal-container') && !node.classList.contains('ea-ghost-modal')) {
+								if (activeDocument.body.classList.contains('is-phone')) {
 									const modal = node.querySelector('.modal.mod-settings');
 									// If it has .is-closing or .eaAnimated, CSS animation already handled it (e.g. Escape).
 									// If it doesn't, it means it was instantly removed (e.g. clicking X).
@@ -411,8 +416,8 @@ export class EnchantedAnimationsController {
 			}
 		});
 
-		this.bodyObserver.observe(document.body, { childList: true });
-		document.addEventListener('click', this.onGlobalClick, true);
+		this.bodyObserver.observe(activeDocument.body, { childList: true });
+		activeDocument.addEventListener('click', this.onGlobalClick, true);
 	}
 	
 	private animateMobileSettingsExit(originalNode: HTMLElement, ease: string) {
@@ -430,7 +435,7 @@ export class EnchantedAnimationsController {
 		});
 		
 		// Always append to body to prevent flex/grid layout shifts
-		document.body.appendChild(ghost);
+		activeDocument.body.appendChild(ghost);
 		
 		const exitDur = this.plugin.settings.speed * 1400;
 		const innerModal = ghost.querySelector('.modal') as HTMLElement;
@@ -455,13 +460,13 @@ export class EnchantedAnimationsController {
 				}
 				
 				anim.onfinish = () => ghost.remove();
-			} catch (e) {
+			} catch (_e) {
 				Object.assign(ghost.style, { opacity: '0' });
 			}
 		}
 		
 		window.setTimeout(() => {
-			if (document.contains(ghost)) {
+			if (activeDocument.contains(ghost)) {
 				ghost.remove();
 			}
 		}, exitDur + 50);
@@ -476,12 +481,12 @@ export class EnchantedAnimationsController {
 
 		this.bodyObserver?.disconnect();
 		this.bodyObserver = null;
-		document.removeEventListener('click', this.onGlobalClick, true);
+		activeDocument.removeEventListener('click', this.onGlobalClick, true);
 	}
 	private showConfetti(el: HTMLElement) {
-		const animationEl = document.createElement("div");
+		const animationEl = activeDocument.createElement("div");
 		animationEl.className = "ea-checkbox-animation ea-confetti";
-		document.body.appendChild(animationEl);
+		activeDocument.body.appendChild(animationEl);
 		
 		const rect = el.getBoundingClientRect();
 		const x = rect.left + rect.width / 2;
@@ -493,7 +498,7 @@ export class EnchantedAnimationsController {
 		const count = 40;
 		
 		for (let i = 0; i < count; i++) {
-			const particle = document.createElement("div");
+			const particle = activeDocument.createElement("div");
 			particle.className = "ea-particle";
 			Object.assign(particle.style, {
 				backgroundColor: colors[Math.floor(Math.random() * colors.length)] || "#ff0000"
@@ -504,7 +509,7 @@ export class EnchantedAnimationsController {
 		}
 		
 		window.setTimeout(() => {
-			if (document.body.contains(animationEl)) {
+			if (activeDocument.body.contains(animationEl)) {
 				animationEl.remove();
 			}
 		}, 3000);
