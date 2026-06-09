@@ -1,4 +1,3 @@
-/* eslint-disable obsidianmd/no-static-styles-assignment, obsidianmd/no-cross-window-instanceof, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-this-alias, @typescript-eslint/ban-types, @typescript-eslint/no-unused-vars */
 export class EnchantedAnimationsController {
 	private plugin: any;
 	private _animating: WeakSet<Element>;
@@ -57,8 +56,7 @@ export class EnchantedAnimationsController {
 						this.inlineTitleState.set(el, { height: currentState.height, isHidden: true });
 						
 						// Temporarily force it visible to animate it out
-						el.style.setProperty('display', 'block', 'important');
-						el.style.overflow = 'hidden';
+						el.setCssProps({ display: 'block !important', overflow: 'hidden' });
 						
 						const anim = el.animate([
 							{ maxHeight: `${currentState.height}px`, opacity: 1, margin: '0 0 12px 0' },
@@ -76,7 +74,7 @@ export class EnchantedAnimationsController {
 						// IMMEDIATELY update state
 						this.inlineTitleState.set(el, { height: el.scrollHeight, isHidden: false });
 						
-						el.style.overflow = 'hidden';
+						el.setCssProps({ overflow: 'hidden' });
 
 						const anim = el.animate([
 							{ maxHeight: '0px', opacity: 0, margin: '0' },
@@ -122,16 +120,14 @@ export class EnchantedAnimationsController {
 							this._animating.add(content);
 
 							// FLIP Text
-							content.style.transform = `translateX(${-diff}px)`;
-							content.style.transition = 'none';
+							content.setCssProps({ transform: `translateX(${-diff}px)`, transition: 'none' });
 
 							window.requestAnimationFrame(() => {
-								content.style.transition = `transform ${dur}ms ${ease}`;
-								content.style.transform = 'translateX(0)';
+								content.setCssProps({ transition: `transform ${dur}ms ${ease}`, transform: 'translateX(0)' });
 								
 								window.setTimeout(() => {
-									content.style.transition = '';
-									content.style.transform = '';
+									content.style.removeProperty('transition');
+									content.style.removeProperty('transform');
 									this._animating.delete(content);
 								}, dur);
 							});
@@ -184,18 +180,19 @@ export class EnchantedAnimationsController {
 											const guttersRect = gutters.getBoundingClientRect();
 											
 											const bgColor = window.getComputedStyle(gutters).backgroundColor;
-											ghost.style.backgroundColor = (bgColor && bgColor !== 'rgba(0, 0, 0, 0)') ? bgColor : 'var(--background-secondary)';
-											
-											ghost.style.position = 'absolute';
-											ghost.style.left = `${guttersRect.left - editorRect.left}px`;
-											ghost.style.top = `${guttersRect.top - editorRect.top}px`;
-											ghost.style.height = `${guttersRect.height}px`;
-											ghost.style.zIndex = '99';
-											ghost.style.pointerEvents = 'none';
-											ghost.style.overflow = 'hidden';
-											ghost.style.display = 'flex';
-											ghost.style.flexDirection = 'column';
-											ghost.style.alignItems = 'flex-end'; // Line numbers typically align right
+											ghost.setCssProps({
+												'background-color': (bgColor && bgColor !== 'rgba(0, 0, 0, 0)') ? bgColor : 'var(--background-secondary)',
+												position: 'absolute',
+												left: `${guttersRect.left - editorRect.left}px`,
+												top: `${guttersRect.top - editorRect.top}px`,
+												height: `${guttersRect.height}px`,
+												'z-index': '99',
+												'pointer-events': 'none',
+												overflow: 'hidden',
+												display: 'flex',
+												'flex-direction': 'column',
+												'align-items': 'flex-end'
+											});
 											
 											editor.appendChild(ghost);
 
@@ -239,12 +236,14 @@ export class EnchantedAnimationsController {
 
 					this._animating.add(el);
 
-					el.style.setProperty('font-size', 'inherit');
-					el.style.setProperty('letter-spacing', 'normal');
-					el.style.setProperty('color', 'inherit');
-					el.style.setProperty('font-family', 'inherit');
-					el.style.display = 'inline-block';
-					el.style.verticalAlign = 'baseline';
+					el.setCssProps({
+						'font-size': 'inherit',
+						'letter-spacing': 'normal',
+						color: 'inherit',
+						'font-family': 'inherit',
+						display: 'inline-block',
+						'vertical-align': 'baseline'
+					});
 
 					const anim = el.animate([
 						{ marginInline: '0', opacity: 1, transform: 'scale(1)' },
@@ -277,7 +276,7 @@ export class EnchantedAnimationsController {
 							{ transform: 'translateY(0)' }
 						], { duration: dur, easing: ease });
 
-						node.style.overflow = 'hidden';
+						node.setCssProps({ overflow: 'hidden' });
 						const lineAnim = node.animate([
 							{ maxHeight: '0px', opacity: 0 },
 							{ maxHeight: h + 'px', opacity: 1 }
@@ -348,9 +347,11 @@ export class EnchantedAnimationsController {
 								ghost.classList.add('ea-ghost-tab-switcher');
 								
 								// CRITICAL: Prevent the ghost from blocking any clicks
-								ghost.style.setProperty('pointer-events', 'none', 'important');
-								ghost.style.position = 'fixed';
-								ghost.style.zIndex = '99999';
+								ghost.setCssProps({
+									'pointer-events': 'none !important',
+									position: 'fixed',
+									'z-index': '99999'
+								});
 								
 								// Ensure it doesn't scroll or capture focus
 								ghost.setAttribute('aria-hidden', 'true');
@@ -363,7 +364,7 @@ export class EnchantedAnimationsController {
 								});
 								ghost.querySelectorAll('*').forEach(el => {
 									if (el instanceof HTMLElement && el.style.backgroundImage) {
-										el.style.backgroundImage = 'none';
+										el.setCssProps({ 'background-image': 'none' });
 									}
 								});
 
@@ -381,7 +382,7 @@ export class EnchantedAnimationsController {
 									anim.onfinish = () => ghost.remove();
 								} catch (e) {
 									// Fallback if animate fails
-									ghost.style.opacity = '0';
+									ghost.setCssProps({ opacity: '0' });
 								}
 								
 								// Failsafe: ALWAYS remove the ghost from DOM after the duration + 50ms buffer
@@ -419,13 +420,14 @@ export class EnchantedAnimationsController {
 		ghost.classList.add('ea-ghost-modal');
 		
 		// Ensure ghost is visible
-		ghost.style.opacity = '1';
-		ghost.style.visibility = 'visible';
-		ghost.style.display = 'flex'; // Obsidian modals are usually flex
-		ghost.style.animation = 'none';
-		
-		ghost.style.pointerEvents = 'none';
-		ghost.style.zIndex = '99999';
+		ghost.setCssProps({
+			opacity: '1',
+			visibility: 'visible',
+			display: 'flex', // Obsidian modals are usually flex
+			animation: 'none',
+			'pointer-events': 'none',
+			'z-index': '99999'
+		});
 		
 		// Always append to body to prevent flex/grid layout shifts
 		document.body.appendChild(ghost);
@@ -436,7 +438,7 @@ export class EnchantedAnimationsController {
 		
 		if (innerModal) {
 			// Disable CSS animations on the clone so it doesn't trigger the entry animation again
-			innerModal.style.animation = 'none';
+			innerModal.setCssProps({ animation: 'none' });
 			
 			try {
 				const anim = innerModal.animate([
@@ -445,7 +447,7 @@ export class EnchantedAnimationsController {
 				], { duration: exitDur, easing: ease, fill: 'forwards' });
 				
 				if (bg) {
-					bg.style.animation = 'none';
+					bg.setCssProps({ animation: 'none' });
 					bg.animate([
 						{ opacity: 1 },
 						{ opacity: 0 }
@@ -454,7 +456,7 @@ export class EnchantedAnimationsController {
 				
 				anim.onfinish = () => ghost.remove();
 			} catch (e) {
-				ghost.style.opacity = '0';
+				ghost.setCssProps({ opacity: '0' });
 			}
 		}
 		
@@ -485,8 +487,7 @@ export class EnchantedAnimationsController {
 		const x = rect.left + rect.width / 2;
 		const y = rect.top + rect.height / 2;
 		
-		animationEl.style.left = `${x}px`;
-		animationEl.style.top = `${y}px`;
+		animationEl.setCssProps({ left: `${x}px`, top: `${y}px` });
 		
 		const colors = ["#ff3300", "#00ff00", "#0066ff", "#ffff00", "#ff00ff", "#00ffff"];
 		const count = 40;
@@ -494,9 +495,11 @@ export class EnchantedAnimationsController {
 		for (let i = 0; i < count; i++) {
 			const particle = document.createElement("div");
 			particle.className = "ea-particle";
-			particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)] || "#ff0000";
-			particle.style.setProperty("--tx", `${(Math.random() - 0.5) * 400}px`);
-			particle.style.setProperty("--ty", `${(Math.random() - 0.5) * 400}px`);
+			particle.setCssProps({
+				'background-color': colors[Math.floor(Math.random() * colors.length)] || "#ff0000",
+				"--tx": `${(Math.random() - 0.5) * 400}px`,
+				"--ty": `${(Math.random() - 0.5) * 400}px`
+			});
 			animationEl.appendChild(particle);
 		}
 		

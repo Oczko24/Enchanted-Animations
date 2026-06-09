@@ -466,16 +466,16 @@ export class EnchantedAnimationsSettingTab extends PluginSettingTab {
 		new Setting(containerEl)
 			.setName("Reset Settings")
 			.setDesc("Restore all animation values and toggles to their default states.")
-			.addButton(button => button
-				.setButtonText("Reset to Defaults")
-				.setDestructive()
-				.onClick(async () => {
-					this.plugin.settings = Object.assign({}, DEFAULT_SETTINGS);
-					await this.plugin.saveSettings();
-					this.plugin.applyStyles();
-					// eslint-disable-next-line @typescript-eslint/no-deprecated
-					this.display();
-				})
-			);
+			.addButton(button => {
+				button.setButtonText("Reset to Defaults")
+					.onClick(async () => {
+						this.plugin.settings = Object.assign({}, DEFAULT_SETTINGS);
+						await this.plugin.saveSettings();
+						this.plugin.applyStyles();
+						this.display();
+					});
+				button.buttonEl.addClass("mod-warning");
+				return button;
+			});
 	}
 }

@@ -1,4 +1,3 @@
-/* eslint-disable obsidianmd/no-static-styles-assignment, obsidianmd/no-cross-window-instanceof, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-this-alias, @typescript-eslint/ban-types, @typescript-eslint/no-unused-vars */
 import {Plugin, Modal, Menu, Notice} from 'obsidian';
 import {DEFAULT_SETTINGS, EnchantedAnimationsSettings, EnchantedAnimationsSettingTab} from "./settings";
 import {EnchantedAnimationsController} from "./animations";
@@ -209,18 +208,20 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 					const ghost = container.cloneNode(true) as HTMLElement;
 					const rect = container.getBoundingClientRect();
 					
-					ghost.style.position = 'fixed';
-					ghost.style.left = rect.left + 'px';
-					ghost.style.top = rect.top + 'px';
-					ghost.style.width = rect.width + 'px';
-					ghost.style.height = rect.height + 'px';
-					ghost.style.margin = '0';
-					ghost.style.pointerEvents = 'none';
-					ghost.style.zIndex = '99999';
+					ghost.setCssProps({
+						position: 'fixed',
+						left: rect.left + 'px',
+						top: rect.top + 'px',
+						width: rect.width + 'px',
+						height: rect.height + 'px',
+						margin: '0',
+						pointerEvents: 'none',
+						zIndex: '99999'
+					});
 
 					// Prevent children from replaying entrance animations
 					ghost.querySelectorAll('*').forEach(el => {
-						(el as HTMLElement).style.animationName = 'none';
+						(el as HTMLElement).setCssProps({ animationName: 'none' });
 					});
 					
 					ghost.classList.add('is-closing');
@@ -291,7 +292,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 						
 						window.setTimeout(() => {
 							// We mimic the native hide behavior directly on the DOM element
-							node.style.opacity = '0';
+							node.setCssProps({ opacity: '0' });
 							window.setTimeout(() => {
 								if (node.parentElement) {
 									node.remove();
@@ -528,7 +529,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 				// Force the menu to be at least as wide as the button
 				window.setTimeout(() => {
 					if (dom) {
-						dom.style.minWidth = `${rect.width}px`;
+						dom.setCssProps({ minWidth: `${rect.width}px` });
 					}
 				}, 0);
 			}
