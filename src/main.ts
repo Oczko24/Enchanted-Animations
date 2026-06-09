@@ -1,4 +1,4 @@
-import {Plugin, Modal, Menu, Notice, App} from 'obsidian';
+import {Plugin, Modal, Menu, Notice} from 'obsidian';
 import {DEFAULT_SETTINGS, EnchantedAnimationsSettings, EnchantedAnimationsSettingTab} from "./settings";
 import {EnchantedAnimationsController} from "./animations";
 
@@ -11,6 +11,7 @@ interface SimulatedElement extends HTMLElement { _eaSimulated?: boolean; }
 
 
 export default class EnchantedAnimationsPlugin extends Plugin {
+	static instance: EnchantedAnimationsPlugin;
 	settings: EnchantedAnimationsSettings;
 	originalModalClose: (...args: unknown[]) => unknown;
 	originalSettingClose: (...args: unknown[]) => unknown;
@@ -20,6 +21,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 	animationsController: EnchantedAnimationsController;
 
 	async onload() {
+		EnchantedAnimationsPlugin.instance = this;
 		activeDocument.body.classList.add('enchanted-animations-present');
 		await this.loadSettings();
 		this.applyStyles();
@@ -128,8 +130,8 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 	}
 
 	patchModalClose() {
-		this.originalModalClose = Modal.prototype.close;
-		const plugin = this;
+		this.originalModalClose = Reflect.get(Modal.prototype, 'close');
+		const plugin = EnchantedAnimationsPlugin.instance;
 
 		Modal.prototype.close = function() {
 			if (!plugin.settings.enableModalAnimations) {
@@ -161,7 +163,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		// wrapping it in a window.setTimeout for next tick in case app.setting isn't fully ready immediately.
 		window.setTimeout(() => {
 			if ((this.app as unknown as AppWithSetting).setting) {
-				this.originalSettingClose = (this.app as unknown as AppWithSetting).setting.close;
+				this.originalSettingClose = Reflect.get((this.app as unknown as AppWithSetting).setting, 'close');
 				(this.app as unknown as AppWithSetting).setting.close = function(this: { close: (...args: unknown[]) => void; containerEl?: HTMLElement }) {
 					if (!plugin.settings.enableModalAnimations) {
 						plugin.originalSettingClose.call(this);
@@ -197,12 +199,12 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 	}
 
 	patchMenuClose() {
-		const plugin = this;
+		const plugin = EnchantedAnimationsPlugin.instance;
 
 		// We patch unload to create a visual ghost that animates out while the real menu dies instantly,
 		// preventing Obsidian's state machine from breaking and menus accumulating.
 		if (Menu.prototype.unload) {
-			this.originalMenuUnload = Menu.prototype.unload;
+			this.originalMenuUnload = Reflect.get(Menu.prototype, 'unload');
 			Menu.prototype.unload = function() {
 				if (!plugin.settings.enableModalAnimations) {
 					return plugin.originalMenuUnload.call(this);
@@ -253,8 +255,8 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 
 	patchNotice() {
 		if (Notice.prototype.hide) {
-			this.originalNoticeHide = Notice.prototype.hide;
-			const plugin = this;
+			this.originalNoticeHide = Reflect.get(Notice.prototype, 'hide');
+			const plugin = EnchantedAnimationsPlugin.instance;
 
 			Notice.prototype.hide = function() {
 				// Extension logic (when offset is > 0)
@@ -297,10 +299,10 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 						
 						window.setTimeout(() => {
 							// We mimic the native hide behavior directly on the DOM element
-							Object.assign(node.style, { opacity: '0' });
+							Object.assign((node as HTMLElement).style, { opacity: '0' });
 							window.setTimeout(() => {
 								if (node.parentElement) {
-									node.remove();
+									(node as HTMLElement).remove();
 								}
 							}, 500); // Wait for transition
 						}, newTimeout);

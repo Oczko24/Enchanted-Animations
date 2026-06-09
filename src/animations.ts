@@ -157,12 +157,12 @@ export class EnchantedAnimationsController {
 					const isTransitioning = activeDocument.body.classList.contains('ea-note-transitioning');
 					if (this.plugin.settings.enableLayoutAnimations && !isTransitioning) {
 						for (const node of Array.from(m.addedNodes)) {
-							if (node.nodeType === 1) {
-								const lineNumbers = node.classList.contains('cm-lineNumbers') ? node : node.querySelector('.cm-lineNumbers');
-								if (lineNumbers && lineNumbers instanceof HTMLElement) {
-									const scroller = lineNumbers.closest('.cm-scroller');
+							if (node.nodeType === 1) { const el = node as HTMLElement;
+								const lineNumbers = (node as HTMLElement).classList.contains('cm-lineNumbers') ? node : (node as HTMLElement).querySelector('.cm-lineNumbers');
+								if (lineNumbers && lineNumbers.nodeType === 1) {
+									const scroller = (lineNumbers as HTMLElement).closest('.cm-scroller');
 									if (scroller && this.scrollerGutterWidth.has(scroller)) {
-										lineNumbers.animate([
+										(lineNumbers as HTMLElement).animate([
 											{ opacity: 0, transform: 'translateX(-100%)' },
 											{ opacity: 1, transform: 'translateX(0)' }
 										], { duration: dur, easing: ease });
@@ -171,8 +171,8 @@ export class EnchantedAnimationsController {
 							}
 						}
 						for (const node of Array.from(m.removedNodes)) {
-							if (node.nodeType === 1) {
-								if (node.classList.contains('cm-lineNumbers')) {
+							if (node.nodeType === 1) { const el = node as HTMLElement;
+								if ((node as HTMLElement).classList.contains('cm-lineNumbers')) {
 									const gutters = m.target as HTMLElement;
 									const scroller = gutters.closest('.cm-scroller');
 									if (gutters && gutters.classList.contains('cm-gutters') && scroller && this.scrollerGutterWidth.has(scroller)) {
@@ -213,11 +213,11 @@ export class EnchantedAnimationsController {
 					}
 
 					m.addedNodes.forEach(node => {
-						if (node.nodeType === 1) {
-							if (node.classList.contains('inline-title') || node.classList.contains('cm-gutters')) {
-								this.resizeObserver?.observe(node);
+						if (node.nodeType === 1) { const el = node as HTMLElement;
+							if ((node as HTMLElement).classList.contains('inline-title') || (node as HTMLElement).classList.contains('cm-gutters')) {
+								this.resizeObserver?.observe(node as HTMLElement);
 							}
-							const titles = node.querySelectorAll('.inline-title, .cm-gutters');
+							const titles = (node as HTMLElement).querySelectorAll('.inline-title, .cm-gutters');
 							titles.forEach(t => this.resizeObserver?.observe(t));
 						}
 					});
@@ -269,29 +269,29 @@ export class EnchantedAnimationsController {
 				// ── Embed line added/removed → smooth slide ──
 				if (this.plugin.settings.enableFormattingAnimations && m.type === 'childList') {
 					for (const node of Array.from(m.addedNodes)) {
-						if (!(node.nodeType === 1) || !node.classList.contains('cm-line')) continue;
-						if (!node.querySelector(':scope > .cm-formatting-embed')) continue;
+						if (!(node.nodeType === 1) || !(node as HTMLElement).classList.contains('cm-line')) continue;
+						if (!(node as HTMLElement).querySelector(':scope > .cm-formatting-embed')) continue;
 
-						const embedBlock = node.nextElementSibling;
+						const embedBlock = (node as HTMLElement).nextElementSibling as HTMLElement;
 						if (!embedBlock) continue;
 
-						const h = node.offsetHeight || 28;
+						const h = (node as HTMLElement).offsetHeight || 28;
 						embedBlock.animate([
 							{ transform: `translateY(-${h}px)` },
 							{ transform: 'translateY(0)' }
 						], { duration: dur, easing: ease });
 
-						Object.assign(node.style, { overflow: 'hidden' });
-						const lineAnim = node.animate([
+						Object.assign((node as HTMLElement).style, { overflow: 'hidden' });
+						const lineAnim = (node as HTMLElement).animate([
 							{ maxHeight: '0px', opacity: 0 },
 							{ maxHeight: h + 'px', opacity: 1 }
 						], { duration: dur, easing: ease });
-						lineAnim.onfinish = () => { node.style.removeProperty('overflow'); };
+						lineAnim.onfinish = () => { (node as HTMLElement).style.removeProperty('overflow'); };
 					}
 
 					for (const node of Array.from(m.removedNodes)) {
-						if (!(node.nodeType === 1) || !node.classList.contains('cm-line')) continue;
-						if (!node.querySelector(':scope > .cm-formatting-embed')) continue;
+						if (!(node.nodeType === 1) || !(node as HTMLElement).classList.contains('cm-line')) continue;
+						if (!(node as HTMLElement).querySelector(':scope > .cm-formatting-embed')) continue;
 
 						const embedBlock = m.nextSibling as HTMLElement;
 						if (!embedBlock || !(embedBlock.instanceOf(HTMLElement))) continue;
@@ -329,17 +329,17 @@ export class EnchantedAnimationsController {
 			for (const m of mutations) {
 				if (m.type === 'childList') {
 					for (const node of Array.from(m.addedNodes)) {
-						if (node.nodeType === 1 && node.classList.contains('modal-container')) {
-							delete node.dataset.eaAnimated;
+						if (node.nodeType === 1 && (node as HTMLElement).classList.contains('modal-container')) {
+							delete (node as HTMLElement).dataset.eaAnimated;
 						}
 					}
 					
 					if (isTabAnimationsEnabled && !this.plugin.settings.enableNativeAnimations) {
 						for (const node of Array.from(m.addedNodes)) {
-							if (node.nodeType === 1 && node.classList.contains('mobile-tab-switcher') && !node.classList.contains('ea-ghost-tab-switcher')) {
+							if (node.nodeType === 1 && (node as HTMLElement).classList.contains('mobile-tab-switcher') && !(node as HTMLElement).classList.contains('ea-ghost-tab-switcher')) {
 								// Cancel Obsidian's native JS animation if any
-								node.getAnimations().forEach(a => a.cancel());
-								node.animate([
+								(node as HTMLElement).getAnimations().forEach(a => a.cancel());
+								(node as HTMLElement).animate([
 									{ opacity: 0, transform: 'translateY(15px) scale(0.98)' },
 									{ opacity: 1, transform: 'translateY(0) scale(1)' }
 								], { duration: dur, easing: ease, fill: 'forwards' });
@@ -347,7 +347,7 @@ export class EnchantedAnimationsController {
 						}
 						
 						for (const node of Array.from(m.removedNodes)) {
-							if (node.nodeType === 1 && node.classList.contains('mobile-tab-switcher') && !node.classList.contains('ea-ghost-tab-switcher')) {
+							if (node.nodeType === 1 && (node as HTMLElement).classList.contains('mobile-tab-switcher') && !(node as HTMLElement).classList.contains('ea-ghost-tab-switcher')) {
 								const ghost = node.cloneNode(true) as HTMLElement;
 								ghost.classList.add('ea-ghost-tab-switcher');
 								
@@ -385,7 +385,7 @@ export class EnchantedAnimationsController {
 									], { duration: exitDur, easing: ease, fill: 'forwards' });
 									
 									anim.onfinish = () => ghost.remove();
-								} catch (_e) {
+								} catch {
 									// Fallback if animate fails
 									Object.assign(ghost.style, { opacity: '0' });
 								}
@@ -400,13 +400,13 @@ export class EnchantedAnimationsController {
 							}
 							
 							// ── Mobile Settings Modal Exit (Fallback for X button) ──
-							if (node.nodeType === 1 && node.classList.contains('modal-container') && !node.classList.contains('ea-ghost-modal')) {
+							if (node.nodeType === 1 && (node as HTMLElement).classList.contains('modal-container') && !(node as HTMLElement).classList.contains('ea-ghost-modal')) {
 								if (activeDocument.body.classList.contains('is-phone')) {
-									const modal = node.querySelector('.modal.mod-settings');
+									const modal = (node as HTMLElement).querySelector('.modal.mod-settings');
 									// If it has .is-closing or .eaAnimated, CSS animation already handled it (e.g. Escape).
 									// If it doesn't, it means it was instantly removed (e.g. clicking X).
-									if (modal && !node.classList.contains('is-closing') && node.dataset.eaAnimated !== 'true') {
-										this.animateMobileSettingsExit(node, ease);
+									if (modal && !(node as HTMLElement).classList.contains('is-closing') && (node as HTMLElement).dataset.eaAnimated !== 'true') {
+										this.animateMobileSettingsExit(node as HTMLElement, ease);
 									}
 								}
 							}
@@ -460,7 +460,7 @@ export class EnchantedAnimationsController {
 				}
 				
 				anim.onfinish = () => ghost.remove();
-			} catch (_e) {
+			} catch {
 				Object.assign(ghost.style, { opacity: '0' });
 			}
 		}

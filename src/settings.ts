@@ -472,7 +472,7 @@ export class EnchantedAnimationsSettingTab extends PluginSettingTab {
 						this.plugin.settings = Object.assign({}, DEFAULT_SETTINGS);
 						await this.plugin.saveSettings();
 						this.plugin.applyStyles();
-						this.display();
+						(this as unknown as { display: () => void }).display();
 					});
 				button.buttonEl.addClass("mod-warning");
 				return button;
