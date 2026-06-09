@@ -219,13 +219,28 @@ body:not(.disable-header-animations) .markdown-source-view.mod-cm6 .cm-line.cm-a
   transition: padding-left var(--enchanted-animations-speed) var(--enchanted-animations-easing);
 }
 
+body:not(.disable-header-animations) .markdown-source-view.mod-cm6 .cm-line.HyperMD-header .cm-fold-indicator {
+  transition: transform var(--enchanted-animations-speed) var(--enchanted-animations-easing);
+}
+
 body:not(.disable-header-animations) .markdown-source-view.mod-cm6 .cm-line.cm-active {
   &.HyperMD-header-1 { padding-left: 20px; }
+  &.HyperMD-header-1 .cm-fold-indicator { transform: translateX(-20px); }
+  
   &.HyperMD-header-2 { padding-left: 30px; }
+  &.HyperMD-header-2 .cm-fold-indicator { transform: translateX(-30px); }
+  
   &.HyperMD-header-3 { padding-left: 40px; }
+  &.HyperMD-header-3 .cm-fold-indicator { transform: translateX(-40px); }
+  
   &.HyperMD-header-4 { padding-left: 50px; }
+  &.HyperMD-header-4 .cm-fold-indicator { transform: translateX(-50px); }
+  
   &.HyperMD-header-5 { padding-left: 60px; }
+  &.HyperMD-header-5 .cm-fold-indicator { transform: translateX(-60px); }
+  
   &.HyperMD-header-6 { padding-left: 70px; }
+  &.HyperMD-header-6 .cm-fold-indicator { transform: translateX(-70px); }
 }
 
 
@@ -233,10 +248,10 @@ body:not(.disable-header-animations) .markdown-source-view.mod-cm6 .cm-line.cm-a
 
 /* Container formatting push for codeblock boundaries. 
    We cannot use absolute positioning or inline-block on CodeMirror spans, as it shatters the cursor measurement algorithm.
-   text-indent on the parent safely moves the boundaries without touching the background or breaking layout. */
-body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-line.HyperMD-codeblock-begin,
-body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-line.HyperMD-codeblock-end {
-  animation: ea-codeblock-text-slide calc(var(--enchanted-animations-speed) * 0.8) var(--enchanted-animations-easing) forwards;
+   However, we can safely animate 'left' on a relatively positioned span to slide it visually without affecting layout flow! */
+body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-line.HyperMD-codeblock-begin .cm-formatting-code-block,
+body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .cm-line.HyperMD-codeblock-end .cm-formatting-code-block {
+  animation: ea-formatting-codeblock-slide-in calc(var(--enchanted-animations-speed) * 0.8) var(--enchanted-animations-easing) forwards;
 }
 
 body:not(.disable-formatting-animations) .markdown-source-view.mod-cm6 .code-block-flair,
@@ -539,11 +554,9 @@ body .ea-ghost-tab-switcher * {
   100% { opacity: 0; visibility: hidden; }
 }
 
-@keyframes ea-codeblock-text-slide {
-  /* stylelint-disable-next-line plugin/no-unsupported-browser-features */
-  from { text-indent: -15px; }
-  /* stylelint-disable-next-line plugin/no-unsupported-browser-features */
-  to   { text-indent: 0; }
+@keyframes ea-formatting-codeblock-slide-in {
+  from { opacity: 0; position: relative; left: -15px; }
+  to   { opacity: 1; position: relative; left: 0; }
 }
 
 @keyframes ea-header-pop {
