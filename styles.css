@@ -349,7 +349,6 @@ body:not(.disable-native-animations) {
 /* ==================== Smooth Scroll ==================== */
 
 body.ea-smooth-scroll .markdown-reading-view,
-body.ea-smooth-scroll .markdown-source-view .cm-scroller,
 body.ea-smooth-scroll .nav-files-container,
 body.ea-smooth-scroll .workspace-drawer-inner,
 body.ea-smooth-scroll .modal .vertical-tab-content,
