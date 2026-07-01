@@ -84,6 +84,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		this.patchMenuClose();
 		this.patchGraphControls();
 		this.patchDocumentSearch();
+		this.patchMobileSettingsClose();
 		this.patchNotice();
 		this.addSettingTab(new EnchantedAnimationsSettingTab(this.app, this));
 	}
@@ -175,11 +176,11 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 						return;
 					}
 
-					let container = this.containerEl || activeDocument.querySelector('.modal-container.mod-settings') as HTMLElement;
+					let container = this.containerEl || (activeDocument.querySelector('.modal.mod-settings')?.closest('.modal-container') as HTMLElement);
 					if (container && !container.classList.contains('is-closing')) {
 						container.classList.add('is-closing');
 						container.dataset.eaAnimated = 'true';
-						const isMobile = activeDocument.body.classList.contains('is-phone');
+						const isMobile = activeDocument.body.classList.contains('is-mobile');
 						const durationMs = plugin.settings.speed * (isMobile ? 1400 : 700);
 						
 						window.setTimeout(() => {
@@ -479,6 +480,40 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 						});
 						(simulatedEvent as SimulatedEvent)._eaSimulated = true;
 						target.dispatchEvent(simulatedEvent);
+					}, Math.max(0, durationMs - 10));
+				}
+			}
+		}, true);
+	}
+
+	patchMobileSettingsClose() {
+		// Intercept clicks on the settings close button (mostly an issue on mobile)
+		this.registerDomEvent(activeDocument, 'click', (evt: MouseEvent) => {
+			if (!this.settings.enableModalAnimations) return;
+
+			const target = evt.target as HTMLElement;
+			if (!target) return;
+			
+			const closeBtn = target.closest('.is-mobile .modal.mod-settings .modal-close-button');
+			if (closeBtn) {
+				if ((closeBtn as SimulatedElement)._eaSimulated) {
+					(closeBtn as SimulatedElement)._eaSimulated = false; // Reset
+					return;
+				}
+
+				const container = closeBtn.closest('.modal-container');
+				if (container && !container.classList.contains('is-closing')) {
+					evt.preventDefault();
+					evt.stopPropagation();
+					evt.stopImmediatePropagation();
+
+					container.classList.add('is-closing');
+					const durationMs = this.settings.speed * 1400; // Mobile modal exit is 1.4x
+					
+					window.setTimeout(() => {
+						container.classList.remove('is-closing');
+						(closeBtn as SimulatedElement)._eaSimulated = true;
+						closeBtn.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
 					}, Math.max(0, durationMs - 10));
 				}
 			}

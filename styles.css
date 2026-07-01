@@ -53,11 +53,11 @@ body:not(.disable-modal-animation):not(.is-mobile) .prompt {
   animation: ea-prompt-in var(--enchanted-animations-speed) var(--enchanted-animations-easing);
 }
 
-body:not(.disable-modal-animation) .is-mobile .prompt {
+body:not(.disable-modal-animation).is-mobile .prompt {
   animation: ea-slide-up var(--enchanted-animations-speed) var(--enchanted-animations-easing);
 }
 
-body:not(.disable-modal-animation) .is-phone .prompt {
+body:not(.disable-modal-animation).is-phone .prompt {
   animation: ea-slide-up calc(var(--enchanted-animations-speed) * 1.2) var(--enchanted-animations-easing);
 }
 
@@ -70,6 +70,7 @@ body:not(.disable-modal-animation):not(.is-mobile) .menu {
 
 body:not(.disable-modal-animation):not(.is-mobile) .menu.is-closing {
   animation: ea-menu-out calc(var(--enchanted-animations-speed) * 0.4) cubic-bezier(0.3, 0, 1, 1) forwards;
+  pointer-events: none;
 }
 
 /* Size limit for hijacked dropdowns to prevent them from extending beyond the screen */
@@ -86,12 +87,13 @@ body .menu.ea-select-menu .menu-item-title {
   text-overflow: ellipsis;
 }
 
-body:not(.disable-modal-animation) .is-phone .menu {
+body:not(.disable-modal-animation).is-phone .menu {
   animation: ea-slide-up calc(var(--enchanted-animations-speed) * 1.2) var(--enchanted-animations-easing);
 }
 
-body:not(.disable-modal-animation) .is-phone .menu.is-closing {
+body:not(.disable-modal-animation).is-phone .menu.is-closing {
   animation: ea-slide-down calc(var(--enchanted-animations-speed) * 1.2) var(--enchanted-animations-easing) forwards;
+  pointer-events: none;
 }
 
 
@@ -126,6 +128,7 @@ body:not(.disable-modal-animation) .canvas-controls {
 body:not(.disable-modal-animation) .graph-controls.is-closing {
   transform-origin: top right;
   animation: ea-graph-controls-out calc(var(--enchanted-animations-speed) * 0.6) var(--enchanted-animations-easing) forwards;
+  pointer-events: none;
 }
 
 
@@ -136,6 +139,7 @@ body:not(.disable-modal-animation) .modal-container.is-closing,
 .theme-dark body:not(.disable-modal-animation) .modal-container.is-closing,
 .theme-light body:not(.disable-modal-animation) .modal-container.is-closing {
   opacity: 1;
+  pointer-events: none;
 }
 
 body:not(.disable-modal-animation) .modal-container.is-closing .modal-bg {
@@ -152,24 +156,25 @@ body:not(.disable-modal-animation) .document-search-container {
 body:not(.disable-modal-animation) .document-search-container.is-closing {
   transform-origin: top;
   animation: ea-search-out calc(var(--enchanted-animations-speed) * 0.6) var(--enchanted-animations-easing) forwards;
+  pointer-events: none;
 }
 
 
 /* ==================== Mobile Settings Drill-Down & Tab Switch ==================== */
 
-body:not(.disable-modal-animation).is-phone .modal.mod-settings {
+body:not(.disable-modal-animation).is-mobile .modal.mod-settings {
   box-shadow: 0px 10px 40px rgba(0,0,0,0.2);
   animation: ea-mobile-modal-in calc(var(--enchanted-animations-speed) * 1.4) var(--enchanted-animations-easing) forwards;
   transform-origin: center center;
 }
 
-body:not(.disable-modal-animation).is-phone .modal-container.is-closing .modal.mod-settings {
+body:not(.disable-modal-animation).is-mobile .modal-container.is-closing .modal.mod-settings {
   animation: ea-mobile-modal-out calc(var(--enchanted-animations-speed) * 1.4) var(--enchanted-animations-easing) forwards;
   transform-origin: center center;
 }
 
 /* Desktop-only settings tab content fade (excluded from phone to avoid fighting Obsidian's native drill-down) */
-body:not(.disable-modal-animation):not(.is-phone) .vertical-tab-content {
+body:not(.disable-modal-animation):not(.is-mobile) .vertical-tab-content {
   animation: ea-note-in calc(var(--enchanted-animations-speed) * 0.8) var(--enchanted-animations-easing);
 }
 
@@ -753,12 +758,12 @@ body:not(.disable-native-animations) .progress-bar .progress-bar-subline,
 body:not(.disable-native-animations) .pdf-sidebar-resizer,
 body:not(.disable-native-animations) .workspace-leaf-resize-handle,
 body:not(.disable-native-animations) .search-input-clear-button,
-body:not(.disable-native-animations) .is-mobile .clickable-icon,
-body:not(.disable-native-animations) .is-phone .workspace-drawer-tab-options-list,
-body:not(.disable-native-animations) .is-phone .menu-grabber,
-body:not(.disable-native-animations) .is-phone .menu .suggestion-group .suggestion-item,
-body:not(.disable-native-animations) .is-phone .menu-item,
-body:not(.disable-native-animations) .is-phone .modal.mod-settings .vertical-tab-nav-item,
+body:not(.disable-native-animations).is-mobile .clickable-icon,
+body:not(.disable-native-animations).is-phone .workspace-drawer-tab-options-list,
+body:not(.disable-native-animations).is-phone .menu-grabber,
+body:not(.disable-native-animations).is-phone .menu .suggestion-group .suggestion-item,
+body:not(.disable-native-animations).is-phone .menu-item,
+body:not(.disable-native-animations).is-phone .modal.mod-settings .vertical-tab-nav-item,
 body:not(.disable-native-animations) .mobile-navbar,
 body:not(.disable-native-animations) .mobile-navbar-action,
 body:not(.disable-native-animations) .mobile-tab-switcher-menu-button {
@@ -1044,11 +1049,7 @@ body.ea-checkbox-animations:not(.disable-checkbox-animations) .markdown-source-v
   text-decoration: none;
 }
 
-body.ea-checkbox-animations:not(.disable-checkbox-animations) .markdown-source-view.mod-cm6 .HyperMD-task-line[data-task] .cm-line {
-  text-decoration: none;
-}
-
-body.ea-checkbox-animations:not(.disable-checkbox-animations) .markdown-source-view.mod-cm6 .HyperMD-task-line[data-task] span:not(.cm-formatting):not(.cm-widgetBuffer):not(.task-list-label):not(.cm-hmd-list-indent):not(.cm-indent) {
+body.ea-checkbox-animations:not(.disable-checkbox-animations) .markdown-source-view.mod-cm6 .HyperMD-task-line[data-task] span:not(.cm-formatting):not(.cm-widgetBuffer):not(.task-list-label):not(.cm-hmd-list-indent):not(.cm-indent):not(.cm-tag):not(.cm-hmd-internal-link):not(.cm-url):not(.cm-link):not(.cm-inline-code):not(.cm-math) {
   background-image: linear-gradient(var(--text-muted), var(--text-muted));
   background-position: left center;
   background-size: 0% 1.5px;
@@ -1057,9 +1058,22 @@ body.ea-checkbox-animations:not(.disable-checkbox-animations) .markdown-source-v
               color calc(var(--enchanted-animations-speed) * 0.8) var(--enchanted-animations-easing);
 }
 
-body.ea-checkbox-animations:not(.disable-checkbox-animations) .markdown-source-view.mod-cm6 .HyperMD-task-line[data-task]:not([data-task=" "]) span:not(.cm-formatting):not(.cm-widgetBuffer):not(.task-list-label):not(.cm-hmd-list-indent):not(.cm-indent) {
+body.ea-checkbox-animations:not(.disable-checkbox-animations) .markdown-source-view.mod-cm6 .HyperMD-task-line[data-task]:not([data-task=" "]) span:not(.cm-formatting):not(.cm-widgetBuffer):not(.task-list-label):not(.cm-hmd-list-indent):not(.cm-indent):not(.cm-tag):not(.cm-hmd-internal-link):not(.cm-url):not(.cm-link):not(.cm-inline-code):not(.cm-math) {
   background-size: 100% 1.5px;
   color: var(--text-muted);
+}
+
+/* Dim complex elements (tags, links, code) instead of drawing an ugly line through them */
+body.ea-checkbox-animations:not(.disable-checkbox-animations) .markdown-source-view.mod-cm6 .HyperMD-task-line[data-task]:not([data-task=" "]) span.cm-tag,
+body.ea-checkbox-animations:not(.disable-checkbox-animations) .markdown-source-view.mod-cm6 .HyperMD-task-line[data-task]:not([data-task=" "]) span.cm-hmd-internal-link,
+body.ea-checkbox-animations:not(.disable-checkbox-animations) .markdown-source-view.mod-cm6 .HyperMD-task-line[data-task]:not([data-task=" "]) span.cm-url,
+body.ea-checkbox-animations:not(.disable-checkbox-animations) .markdown-source-view.mod-cm6 .HyperMD-task-line[data-task]:not([data-task=" "]) span.cm-link,
+body.ea-checkbox-animations:not(.disable-checkbox-animations) .markdown-source-view.mod-cm6 .HyperMD-task-line[data-task]:not([data-task=" "]) span.cm-inline-code,
+body.ea-checkbox-animations:not(.disable-checkbox-animations) .markdown-source-view.mod-cm6 .HyperMD-task-line[data-task]:not([data-task=" "]) span.cm-math {
+  color: var(--text-muted);
+  opacity: 0.6;
+  transition: color calc(var(--enchanted-animations-speed) * 0.8) var(--enchanted-animations-easing),
+              opacity calc(var(--enchanted-animations-speed) * 0.8) var(--enchanted-animations-easing);
 }
 
 /* Animate the strikethrough in Live Preview */
