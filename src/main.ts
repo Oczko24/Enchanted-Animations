@@ -3,7 +3,7 @@ import {DEFAULT_SETTINGS, EnchantedAnimationsSettings, EnchantedAnimationsSettin
 import {EnchantedAnimationsController} from "./animations";
 
 declare const activeDocument: Document;
-interface AppWithSetting { setting: { close: (...args: unknown[]) => void; containerEl?: HTMLElement }; }
+interface AppWithSetting { setting: { close: (...args: unknown[]) => void; open: (...args: unknown[]) => void; containerEl?: HTMLElement }; }
 interface MenuWithDom extends Menu { dom: HTMLElement; }
 interface NoticeWithDelay extends Notice { _eaDelayed?: boolean; }
 interface SimulatedEvent extends Event { _eaSimulated?: boolean; }
@@ -135,9 +135,28 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		activeDocument.body.classList.remove('ea-menu-cascade');
 	}
 
+	originalModalOpen: (...args: unknown[]) => unknown;
+
 	patchModalClose() {
 		this.originalModalClose = Reflect.get(Modal.prototype, 'close');
+		this.originalModalOpen = Reflect.get(Modal.prototype, 'open');
 		const plugin = EnchantedAnimationsPlugin.instance;
+
+		if (typeof this.originalModalOpen === 'function') {
+			Modal.prototype.open = function() {
+				let container = this.containerEl as HTMLElement;
+				if (container && !container.classList.contains('modal-container')) {
+					container = container.closest('.modal-container') as HTMLElement;
+				}
+				if (container) {
+					container.classList.remove('is-closing');
+					Object.assign(container.style, { animationName: '' });
+					const modal = container.querySelector('.modal') as HTMLElement;
+					if (modal) Object.assign(modal.style, { animationName: '' });
+				}
+				plugin.originalModalOpen.call(this);
+			};
+		}
 
 		Modal.prototype.close = function() {
 			if (!plugin.settings.enableModalAnimations) {
@@ -145,7 +164,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 				return;
 			}
 
-			let container = this.containerEl;
+			let container = this.containerEl as HTMLElement;
 			if (container && !container.classList.contains('modal-container')) {
 				container = container.closest('.modal-container') as HTMLElement;
 			}
@@ -153,12 +172,17 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 			if (container && !container.classList.contains('is-closing')) {
 				container.classList.add('is-closing');
 				container.dataset.eaAnimated = 'true';
-				const isMobileSettings = activeDocument.body.classList.contains('is-phone') && container.querySelector('.modal.mod-settings');
+				const isMobileSettings = activeDocument.body.classList.contains('is-mobile') && container.querySelector('.modal.mod-settings');
 				const durationMs = plugin.settings.speed * (isMobileSettings ? 1400 : 700);
 				
 				window.setTimeout(() => {
-					container.classList.remove('is-closing');
 					plugin.originalModalClose.call(this);
+					window.setTimeout(() => {
+						Object.assign(container.style, { animationName: 'none' });
+						const modal = container.querySelector('.modal') as HTMLElement;
+						if (modal) Object.assign(modal.style, { animationName: 'none' });
+						container.classList.remove('is-closing');
+					}, 50);
 				}, Math.max(0, durationMs - 10));
 			} else {
 				plugin.originalModalClose.call(this);
@@ -170,13 +194,41 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		window.setTimeout(() => {
 			if ((this.app as unknown as AppWithSetting).setting) {
 				this.originalSettingClose = Reflect.get((this.app as unknown as AppWithSetting).setting, 'close');
+				
+				// Patch open to clean up any left-over closing classes before it shows
+				const originalSettingOpen = Reflect.get((this.app as unknown as AppWithSetting).setting, 'open');
+				if (originalSettingOpen) {
+					(this.app as unknown as AppWithSetting).setting.open = function(this: { open: (...args: unknown[]) => void; containerEl?: HTMLElement }) {
+						let container = this.containerEl as HTMLElement;
+						if (container && !container.classList.contains('modal-container')) {
+							container = container.closest('.modal-container') as HTMLElement;
+						}
+						if (!container) {
+							container = activeDocument.querySelector('.modal.mod-settings')?.closest('.modal-container') as HTMLElement;
+						}
+						if (container) {
+							container.classList.remove('is-closing');
+							Object.assign(container.style, { animationName: '' });
+							const modal = container.querySelector('.modal.mod-settings') as HTMLElement;
+							if (modal) Object.assign(modal.style, { animationName: '' });
+						}
+						originalSettingOpen.call(this);
+					};
+				}
+
 				(this.app as unknown as AppWithSetting).setting.close = function(this: { close: (...args: unknown[]) => void; containerEl?: HTMLElement }) {
 					if (!plugin.settings.enableModalAnimations) {
 						plugin.originalSettingClose.call(this);
 						return;
 					}
 
-					let container = this.containerEl || (activeDocument.querySelector('.modal.mod-settings')?.closest('.modal-container') as HTMLElement);
+					let container = this.containerEl as HTMLElement;
+					if (container && !container.classList.contains('modal-container')) {
+						container = container.closest('.modal-container') as HTMLElement;
+					}
+					if (!container) {
+						container = activeDocument.querySelector('.modal.mod-settings')?.closest('.modal-container') as HTMLElement;
+					}
 					if (container && !container.classList.contains('is-closing')) {
 						container.classList.add('is-closing');
 						container.dataset.eaAnimated = 'true';
@@ -184,8 +236,16 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 						const durationMs = plugin.settings.speed * (isMobile ? 1400 : 700);
 						
 						window.setTimeout(() => {
-							container.classList.remove('is-closing');
 							plugin.originalSettingClose.call(this);
+							
+							// Instead of removing is-closing, we just disable the animation to prevent IN animation flash.
+							// It will be cleaned up in open() next time.
+							window.setTimeout(() => {
+								Object.assign(container.style, { animationName: 'none' });
+								const modal = container.querySelector('.modal.mod-settings') as HTMLElement;
+								if (modal) Object.assign(modal.style, { animationName: 'none' });
+								container.classList.remove('is-closing');
+							}, 50);
 						}, Math.max(0, durationMs - 10));
 					} else {
 						plugin.originalSettingClose.call(this);
@@ -406,9 +466,9 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 					const durationMs = this.settings.speed * 600;
 					
 					window.setTimeout(() => {
-						container.classList.remove('is-closing');
 						(closeBtn as SimulatedElement)._eaSimulated = true;
 						closeBtn.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+						window.setTimeout(() => container.classList.remove('is-closing'), 50);
 					}, Math.max(0, durationMs - 10));
 				}
 			}
@@ -440,9 +500,9 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 					const durationMs = this.settings.speed * 600;
 					
 					window.setTimeout(() => {
-						container.classList.remove('is-closing');
 						(closeBtn as SimulatedElement)._eaSimulated = true;
 						closeBtn.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+						window.setTimeout(() => container.classList.remove('is-closing'), 50);
 					}, Math.max(0, durationMs - 10));
 				}
 			}
@@ -471,7 +531,6 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 					const durationMs = this.settings.speed * 600;
 					
 					window.setTimeout(() => {
-						container.classList.remove('is-closing');
 						const simulatedEvent = new KeyboardEvent('keydown', { 
 							key: 'Escape', 
 							code: 'Escape',
@@ -480,6 +539,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 						});
 						(simulatedEvent as SimulatedEvent)._eaSimulated = true;
 						target.dispatchEvent(simulatedEvent);
+						window.setTimeout(() => container.classList.remove('is-closing'), 50);
 					}, Math.max(0, durationMs - 10));
 				}
 			}
@@ -487,22 +547,20 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 	}
 
 	patchMobileSettingsClose() {
-		// Intercept clicks on the settings close button (mostly an issue on mobile)
+		// Intercept clicks on the settings close button specifically to prevent Obsidian from closing it instantly (bypassing animation)
 		this.registerDomEvent(activeDocument, 'click', (evt: MouseEvent) => {
 			if (!this.settings.enableModalAnimations) return;
 
 			const target = evt.target as HTMLElement;
 			if (!target) return;
 			
-			const closeBtn = target.closest('.is-mobile .modal.mod-settings .modal-close-button');
+			// Strict selector for the X button, completely avoiding the back button in drill-down menus
+			const closeBtn = target.closest('.is-mobile .modal.mod-settings .modal-close-button:not(.mod-back), .is-mobile .modal.mod-settings .clickable-icon.mod-close, .is-mobile .modal.mod-settings [aria-label="Close"], .is-mobile .modal.mod-settings [aria-label="Zamknij"]');
+			
 			if (closeBtn) {
-				if ((closeBtn as SimulatedElement)._eaSimulated) {
-					(closeBtn as SimulatedElement)._eaSimulated = false; // Reset
-					return;
-				}
-
 				const container = closeBtn.closest('.modal-container');
 				if (container && !container.classList.contains('is-closing')) {
+					// Stop Obsidian's native instant-close
 					evt.preventDefault();
 					evt.stopPropagation();
 					evt.stopImmediatePropagation();
@@ -511,9 +569,18 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 					const durationMs = this.settings.speed * 1400; // Mobile modal exit is 1.4x
 					
 					window.setTimeout(() => {
-						container.classList.remove('is-closing');
-						(closeBtn as SimulatedElement)._eaSimulated = true;
-						closeBtn.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+						if ((this.app as unknown as AppWithSetting).setting) {
+							// Trigger the real close natively instead of faking a click
+							(this.app as unknown as AppWithSetting).setting.close();
+							
+							// Clean up after the native close to prevent IN animation flash
+							window.setTimeout(() => {
+								Object.assign((container as HTMLElement).style, { animationName: 'none' });
+								const modal = container.querySelector('.modal.mod-settings') as HTMLElement;
+								if (modal) Object.assign(modal.style, { animationName: 'none' });
+								container.classList.remove('is-closing');
+							}, 50);
+						}
 					}, Math.max(0, durationMs - 10));
 				}
 			}
