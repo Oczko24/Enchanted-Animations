@@ -19,6 +19,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 	originalNoticeHide: (...args: unknown[]) => unknown;
 	noticeObserver: MutationObserver | null;
 	animationsController: EnchantedAnimationsController;
+	sidebarObserver: ResizeObserver | null;
 
 	async onload() {
 		EnchantedAnimationsPlugin.instance = this;
@@ -97,6 +98,10 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		}
 		if (this.animationsController) {
 			this.animationsController.teardown();
+		}
+		if (this.sidebarObserver) {
+			this.sidebarObserver.disconnect();
+			this.sidebarObserver = null;
 		}
 
 		activeDocument.body.style.removeProperty('--enchanted-animations-speed');
@@ -324,7 +329,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 	setupSidebarVelocity() {
 		// Calculate sidebar width and set it as a variable so CSS can calculate velocity (px/s)
 		const sidebars = activeDocument.querySelectorAll('.workspace-split.mod-sidedock');
-		const ro = new ResizeObserver((entries) => {
+		this.sidebarObserver = new ResizeObserver((entries) => {
 			for (const entry of entries) {
 				const el = entry.target as HTMLElement;
 				// Only update if it has a meaningful width (not collapsed)
@@ -333,7 +338,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 				}
 			}
 		});
-		sidebars.forEach(s => ro.observe(s));
+		sidebars.forEach(s => this.sidebarObserver?.observe(s));
 	}
 
 	async loadSettings() {

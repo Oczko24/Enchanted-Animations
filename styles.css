@@ -971,18 +971,18 @@ body:not(.disable-animated-callouts) .callout[data-callout="example"]:hover .cal
 
 
 /* ==================== Checkboxes ==================== */
-body.ea-checkbox-animations input[type="checkbox"],
-body.ea-checkbox-animations .task-list-item-checkbox {
+body.ea-checkbox-animations:not(.disable-checkbox-animations) input[type="checkbox"],
+body.ea-checkbox-animations:not(.disable-checkbox-animations) .task-list-item-checkbox {
   transition: transform calc(var(--enchanted-animations-speed) * 0.5) var(--enchanted-animations-easing);
 }
 
-body.ea-checkbox-animations input[type="checkbox"]:active,
-body.ea-checkbox-animations .task-list-item-checkbox:active {
+body.ea-checkbox-animations:not(.disable-checkbox-animations) input[type="checkbox"]:active,
+body.ea-checkbox-animations:not(.disable-checkbox-animations) .task-list-item-checkbox:active {
   transform: scale(0.85); /* Note: Removed !important as per guidelines */
 }
 
-body.ea-checkbox-animations input[type="checkbox"]:checked,
-body.ea-checkbox-animations .task-list-item-checkbox:checked {
+body.ea-checkbox-animations:not(.disable-checkbox-animations) input[type="checkbox"]:checked,
+body.ea-checkbox-animations:not(.disable-checkbox-animations) .task-list-item-checkbox:checked {
   /* Removed forwards - element returns to native styles after animation, allowing :active to work */
   animation: ea-checkbox-pop calc(var(--enchanted-animations-speed) * 0.8) var(--enchanted-animations-easing);
 }
@@ -994,21 +994,21 @@ body.ea-checkbox-animations .task-list-item-checkbox:checked {
 }
 
 /* Animation for the checkmark icon appearing inside the checkbox */
-body.ea-checkbox-animations input[type="checkbox"]::after,
-body.ea-checkbox-animations .task-list-item-checkbox::after {
+body.ea-checkbox-animations:not(.disable-checkbox-animations) input[type="checkbox"]::after,
+body.ea-checkbox-animations:not(.disable-checkbox-animations) .task-list-item-checkbox::after {
   transition: transform calc(var(--enchanted-animations-speed) * 0.5) var(--enchanted-animations-easing),
               opacity calc(var(--enchanted-animations-speed) * 0.5) var(--enchanted-animations-easing);
 }
 
-body.ea-checkbox-animations input[type="checkbox"]:checked::after,
-body.ea-checkbox-animations .task-list-item-checkbox:checked::after {
+body.ea-checkbox-animations:not(.disable-checkbox-animations) input[type="checkbox"]:checked::after,
+body.ea-checkbox-animations:not(.disable-checkbox-animations) .task-list-item-checkbox:checked::after {
   animation: ea-checkmark-pop calc(var(--enchanted-animations-speed) * 0.8) var(--enchanted-animations-easing);
   transform: scale(1);
   opacity: 1;
 }
 
-body.ea-checkbox-animations input[type="checkbox"]:not(:checked)::after,
-body.ea-checkbox-animations .task-list-item-checkbox:not(:checked)::after {
+body.ea-checkbox-animations:not(.disable-checkbox-animations) input[type="checkbox"]:not(:checked)::after,
+body.ea-checkbox-animations:not(.disable-checkbox-animations) .task-list-item-checkbox:not(:checked)::after {
   transform: scale(0);
   opacity: 0;
 }
@@ -1022,7 +1022,7 @@ body.ea-checkbox-animations .task-list-item-checkbox:not(:checked)::after {
 
 /* stylelint-disable plugin/no-unsupported-browser-features */
 /* doiuse-disable */
-body.ea-checkbox-animations .task-list-item {
+body.ea-checkbox-animations:not(.disable-checkbox-animations) .task-list-item {
   transition: opacity calc(var(--enchanted-animations-speed) * 0.8) var(--enchanted-animations-easing),
               color calc(var(--enchanted-animations-speed) * 0.8) var(--enchanted-animations-easing),
               text-decoration-color calc(var(--enchanted-animations-speed) * 0.8) var(--enchanted-animations-easing);
@@ -1030,7 +1030,7 @@ body.ea-checkbox-animations .task-list-item {
   text-decoration-color: transparent;
 }
 
-body.ea-checkbox-animations .task-list-item.is-checked {
+body.ea-checkbox-animations:not(.disable-checkbox-animations) .task-list-item.is-checked {
   opacity: 0.6;
   text-decoration-color: var(--text-muted);
   color: var(--text-muted);
@@ -1040,15 +1040,15 @@ body.ea-checkbox-animations .task-list-item.is-checked {
 
 
 /* Animate task completion strikethrough in Live Preview */
-body.ea-checkbox-animations .markdown-source-view.mod-cm6 .HyperMD-task-line[data-task] {
+body.ea-checkbox-animations:not(.disable-checkbox-animations) .markdown-source-view.mod-cm6 .HyperMD-task-line[data-task] {
   text-decoration: none;
 }
 
-body.ea-checkbox-animations .markdown-source-view.mod-cm6 .HyperMD-task-line[data-task] .cm-line {
+body.ea-checkbox-animations:not(.disable-checkbox-animations) .markdown-source-view.mod-cm6 .HyperMD-task-line[data-task] .cm-line {
   text-decoration: none;
 }
 
-body.ea-checkbox-animations .markdown-source-view.mod-cm6 .HyperMD-task-line[data-task] span:not(.cm-formatting):not(.cm-widgetBuffer):not(.task-list-label):not(.cm-hmd-list-indent):not(.cm-indent) {
+body.ea-checkbox-animations:not(.disable-checkbox-animations) .markdown-source-view.mod-cm6 .HyperMD-task-line[data-task] span:not(.cm-formatting):not(.cm-widgetBuffer):not(.task-list-label):not(.cm-hmd-list-indent):not(.cm-indent) {
   background-image: linear-gradient(var(--text-muted), var(--text-muted));
   background-position: left center;
   background-size: 0% 1.5px;
@@ -1057,19 +1057,19 @@ body.ea-checkbox-animations .markdown-source-view.mod-cm6 .HyperMD-task-line[dat
               color calc(var(--enchanted-animations-speed) * 0.8) var(--enchanted-animations-easing);
 }
 
-body.ea-checkbox-animations .markdown-source-view.mod-cm6 .HyperMD-task-line[data-task]:not([data-task=" "]) span:not(.cm-formatting):not(.cm-widgetBuffer):not(.task-list-label):not(.cm-hmd-list-indent):not(.cm-indent) {
+body.ea-checkbox-animations:not(.disable-checkbox-animations) .markdown-source-view.mod-cm6 .HyperMD-task-line[data-task]:not([data-task=" "]) span:not(.cm-formatting):not(.cm-widgetBuffer):not(.task-list-label):not(.cm-hmd-list-indent):not(.cm-indent) {
   background-size: 100% 1.5px;
   color: var(--text-muted);
 }
 
 /* Animate the strikethrough in Live Preview */
-body.ea-checkbox-animations .cm-strikethrough {
+body.ea-checkbox-animations:not(.disable-checkbox-animations) .cm-strikethrough {
   display: inline-block;
   position: relative;
   text-decoration: none;
   color: var(--text-muted);
 }
-body.ea-checkbox-animations .cm-strikethrough::after {
+body.ea-checkbox-animations:not(.disable-checkbox-animations) .cm-strikethrough::after {
   content: "";
   position: absolute;
   left: 0;
@@ -1082,14 +1082,14 @@ body.ea-checkbox-animations .cm-strikethrough::after {
 }
 
 /* Reading mode strike-through */
-body.ea-checkbox-animations .markdown-preview-view .task-list-item.is-checked s,
-body.ea-checkbox-animations .markdown-preview-view .task-list-item.is-checked del {
+body.ea-checkbox-animations:not(.disable-checkbox-animations) .markdown-preview-view .task-list-item.is-checked s,
+body.ea-checkbox-animations:not(.disable-checkbox-animations) .markdown-preview-view .task-list-item.is-checked del {
   text-decoration: none;
   position: relative;
   display: inline-block;
 }
-body.ea-checkbox-animations .markdown-preview-view .task-list-item.is-checked s::after,
-body.ea-checkbox-animations .markdown-preview-view .task-list-item.is-checked del::after {
+body.ea-checkbox-animations:not(.disable-checkbox-animations) .markdown-preview-view .task-list-item.is-checked s::after,
+body.ea-checkbox-animations:not(.disable-checkbox-animations) .markdown-preview-view .task-list-item.is-checked del::after {
   content: "";
   position: absolute;
   left: 0;
