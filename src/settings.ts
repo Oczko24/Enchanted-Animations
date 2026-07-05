@@ -89,7 +89,6 @@ export class EnchantedAnimationsSettingTab extends PluginSettingTab {
 			.addSlider(slider => slider
 				.setLimits(0.1, 2.0, 0.05)
 				.setValue(this.plugin.settings.speed)
-				.setDynamicTooltip()
 				.onChange(async (value) => {
 					this.plugin.settings.speed = value;
 					await this.plugin.saveSettings();
@@ -416,7 +415,6 @@ export class EnchantedAnimationsSettingTab extends PluginSettingTab {
 			.addSlider(slider => slider
 				.setLimits(-3, 10, 1)
 				.setValue(this.plugin.settings.noticeDurationOffset)
-				.setDynamicTooltip()
 				.onChange(async (value) => {
 					this.plugin.settings.noticeDurationOffset = value;
 					await this.plugin.saveSettings();
@@ -429,7 +427,6 @@ export class EnchantedAnimationsSettingTab extends PluginSettingTab {
 			.addSlider(slider => slider
 				.setLimits(1, 10, 0.5)
 				.setValue(this.plugin.settings.progressBarAnimationSpeed)
-				.setDynamicTooltip()
 				.onChange(async (value) => {
 					this.plugin.settings.progressBarAnimationSpeed = value;
 					await this.plugin.saveSettings();

@@ -144,7 +144,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 
 		if (typeof this.originalModalOpen === 'function') {
 			Modal.prototype.open = function() {
-				let container = this.containerEl as HTMLElement;
+				let container = this.containerEl;
 				if (container && !container.classList.contains('modal-container')) {
 					container = container.closest('.modal-container') as HTMLElement;
 				}
@@ -164,7 +164,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 				return;
 			}
 
-			let container = this.containerEl as HTMLElement;
+			let container = this.containerEl;
 			if (container && !container.classList.contains('modal-container')) {
 				container = container.closest('.modal-container') as HTMLElement;
 			}
@@ -257,10 +257,10 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 
 	unpatchModalClose() {
 		if (this.originalModalClose) {
-			Modal.prototype.close = this.originalModalClose as (...args: unknown[]) => unknown;
+			Modal.prototype.close = this.originalModalClose;
 		}
 		if (this.originalSettingClose && (this.app as unknown as AppWithSetting).setting) {
-			(this.app as unknown as AppWithSetting).setting.close = this.originalSettingClose as (...args: unknown[]) => unknown;
+			(this.app as unknown as AppWithSetting).setting.close = this.originalSettingClose;
 		}
 	}
 
@@ -315,7 +315,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 
 	unpatchMenuClose() {
 		if (this.originalMenuUnload) {
-			Menu.prototype.unload = this.originalMenuUnload as (...args: unknown[]) => unknown;
+			Menu.prototype.unload = this.originalMenuUnload;
 		}
 	}
 
@@ -344,7 +344,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 
 	unpatchNotice() {
 		if (this.originalNoticeHide) {
-			Notice.prototype.hide = this.originalNoticeHide as (...args: unknown[]) => unknown;
+			Notice.prototype.hide = this.originalNoticeHide;
 		}
 	}
 
