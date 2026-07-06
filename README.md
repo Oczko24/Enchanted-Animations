@@ -39,6 +39,9 @@ The goal is to animate everything possible! I frequently release updates with ne
 - [ ] Mobile-specialized animations
 - [ ] Make animations coherent and adequate & adjustable by settings one by one
 
+## Credits
+- Checkbox Confetti animation is based on [Checkbox Sounds Plugin](https://github.com/yasd251/checkbox-sounds-plugin) by yasd251.
+
 ## How to Install
 
 1. Go into this link https://community.obsidian.md/plugins/enchanted-animations

@@ -483,6 +483,10 @@ export class EnchantedAnimationsController {
 		this.bodyObserver = null;
 		activeDocument.removeEventListener('click', this.onGlobalClick, true);
 	}
+	/**
+	 * Renders confetti animation upon task completion.
+	 * Credits for the original implementation concept: https://github.com/yasd251/checkbox-sounds-plugin
+	 */
 	private showConfetti(el: HTMLElement) {
 		const animationEl = activeDocument.createElement("div");
 		animationEl.className = "ea-checkbox-animation ea-confetti";

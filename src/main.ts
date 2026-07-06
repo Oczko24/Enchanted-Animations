@@ -605,7 +605,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 	hijackSelectDropdowns() {
 		// 1. Block the native OS dropdown already on mousedown
 		this.registerDomEvent(activeDocument.body, 'mousedown', (evt: MouseEvent) => {
-			if (!this.settings.enableModalAnimations) return;
+			if (!this.settings.enableCustomDropdowns) return;
 			const target = evt.target as HTMLElement;
 			const selectElement = target.closest('select.dropdown') as HTMLSelectElement;
 			
@@ -616,7 +616,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 
 		// 2. Create and show our animated menu only on a full click
 		this.registerDomEvent(activeDocument.body, 'click', (evt: MouseEvent) => {
-			if (!this.settings.enableModalAnimations) return;
+			if (!this.settings.enableCustomDropdowns) return;
 
 			const target = evt.target as HTMLElement;
 			const selectElement = target.closest('select.dropdown') as HTMLSelectElement;

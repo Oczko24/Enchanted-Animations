@@ -10,6 +10,7 @@ export interface EnchantedAnimationsSettings {
 	enableHeaderAnimations: boolean;
 	enableFormattingAnimations: boolean;
 	enableModalAnimations: boolean;
+	enableCustomDropdowns: boolean;
 	enableNativeAnimations: boolean;
 	enableSmoothScroll: boolean;
 	enableGpuAcceleration: boolean;
@@ -42,6 +43,7 @@ export const DEFAULT_SETTINGS: EnchantedAnimationsSettings = {
 	enableHeaderAnimations: true,
 	enableFormattingAnimations: true,
 	enableModalAnimations: true,
+	enableCustomDropdowns: true,
 	enableNativeAnimations: true,
 	enableSmoothScroll: true,
 	enableGpuAcceleration: true,
@@ -114,7 +116,58 @@ export class EnchantedAnimationsSettingTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("Workspace & UI")
+			.setName("UI Enhancements")
+			.setHeading();
+
+		new Setting(containerEl)
+			.setName("Custom Animated Dropdowns")
+			.setDesc("Replaces native dropdown selects with a custom, smooth, material-style animated dropdown menu.")
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.enableCustomDropdowns)
+				.onChange(async (value) => {
+					this.plugin.settings.enableCustomDropdowns = value;
+					await this.plugin.saveSettings();
+					this.plugin.applyStyles();
+				})
+			);
+
+		new Setting(containerEl)
+			.setName("Auto-Hide Scrollbars")
+			.setDesc("Hides the scrollbars until you hover over them for a cleaner look.")
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.autoHideScrollbars)
+				.onChange(async (value) => {
+					this.plugin.settings.autoHideScrollbars = value;
+					await this.plugin.saveSettings();
+					this.plugin.applyStyles();
+				})
+			);
+
+		new Setting(containerEl)
+			.setName("Smart Status Bar")
+			.setDesc("Hides the status bar until you hover over the bottom of the window.")
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.enableStatusBarHover)
+				.onChange(async (value) => {
+					this.plugin.settings.enableStatusBarHover = value;
+					await this.plugin.saveSettings();
+				})
+			);
+
+		new Setting(containerEl)
+			.setName("Confetti Checkbox Celebration")
+			.setDesc("A satisfying burst of confetti when you complete a task. Treat yourself! (2x larger). Credits: https://github.com/yasd251/checkbox-sounds-plugin")
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.enableConfetti)
+				.onChange(async (value) => {
+					this.plugin.settings.enableConfetti = value;
+					await this.plugin.saveSettings();
+					this.plugin.applyStyles();
+				})
+			);
+
+		new Setting(containerEl)
+			.setName("Workspace Animations")
 			.setHeading();
 
 		new Setting(containerEl)
@@ -188,31 +241,6 @@ export class EnchantedAnimationsSettingTab extends PluginSettingTab {
 					this.plugin.applyStyles();
 				})
 			);
-
-		new Setting(containerEl)
-			.setName("Smart Status Bar")
-			.setDesc("Hides the status bar until you hover over the bottom of the window.")
-			.addToggle(toggle => toggle
-				.setValue(this.plugin.settings.enableStatusBarHover)
-				.onChange(async (value) => {
-					this.plugin.settings.enableStatusBarHover = value;
-					await this.plugin.saveSettings();
-					this.plugin.applyStyles();
-				})
-			);
-			
-		new Setting(containerEl)
-			.setName("Auto-Hide Scrollbars")
-			.setDesc("Hides the scrollbars until you hover over them for a cleaner look.")
-			.addToggle(toggle => toggle
-				.setValue(this.plugin.settings.autoHideScrollbars)
-				.onChange(async (value) => {
-					this.plugin.settings.autoHideScrollbars = value;
-					await this.plugin.saveSettings();
-					this.plugin.applyStyles();
-				})
-			);
-
 		new Setting(containerEl)
 			.setName("Editor Experience")
 			.setHeading();
@@ -314,7 +342,7 @@ export class EnchantedAnimationsSettingTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("Subtle Interactions")
+			.setName("Hover & Interaction Effects")
 			.setHeading();
 			
 		new Setting(containerEl)
@@ -384,22 +412,6 @@ export class EnchantedAnimationsSettingTab extends PluginSettingTab {
 				.setValue(this.plugin.settings.enableImageAnimations)
 				.onChange(async (value) => {
 					this.plugin.settings.enableImageAnimations = value;
-					await this.plugin.saveSettings();
-					this.plugin.applyStyles();
-				})
-			);
-
-		new Setting(containerEl)
-			.setName("Productivity & Rewards")
-			.setHeading();
-
-		new Setting(containerEl)
-			.setName("Confetti Checkbox Celebration")
-			.setDesc("A satisfying burst of confetti when you complete a task. Treat yourself! (2x larger)")
-			.addToggle(toggle => toggle
-				.setValue(this.plugin.settings.enableConfetti)
-				.onChange(async (value) => {
-					this.plugin.settings.enableConfetti = value;
 					await this.plugin.saveSettings();
 					this.plugin.applyStyles();
 				})
