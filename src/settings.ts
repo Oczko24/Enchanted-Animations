@@ -47,7 +47,7 @@ export const DEFAULT_SETTINGS: EnchantedAnimationsSettings = {
 	enableNativeAnimations: true,
 	enableSmoothScroll: true,
 	enableGpuAcceleration: true,
-	enableStatusBarHover: true,
+	enableStatusBarHover: false,
 	enableFoldHover: true,
 	enableCardHover: true,
 	enableCheckboxAnimations: true,
@@ -151,6 +151,7 @@ export class EnchantedAnimationsSettingTab extends PluginSettingTab {
 				.onChange(async (value) => {
 					this.plugin.settings.enableStatusBarHover = value;
 					await this.plugin.saveSettings();
+					this.plugin.applyStyles();
 				})
 			);
 

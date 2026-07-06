@@ -406,6 +406,8 @@ body.ea-gpu-accel .bookmark,
 body.ea-gpu-accel .cm-tooltip.cm-tooltip-autocomplete {
   transform: translateZ(0);
   will-change: transform, opacity;
+  backface-visibility: hidden;
+  perspective: 1000px;
 }
 
 body.ea-gpu-accel .checkbox-container,
@@ -420,6 +422,8 @@ body.ea-gpu-accel .task-list-item-checkbox:after,
 body.ea-gpu-accel .task-list-item-checkbox:before,
 body.ea-gpu-accel input[type='range']::-webkit-slider-thumb {
   will-change: transform, opacity;
+  backface-visibility: hidden;
+  perspective: 1000px;
 }
 
 /* ==================== Ghost Elements (DOM Caching) ==================== */
@@ -430,6 +434,7 @@ body .ea-ghost-tab-switcher,
 body .ea-ghost-tab-switcher * {
   animation: none;
   transition: none;
+  will-change: auto;
 }
 
 
