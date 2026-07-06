@@ -64,11 +64,11 @@ body:not(.disable-modal-animation).is-phone .prompt {
 
 /* ==================== Context Menus ==================== */
 
-body:not(.disable-modal-animation):not(.is-mobile) .menu {
+body:not(.disable-modal-animation):not(.is-phone) .menu {
   animation: ea-menu-in calc(var(--enchanted-animations-speed) * 0.6) cubic-bezier(0.2, 0, 0, 1);
 }
 
-body:not(.disable-modal-animation):not(.is-mobile) .menu.is-closing {
+body:not(.disable-modal-animation):not(.is-phone) .menu.is-closing {
   animation: ea-menu-out calc(var(--enchanted-animations-speed) * 0.4) cubic-bezier(0.3, 0, 1, 1) forwards;
   pointer-events: none;
 }

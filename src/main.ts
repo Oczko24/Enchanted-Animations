@@ -16,10 +16,15 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 	originalModalClose: (...args: unknown[]) => unknown;
 	originalSettingClose: (...args: unknown[]) => unknown;
 	originalMenuUnload: (...args: unknown[]) => unknown;
+	originalMenuHide: (...args: unknown[]) => unknown;
 	originalNoticeHide: (...args: unknown[]) => unknown;
 	noticeObserver: MutationObserver | null;
 	animationsController: EnchantedAnimationsController;
 	sidebarObserver: ResizeObserver | null;
+	activeSelectMenu: Menu | null = null;
+	activeSelectMenuEl: HTMLSelectElement | null = null;
+	lastMenuClosedTime: number = 0;
+	lastMenuClosedEl: HTMLSelectElement | null = null;
 
 	async onload() {
 		EnchantedAnimationsPlugin.instance = this;
@@ -267,48 +272,55 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 	patchMenuClose() {
 		const plugin = EnchantedAnimationsPlugin.instance;
 
-		// We patch unload to create a visual ghost that animates out while the real menu dies instantly,
-		// preventing Obsidian's state machine from breaking and menus accumulating.
+		const createGhost = function(menuObj: any) {
+			if (!plugin.settings.enableModalAnimations) return;
+
+			let container = (menuObj as MenuWithDom).dom;
+			if (container && container.parentNode && !container.classList.contains('is-closing')) {
+				container.classList.add('is-closing');
+				const ghost = container.cloneNode(true) as HTMLElement;
+				const rect = container.getBoundingClientRect();
+				
+				Object.assign(ghost.style, {
+					position: 'fixed',
+					left: rect.left + 'px',
+					top: rect.top + 'px',
+					width: rect.width + 'px',
+					height: rect.height + 'px',
+					margin: '0',
+					pointerEvents: 'none',
+					zIndex: '99999'
+				});
+
+				// Prevent children from replaying entrance animations
+				ghost.querySelectorAll('*').forEach(el => {
+					Object.assign((el as HTMLElement).style, { animationName: 'none' });
+				});
+				
+				activeDocument.body.appendChild(ghost);
+				
+				const isMobile = activeDocument.body.classList.contains('is-phone');
+				const durationMs = plugin.settings.speed * (isMobile ? 1200 : 400);
+				
+				window.setTimeout(() => {
+					ghost.remove();
+				}, durationMs);
+			}
+		};
+
 		if (Menu.prototype.unload) {
 			this.originalMenuUnload = Reflect.get(Menu.prototype, 'unload');
 			Menu.prototype.unload = function() {
-				if (!plugin.settings.enableModalAnimations) {
-					return plugin.originalMenuUnload.call(this);
-				}
-
-				let container = (this as MenuWithDom).dom;
-				if (container && container.parentNode) {
-					const ghost = container.cloneNode(true) as HTMLElement;
-					const rect = container.getBoundingClientRect();
-					
-					Object.assign(ghost.style, {
-						position: 'fixed',
-						left: rect.left + 'px',
-						top: rect.top + 'px',
-						width: rect.width + 'px',
-						height: rect.height + 'px',
-						margin: '0',
-						pointerEvents: 'none',
-						zIndex: '99999'
-					});
-
-					// Prevent children from replaying entrance animations
-					ghost.querySelectorAll('*').forEach(el => {
-						Object.assign((el as HTMLElement).style, { animationName: 'none' });
-					});
-					
-					ghost.classList.add('is-closing');
-					activeDocument.body.appendChild(ghost);
-					
-					const isMobile = activeDocument.body.classList.contains('is-phone');
-					const durationMs = plugin.settings.speed * (isMobile ? 1200 : 400);
-					
-					window.setTimeout(() => {
-						ghost.remove();
-					}, durationMs);
-				}
-
+				createGhost(this);
 				return plugin.originalMenuUnload.call(this);
+			};
+		}
+
+		if ((Menu.prototype as any).hide) {
+			this.originalMenuHide = Reflect.get(Menu.prototype, 'hide');
+			(Menu.prototype as any).hide = function() {
+				createGhost(this);
+				return plugin.originalMenuHide.call(this);
 			};
 		}
 	}
@@ -316,6 +328,9 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 	unpatchMenuClose() {
 		if (this.originalMenuUnload) {
 			Menu.prototype.unload = this.originalMenuUnload;
+		}
+		if (this.originalMenuHide) {
+			(Menu.prototype as any).hide = this.originalMenuHide;
 		}
 	}
 
@@ -608,12 +623,50 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 			
 			if (selectElement && evt.button === 0) {
 				evt.preventDefault();
-				evt.stopPropagation(); // Block propagation so the click doesn't close the menu immediately!
+				evt.stopPropagation(); // Block propagation so Obsidian's background click doesn't instantly close it
+
+				if (this.activeSelectMenuEl === selectElement) {
+					// We clicked the same select element that is currently open. Close it.
+					(this.activeSelectMenu as any)?.hide ? (this.activeSelectMenu as any).hide() : this.activeSelectMenu?.unload();
+					return;
+				}
+
+				if (this.lastMenuClosedEl === selectElement && Date.now() - this.lastMenuClosedTime < 300) {
+					return;
+				}
+
+				if (this.activeSelectMenu) {
+					(this.activeSelectMenu as any).hide ? (this.activeSelectMenu as any).hide() : this.activeSelectMenu.unload();
+				}
 
 				const menu = new Menu();
-				
+				this.activeSelectMenu = menu;
+				this.activeSelectMenuEl = selectElement;
+
+				// Use native onHide to properly track when menu is closed by clicking outside
+				if (typeof (menu as any).onHide === 'function') {
+					(menu as any).onHide(() => {
+						if (this.activeSelectMenu === menu) {
+							this.lastMenuClosedTime = Date.now();
+							this.lastMenuClosedEl = this.activeSelectMenuEl;
+							this.activeSelectMenu = null;
+							this.activeSelectMenuEl = null;
+						}
+					});
+				} else {
+					const originalUnload = menu.unload.bind(menu);
+					menu.unload = () => {
+						if (this.activeSelectMenu === menu) {
+							this.lastMenuClosedTime = Date.now();
+							this.lastMenuClosedEl = this.activeSelectMenuEl;
+							this.activeSelectMenu = null;
+							this.activeSelectMenuEl = null;
+						}
+						originalUnload();
+					};
+				}
+
 				// Add class BEFORE showing the menu so Obsidian can take into account
-				// our CSS restrictions (max-width) when calculating screen edge collisions!
 				const dom = (menu as MenuWithDom).dom;
 				if (dom) {
 					dom.classList.add('ea-select-menu');
@@ -623,24 +676,20 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 					menu.addItem((item) => {
 						item.setTitle(opt.text);
 						
-						// Mark the currently selected option
 						if (opt.value === selectElement.value) {
 							item.setChecked(true);
 						}
 
 						item.onClick(() => {
 							selectElement.value = opt.value;
-							// Dispatch a 'change' event so Obsidian saves the setting
 							selectElement.dispatchEvent(new Event('change', { bubbles: true }));
 						});
 					});
 				});
 
-				// Show the custom menu using the bounding rect, which allows Obsidian to position it better
 				const rect = selectElement.getBoundingClientRect();
 				menu.showAtPosition({ x: rect.left, y: rect.bottom });
 
-				// Force the menu to be at least as wide as the button
 				window.setTimeout(() => {
 					if (dom) {
 						Object.assign(dom.style, { minWidth: `${rect.width}px` });
