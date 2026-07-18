@@ -3,7 +3,7 @@ import {DEFAULT_SETTINGS, EnchantedAnimationsSettings, EnchantedAnimationsSettin
 import {EnchantedAnimationsController} from "./animations";
 
 declare const activeDocument: Document;
-interface AppWithSetting { setting: { close: (...args: unknown[]) => void; open: (...args: unknown[]) => void; containerEl?: HTMLElement }; }
+interface AppWithSetting { setting: { close: (...args: unknown[]) => void; open: (...args: unknown[]) => void; openTabById: (id: string) => void; containerEl?: HTMLElement }; }
 interface MenuWithDom extends Menu { dom: HTMLElement; }
 interface NoticeWithDelay extends Notice { _eaDelayed?: boolean; }
 interface SimulatedEvent extends Event { _eaSimulated?: boolean; }
@@ -91,6 +91,22 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		this.patchDocumentSearch();
 		this.patchMobileSettingsClose();
 		this.patchNotice();
+		this.addCommand({
+			id: 'show-settings',
+			name: 'Show settings view',
+			callback: () => {
+				try {
+					const appSetting = (this.app as unknown as AppWithSetting).setting;
+					if (appSetting && typeof appSetting.open === 'function' && typeof appSetting.openTabById === 'function') {
+						appSetting.open();
+						appSetting.openTabById(this.manifest.id);
+					}
+				} catch (e) {
+					// Fallback if undocumented API changes
+				}
+			}
+		});
+
 		this.addSettingTab(new EnchantedAnimationsSettingTab(this.app, this));
 	}
 
