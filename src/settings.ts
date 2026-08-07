@@ -12,7 +12,6 @@ export interface EnchantedAnimationsSettings {
 	enableModalAnimations: boolean;
 	enableCustomDropdowns: boolean;
 	enableNativeAnimations: boolean;
-	enableSmoothScroll: boolean;
 	enableGpuAcceleration: boolean;
 	enableStatusBarHover: boolean;
 	enableFoldHover: boolean;
@@ -45,7 +44,6 @@ export const DEFAULT_SETTINGS: EnchantedAnimationsSettings = {
 	enableModalAnimations: true,
 	enableCustomDropdowns: true,
 	enableNativeAnimations: true,
-	enableSmoothScroll: true,
 	enableGpuAcceleration: true,
 	enableStatusBarHover: false,
 	enableFoldHover: true,
@@ -442,18 +440,6 @@ export class EnchantedAnimationsSettingTab extends PluginSettingTab {
 				.setValue(this.plugin.settings.progressBarAnimationSpeed)
 				.onChange(async (value) => {
 					this.plugin.settings.progressBarAnimationSpeed = value;
-					await this.plugin.saveSettings();
-					this.plugin.applyStyles();
-				})
-			);
-
-		new Setting(containerEl)
-			.setName("Butter-Smooth Scrolling")
-			.setDesc("Enable CSS smooth scrolling across all scrollable containers in the app.")
-			.addToggle(toggle => toggle
-				.setValue(this.plugin.settings.enableSmoothScroll)
-				.onChange(async (value) => {
-					this.plugin.settings.enableSmoothScroll = value;
 					await this.plugin.saveSettings();
 					this.plugin.applyStyles();
 				})

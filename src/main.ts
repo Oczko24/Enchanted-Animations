@@ -137,7 +137,6 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		activeDocument.body.classList.remove('disable-modal-animation');
 		activeDocument.body.classList.remove('disable-native-animations');
 		activeDocument.body.classList.remove('disable-animated-callouts');
-		activeDocument.body.classList.remove('ea-smooth-scroll');
 		activeDocument.body.classList.remove('ea-gpu-accel');
 		activeDocument.body.classList.remove('enchanted-animations-startup');
 		activeDocument.body.classList.remove('ea-status-bar-hover');
@@ -454,7 +453,6 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		activeDocument.body.classList.toggle('disable-native-animations', !this.settings.enableNativeAnimations);
 		activeDocument.body.classList.toggle('disable-animated-callouts', !this.settings.enableAnimatedCallouts);
 		activeDocument.body.classList.toggle('ea-layout-animations', this.settings.enableLayoutAnimations);
-		activeDocument.body.classList.toggle('ea-smooth-scroll', this.settings.enableSmoothScroll);
 		activeDocument.body.classList.toggle('ea-gpu-accel', this.settings.enableGpuAcceleration);
 		activeDocument.body.classList.toggle('ea-status-bar-hover', this.settings.enableStatusBarHover);
 		activeDocument.body.classList.toggle('ea-fold-hover', this.settings.enableFoldHover);

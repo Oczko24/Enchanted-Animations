@@ -351,18 +351,7 @@ body:not(.disable-native-animations) {
 }
 
 
-/* ==================== Smooth Scroll ==================== */
 
-body.ea-smooth-scroll .markdown-reading-view,
-body.ea-smooth-scroll .nav-files-container,
-body.ea-smooth-scroll .workspace-drawer-inner,
-body.ea-smooth-scroll .modal .vertical-tab-content,
-body.ea-smooth-scroll .search-results-container,
-body.ea-smooth-scroll .suggestion-container .suggestion,
-body.ea-smooth-scroll .prompt-results,
-body.ea-smooth-scroll .community-modal-search-results {
-  scroll-behavior: smooth;
-}
 
 
 /* ==================== GPU Acceleration ==================== */

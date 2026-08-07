@@ -1,6 +1,6 @@
 {
 	"name": "enchanted-animations",
-	"version": "1.1.12",
+	"version": "1.1.14",
 	"description": "Obsidian plugin that animates everything!",
 	"main": "main.js",
 	"type": "module",
