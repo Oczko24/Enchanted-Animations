@@ -101,7 +101,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 						appSetting.open();
 						appSetting.openTabById(this.manifest.id);
 					}
-				} catch (e) {
+				} catch {
 					// Fallback if undocumented API changes
 				}
 			}
@@ -287,7 +287,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 	patchMenuClose() {
 		const plugin = EnchantedAnimationsPlugin.instance;
 
-		const createGhost = function(menuObj: any) {
+		const createGhost = function(menuObj: MenuWithDom | Menu) {
 			if (!plugin.settings.enableModalAnimations) return;
 
 			let container = (menuObj as MenuWithDom).dom;
@@ -331,9 +331,9 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 			};
 		}
 
-		if ((Menu.prototype as any).hide) {
+		if ((Menu.prototype as { hide?: () => void }).hide) {
 			this.originalMenuHide = Reflect.get(Menu.prototype, 'hide');
-			(Menu.prototype as any).hide = function() {
+			(Menu.prototype as { hide: () => void }).hide = function() {
 				createGhost(this);
 				return plugin.originalMenuHide.call(this);
 			};
@@ -345,7 +345,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 			Menu.prototype.unload = this.originalMenuUnload;
 		}
 		if (this.originalMenuHide) {
-			(Menu.prototype as any).hide = this.originalMenuHide;
+			(Menu.prototype as { hide?: unknown }).hide = this.originalMenuHide;
 		}
 	}
 
@@ -641,7 +641,8 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 
 				if (this.activeSelectMenuEl === selectElement) {
 					// We clicked the same select element that is currently open. Close it.
-					(this.activeSelectMenu as any)?.hide ? (this.activeSelectMenu as any).hide() : this.activeSelectMenu?.unload();
+					const currentMenu = this.activeSelectMenu as Menu & { hide?: () => void };
+					if (currentMenu?.hide) currentMenu.hide(); else currentMenu?.unload();
 					return;
 				}
 
@@ -650,7 +651,8 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 				}
 
 				if (this.activeSelectMenu) {
-					(this.activeSelectMenu as any).hide ? (this.activeSelectMenu as any).hide() : this.activeSelectMenu.unload();
+					const activeMenu = this.activeSelectMenu as Menu & { hide?: () => void };
+					if (activeMenu.hide) activeMenu.hide(); else activeMenu.unload();
 				}
 
 				const menu = new Menu();
@@ -658,8 +660,9 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 				this.activeSelectMenuEl = selectElement;
 
 				// Use native onHide to properly track when menu is closed by clicking outside
-				if (typeof (menu as any).onHide === 'function') {
-					(menu as any).onHide(() => {
+				const menuWithOnHide = menu as Menu & { onHide?: (cb: () => void) => void };
+				if (typeof menuWithOnHide.onHide === 'function') {
+					menuWithOnHide.onHide(() => {
 						if (this.activeSelectMenu === menu) {
 							this.lastMenuClosedTime = Date.now();
 							this.lastMenuClosedEl = this.activeSelectMenuEl;

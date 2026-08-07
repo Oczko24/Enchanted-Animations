@@ -488,9 +488,7 @@ export class EnchantedAnimationsController {
 	 * Credits for the original implementation concept: https://github.com/yasd251/checkbox-sounds-plugin
 	 */
 	private showConfetti(el: HTMLElement) {
-		const animationEl = activeDocument.createElement("div");
-		animationEl.className = "ea-checkbox-animation ea-confetti";
-		activeDocument.body.appendChild(animationEl);
+		const animationEl = activeDocument.body.createDiv({ cls: "ea-checkbox-animation ea-confetti" });
 		
 		const rect = el.getBoundingClientRect();
 		const x = rect.left + rect.width / 2;
@@ -502,14 +500,12 @@ export class EnchantedAnimationsController {
 		const count = 40;
 		
 		for (let i = 0; i < count; i++) {
-			const particle = activeDocument.createElement("div");
-			particle.className = "ea-particle";
+			const particle = animationEl.createDiv({ cls: "ea-particle" });
 			Object.assign(particle.style, {
 				backgroundColor: colors[Math.floor(Math.random() * colors.length)] || "#ff0000"
 			});
 			particle.style.setProperty("--tx", String(`${(Math.random() - 0.5) * 400}px`));
 			particle.style.setProperty("--ty", String(`${(Math.random() - 0.5) * 400}px`));
-			animationEl.appendChild(particle);
 		}
 		
 		window.setTimeout(() => {

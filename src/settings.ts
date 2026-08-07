@@ -73,6 +73,10 @@ export class EnchantedAnimationsSettingTab extends PluginSettingTab {
 		this.plugin = plugin;
 	}
 
+	public getSettingDefinitions() {
+		return [];
+	}
+
 	display(): void {
 		const { containerEl } = this;
 
