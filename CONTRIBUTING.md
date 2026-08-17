@@ -9,3 +9,6 @@ Thank you for wanting to improve this plugin!
    - Make changes in `src/` (TypeScript) or `styles.css`.
    - Build using `npm run build` and test.
    - Open a Pull Request.
+
+
+im really open to new pull requests;))))
