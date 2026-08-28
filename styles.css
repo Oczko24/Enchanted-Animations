@@ -724,6 +724,10 @@ body.ea-vertical-tab-animations:not(.is-phone) .vertical-tab-nav-item:not(.is-ac
   transition-duration: calc(var(--enchanted-animations-speed) * 0.1667);
 }
 
+body.ea-vertical-tab-animations:not(.is-phone) .vertical-tab-nav-item.is-active {
+  transform: translateX(6px);
+}
+
 /* ==================== JavaScript Inline Styles Override (Drawers, Modals, etc.) ==================== */
 /* Forces elements injected with inline styles by app.js (e.g., style.transition = "all 200ms ease") to use plugin settings */
 
