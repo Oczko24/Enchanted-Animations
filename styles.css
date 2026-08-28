@@ -738,6 +738,12 @@ body:not(.disable-native-animations) .notice {
   transition-duration: var(--enchanted-animations-speed);
 }
 
+.ea-force-hidden {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
 
 /* ==================== Hardcoded CSS Timings Override (app.css) ==================== */
 /* Replaces hardcoded 100ms, 150ms from default app.css with plugin values */

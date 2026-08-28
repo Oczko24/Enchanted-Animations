@@ -1,4 +1,4 @@
-import {Plugin, Modal, Menu, Notice} from 'obsidian';
+import {Plugin, Modal, SuggestModal, Menu, Notice} from 'obsidian';
 import {DEFAULT_SETTINGS, EnchantedAnimationsSettings, EnchantedAnimationsSettingTab} from "./settings";
 import {EnchantedAnimationsController} from "./animations";
 
@@ -14,11 +14,14 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 	static instance: EnchantedAnimationsPlugin;
 	settings: EnchantedAnimationsSettings;
 	originalModalClose: (...args: unknown[]) => unknown;
+	originalSuggestModalClose: (...args: unknown[]) => unknown;
+	originalModalOpen: (...args: unknown[]) => unknown;
 	originalSettingClose: (...args: unknown[]) => unknown;
 	originalMenuUnload: (...args: unknown[]) => unknown;
 	originalMenuHide: (...args: unknown[]) => unknown;
 	originalNoticeHide: (...args: unknown[]) => unknown;
 	noticeObserver: MutationObserver | null;
+	modalObserver: MutationObserver | null;
 	animationsController: EnchantedAnimationsController;
 	sidebarObserver: ResizeObserver | null;
 	activeSelectMenu: Menu | null = null;
@@ -118,6 +121,10 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 			this.noticeObserver.disconnect();
 			this.noticeObserver = null;
 		}
+		if (this.modalObserver) {
+			this.modalObserver.disconnect();
+			this.modalObserver = null;
+		}
 		if (this.animationsController) {
 			this.animationsController.teardown();
 		}
@@ -156,10 +163,9 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		activeDocument.body.classList.remove('ea-menu-cascade');
 	}
 
-	originalModalOpen: (...args: unknown[]) => unknown;
-
 	patchModalClose() {
 		this.originalModalClose = Reflect.get(Modal.prototype, 'close');
+		this.originalSuggestModalClose = Reflect.get(SuggestModal.prototype, 'close');
 		this.originalModalOpen = Reflect.get(Modal.prototype, 'open');
 		const plugin = EnchantedAnimationsPlugin.instance;
 
@@ -171,11 +177,30 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 				}
 				if (container) {
 					container.classList.remove('is-closing');
+					container.classList.remove('ea-force-hidden');
 					Object.assign(container.style, { animationName: '' });
 					const modal = container.querySelector('.modal') as HTMLElement;
 					if (modal) Object.assign(modal.style, { animationName: '' });
 				}
 				plugin.originalModalOpen.call(this);
+			};
+		}
+		
+		const originalSuggestModalOpen = Reflect.get(SuggestModal.prototype, 'open');
+		if (typeof originalSuggestModalOpen === 'function') {
+			SuggestModal.prototype.open = function() {
+				let container = this.containerEl;
+				if (container && !container.classList.contains('modal-container')) {
+					container = container.closest('.modal-container') as HTMLElement;
+				}
+				if (container) {
+					container.classList.remove('is-closing');
+					container.classList.remove('ea-force-hidden');
+					Object.assign(container.style, { animationName: '' });
+					const modal = container.querySelector('.modal, .prompt') as HTMLElement;
+					if (modal) Object.assign(modal.style, { animationName: '' });
+				}
+				originalSuggestModalOpen.call(this);
 			};
 		}
 
@@ -190,24 +215,85 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 				container = container.closest('.modal-container') as HTMLElement;
 			}
 
-			if (container && !container.classList.contains('is-closing')) {
-				container.classList.add('is-closing');
-				container.dataset.eaAnimated = 'true';
+			if (container && container.parentNode && !container.classList.contains('ea-force-hidden')) {
+				const ghost = container.cloneNode(true) as HTMLElement;
+				ghost.classList.add('is-closing');
+				ghost.dataset.eaAnimated = 'true';
+				
+				const rect = container.getBoundingClientRect();
+				Object.assign(ghost.style, {
+					position: 'fixed',
+					left: rect.left + 'px',
+					top: rect.top + 'px',
+					width: rect.width + 'px',
+					height: rect.height + 'px',
+					margin: '0',
+					pointerEvents: 'none',
+					zIndex: '99999'
+				});
+
+				ghost.querySelectorAll('*:not(.modal):not(.prompt):not(.modal-bg)').forEach(el => {
+					Object.assign((el as HTMLElement).style, { animationName: 'none' });
+				});
+				
+				activeDocument.body.appendChild(ghost);
+				
 				const isMobileSettings = activeDocument.body.classList.contains('is-mobile') && container.querySelector('.modal.mod-settings');
 				const durationMs = plugin.settings.speed * (isMobileSettings ? 1400 : 700);
 				
 				window.setTimeout(() => {
-					plugin.originalModalClose.call(this);
-					window.setTimeout(() => {
-						Object.assign(container.style, { animationName: 'none' });
-						const modal = container.querySelector('.modal') as HTMLElement;
-						if (modal) Object.assign(modal.style, { animationName: 'none' });
-						container.classList.remove('is-closing');
-					}, 50);
-				}, Math.max(0, durationMs - 10));
-			} else {
-				plugin.originalModalClose.call(this);
+					ghost.remove();
+				}, durationMs);
+				
+				container.classList.add('ea-force-hidden');
 			}
+			plugin.originalModalClose.call(this);
+		};
+
+		SuggestModal.prototype.close = function() {
+			if (!plugin.settings.enableModalAnimations) {
+				plugin.originalSuggestModalClose.call(this);
+				return;
+			}
+
+			let container = this.containerEl;
+			if (container && !container.classList.contains('modal-container')) {
+				container = container.closest('.modal-container') as HTMLElement;
+			}
+
+			if (container && container.parentNode && !container.classList.contains('ea-force-hidden')) {
+				const ghost = container.cloneNode(true) as HTMLElement;
+				ghost.classList.add('is-closing');
+				ghost.dataset.eaAnimated = 'true';
+				
+				const rect = container.getBoundingClientRect();
+				Object.assign(ghost.style, {
+					position: 'fixed',
+					left: rect.left + 'px',
+					top: rect.top + 'px',
+					width: rect.width + 'px',
+					height: rect.height + 'px',
+					margin: '0',
+					pointerEvents: 'none',
+					zIndex: '99999'
+				});
+
+				ghost.querySelectorAll('*:not(.modal):not(.prompt):not(.modal-bg)').forEach(el => {
+					Object.assign((el as HTMLElement).style, { animationName: 'none' });
+				});
+				
+				activeDocument.body.appendChild(ghost);
+				
+				const isMobileSettings = activeDocument.body.classList.contains('is-mobile') && container.querySelector('.modal.mod-settings');
+				const durationMs = plugin.settings.speed * (isMobileSettings ? 1400 : 700);
+				
+				window.setTimeout(() => {
+					ghost.remove();
+				}, durationMs);
+				
+				container.classList.add('ea-force-hidden');
+			}
+			plugin.originalSuggestModalClose.call(this);
 		};
 
 		// Specific patch for the app.setting modal as it sometimes handles its own unmount
@@ -229,6 +315,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 						}
 						if (container) {
 							container.classList.remove('is-closing');
+							container.classList.remove('ea-force-hidden');
 							Object.assign(container.style, { animationName: '' });
 							const modal = container.querySelector('.modal.mod-settings') as HTMLElement;
 							if (modal) Object.assign(modal.style, { animationName: '' });
@@ -250,27 +337,39 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 					if (!container) {
 						container = activeDocument.querySelector('.modal.mod-settings')?.closest('.modal-container') as HTMLElement;
 					}
-					if (container && !container.classList.contains('is-closing')) {
-						container.classList.add('is-closing');
-						container.dataset.eaAnimated = 'true';
+					if (container && container.parentNode && !container.classList.contains('ea-force-hidden')) {
+						const ghost = container.cloneNode(true) as HTMLElement;
+						ghost.classList.add('is-closing');
+						ghost.dataset.eaAnimated = 'true';
+						
+						const rect = container.getBoundingClientRect();
+						Object.assign(ghost.style, {
+							position: 'fixed',
+							left: rect.left + 'px',
+							top: rect.top + 'px',
+							width: rect.width + 'px',
+							height: rect.height + 'px',
+							margin: '0',
+							pointerEvents: 'none',
+							zIndex: '99999'
+						});
+
+						ghost.querySelectorAll('*:not(.modal):not(.prompt):not(.modal-bg)').forEach(el => {
+							Object.assign((el as HTMLElement).style, { animationName: 'none' });
+						});
+						
+						activeDocument.body.appendChild(ghost);
+						
 						const isMobile = activeDocument.body.classList.contains('is-mobile');
 						const durationMs = plugin.settings.speed * (isMobile ? 1400 : 700);
 						
 						window.setTimeout(() => {
-							plugin.originalSettingClose.call(this);
-							
-							// Instead of removing is-closing, we just disable the animation to prevent IN animation flash.
-							// It will be cleaned up in open() next time.
-							window.setTimeout(() => {
-								Object.assign(container.style, { animationName: 'none' });
-								const modal = container.querySelector('.modal.mod-settings') as HTMLElement;
-								if (modal) Object.assign(modal.style, { animationName: 'none' });
-								container.classList.remove('is-closing');
-							}, 50);
-						}, Math.max(0, durationMs - 10));
-					} else {
-						plugin.originalSettingClose.call(this);
+							ghost.remove();
+						}, durationMs);
+						
+						container.classList.add('ea-force-hidden');
 					}
+					plugin.originalSettingClose.call(this);
 				};
 			}
 		}, 0);
@@ -279,6 +378,9 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 	unpatchModalClose() {
 		if (this.originalModalClose) {
 			Modal.prototype.close = this.originalModalClose;
+		}
+		if (this.originalSuggestModalClose) {
+			SuggestModal.prototype.close = this.originalSuggestModalClose;
 		}
 		if (this.originalSettingClose && (this.app as unknown as AppWithSetting).setting) {
 			(this.app as unknown as AppWithSetting).setting.close = this.originalSettingClose;
@@ -326,7 +428,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 
 		if (Menu.prototype.unload) {
 			this.originalMenuUnload = Reflect.get(Menu.prototype, 'unload');
-			Menu.prototype.unload = function() {
+			Menu.prototype.unload = function(this: Menu) {
 				createGhost(this);
 				return plugin.originalMenuUnload.call(this);
 			};
@@ -334,7 +436,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 
 		if ((Menu.prototype as { hide?: () => void }).hide) {
 			this.originalMenuHide = Reflect.get(Menu.prototype, 'hide');
-			(Menu.prototype as { hide: () => void }).hide = function() {
+			(Menu.prototype as { hide: (this: Menu) => void }).hide = function(this: Menu) {
 				createGhost(this);
 				return plugin.originalMenuHide.call(this);
 			};
@@ -409,6 +511,59 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		});
 
 		this.noticeObserver.observe(noticeContainer, { childList: true });
+	}
+
+	setupModalObserver() {
+		this.modalObserver = new MutationObserver((mutations) => {
+			if (!this.settings.enableModalAnimations) return;
+
+			for (const mutation of mutations) {
+				if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+					const target = mutation.target as HTMLElement;
+					
+					if (target.classList.contains('modal-container')) {
+						// Natively added .is-closing, we create ghost
+						if (target.classList.contains('is-closing') && !target.classList.contains('ea-force-hidden')) {
+							const ghost = target.cloneNode(true) as HTMLElement;
+							ghost.dataset.eaAnimated = 'true';
+							
+							const rect = target.getBoundingClientRect();
+							Object.assign(ghost.style, {
+								position: 'fixed',
+								left: rect.left + 'px',
+								top: rect.top + 'px',
+								width: rect.width + 'px',
+								height: rect.height + 'px',
+								margin: '0',
+								pointerEvents: 'none',
+								zIndex: '99999'
+							});
+
+							ghost.querySelectorAll('*:not(.modal):not(.prompt):not(.modal-bg)').forEach(el => {
+								Object.assign((el as HTMLElement).style, { animationName: 'none' });
+							});
+							
+							activeDocument.body.appendChild(ghost);
+							
+							const isMobileSettings = activeDocument.body.classList.contains('is-mobile') && target.querySelector('.modal.mod-settings');
+							const durationMs = this.settings.speed * (isMobileSettings ? 1400 : 700);
+							
+							window.setTimeout(() => {
+								ghost.remove();
+							}, durationMs);
+							
+							target.classList.add('ea-force-hidden');
+						} else if (!target.classList.contains('is-closing') && target.classList.contains('ea-force-hidden')) {
+							// If native code removes .is-closing, make sure we remove our force hidden class 
+							// so that reused modals aren't rendered invisible and blocking clicks
+							target.classList.remove('ea-force-hidden');
+						}
+					}
+				}
+			}
+		});
+
+		this.modalObserver.observe(activeDocument.body, { attributes: true, attributeFilter: ['class'], subtree: true });
 	}
 
 	setupEditorAnimations() {
