@@ -18,6 +18,7 @@ export interface EnchantedAnimationsSettings {
 	enableCardHover: boolean;
 	enableCheckboxAnimations: boolean;
 	enableTabAnimations: boolean;
+	enableVerticalTabAnimations: boolean;
 	enableButtonAnimations: boolean;
 	enableLinkAnimations: boolean;
 	enableTagAnimations: boolean;
@@ -50,6 +51,7 @@ export const DEFAULT_SETTINGS: EnchantedAnimationsSettings = {
 	enableCardHover: true,
 	enableCheckboxAnimations: true,
 	enableTabAnimations: true,
+	enableVerticalTabAnimations: true,
 	enableButtonAnimations: true,
 	enableLinkAnimations: true,
 	enableTagAnimations: true,
@@ -228,6 +230,18 @@ export class EnchantedAnimationsSettingTab extends PluginSettingTab {
 				.setValue(this.plugin.settings.enableTabAnimations)
 				.onChange(async (value) => {
 					this.plugin.settings.enableTabAnimations = value;
+					await this.plugin.saveSettings();
+					this.plugin.applyStyles();
+				})
+			);
+
+		new Setting(containerEl)
+			.setName("Vertical Tab Navigation Animations")
+			.setDesc("Smooth transitions and hover effects for vertical settings tabs.")
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.enableVerticalTabAnimations)
+				.onChange(async (value) => {
+					this.plugin.settings.enableVerticalTabAnimations = value;
 					await this.plugin.saveSettings();
 					this.plugin.applyStyles();
 				})

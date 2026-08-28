@@ -710,9 +710,19 @@ body.ea-fold-hover:not(.is-mobile) .collapse-indicator:hover {
   transform: scale(1.3);
 }
 
+/* ==================== Vertical Tab Navigation ==================== */
+body.ea-vertical-tab-animations:not(.is-phone) .vertical-tab-nav-item {
+  transition: transform calc(var(--enchanted-animations-speed) * 0.3333) ease-out;
+}
 
+body.ea-vertical-tab-animations:not(.is-phone) .vertical-tab-nav-item:not(.is-active):hover {
+  transform: translateX(6px);
+}
 
-
+body.ea-vertical-tab-animations:not(.is-phone) .vertical-tab-nav-item:not(.is-active):active {
+  transform: translateX(20px);
+  transition-duration: calc(var(--enchanted-animations-speed) * 0.1667);
+}
 
 /* ==================== JavaScript Inline Styles Override (Drawers, Modals, etc.) ==================== */
 /* Forces elements injected with inline styles by app.js (e.g., style.transition = "all 200ms ease") to use plugin settings */

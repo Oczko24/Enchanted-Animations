@@ -144,6 +144,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		activeDocument.body.classList.remove('ea-card-hover');
 		activeDocument.body.classList.remove('ea-checkbox-animations');
 		activeDocument.body.classList.remove('ea-tab-animations');
+		activeDocument.body.classList.remove('ea-vertical-tab-animations');
 		activeDocument.body.classList.remove('ea-button-animations');
 		activeDocument.body.classList.remove('ea-link-animations');
 		activeDocument.body.classList.remove('ea-tag-animations');
@@ -459,6 +460,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		activeDocument.body.classList.toggle('ea-card-hover', this.settings.enableCardHover);
 		activeDocument.body.classList.toggle('ea-checkbox-animations', this.settings.enableCheckboxAnimations);
 		activeDocument.body.classList.toggle('ea-tab-animations', this.settings.enableTabAnimations);
+		activeDocument.body.classList.toggle('ea-vertical-tab-animations', this.settings.enableVerticalTabAnimations);
 		activeDocument.body.classList.toggle('ea-button-animations', this.settings.enableButtonAnimations);
 		activeDocument.body.classList.toggle('ea-link-animations', this.settings.enableLinkAnimations);
 		activeDocument.body.classList.toggle('ea-tag-animations', this.settings.enableTagAnimations);
