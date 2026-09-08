@@ -284,14 +284,25 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 				
 				activeDocument.body.appendChild(ghost);
 				
+				const isPhone = activeDocument.body.classList.contains('is-phone');
 				const isMobileSettings = activeDocument.body.classList.contains('is-mobile') && container.querySelector('.modal.mod-settings');
-				const durationMs = plugin.settings.speed * (isMobileSettings ? 1400 : 700);
+				// On phone the exit CSS runs at 1.2x speed — match that here.
+				const durationMs = plugin.settings.speed * (isMobileSettings ? 1400 : isPhone ? 1200 : 700);
 				
 				window.setTimeout(() => {
 					ghost.remove();
 				}, durationMs);
 				
 				container.classList.add('ea-force-hidden');
+
+				// On phone Obsidian's native Modal.close() calls this.animateClose() which
+				// runs its own JS slide-down on modalEl and then resets transform="" when
+				// it finishes. That transform reset snaps the prompt back into view for a
+				// frame, causing the "double exit / powraca" effect. We replace it with a
+				// no-op so only our CSS ghost animation plays.
+				if (isPhone) {
+					(this as unknown as { animateClose?: () => Promise<void> }).animateClose = () => Promise.resolve();
+				}
 			}
 			plugin.originalSuggestModalClose.call(this);
 		};
@@ -414,6 +425,11 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 				ghost.querySelectorAll('*').forEach(el => {
 					Object.assign((el as HTMLElement).style, { animationName: 'none' });
 				});
+
+				// Hide original immediately to prevent double-layer flicker.
+				// Without this, the original (with backdrop-filter) and the ghost
+				// coexist during the exit animation, doubling the blur/opacity.
+				container.classList.add('ea-force-hidden');
 				
 				activeDocument.body.appendChild(ghost);
 				

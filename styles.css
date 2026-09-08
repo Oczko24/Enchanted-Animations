@@ -61,6 +61,16 @@ body:not(.disable-modal-animation).is-phone .prompt {
   animation: ea-slide-up calc(var(--enchanted-animations-speed) * 1.2) var(--enchanted-animations-easing);
 }
 
+/* Phone: prompt exit — mirror of phone menu (ea-slide-down, 1.2x speed) */
+body:not(.disable-modal-animation).is-phone .modal-container.is-closing .prompt {
+  animation: ea-slide-down calc(var(--enchanted-animations-speed) * 1.2) var(--enchanted-animations-easing) forwards;
+  pointer-events: none;
+}
+
+body:not(.disable-modal-animation).is-phone .modal-container.is-closing .modal-bg {
+  animation: ea-fade-out calc(var(--enchanted-animations-speed) * 1.2) var(--enchanted-animations-easing) forwards;
+}
+
 
 /* ==================== Context Menus ==================== */
 
