@@ -754,10 +754,11 @@ body:not(.disable-native-animations) .notice {
   transition-duration: var(--enchanted-animations-speed);
 }
 
-.ea-force-hidden {
-  display: none !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
+body .ea-force-hidden,
+html body .ea-force-hidden {
+  display: none;
+  opacity: 0;
+  pointer-events: none;
 }
 
 

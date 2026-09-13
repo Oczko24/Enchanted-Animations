@@ -63,8 +63,7 @@ export class EnchantedAnimationsController {
 						this.inlineTitleState.set(el, { height: currentState.height, isHidden: true });
 						
 						// Temporarily force it visible to animate it out
-						el.style.setProperty('display', 'block', 'important');
-						el.style.setProperty('overflow', 'hidden');
+						el.setCssStyles({ display: 'block !important', overflow: 'hidden' });
 						
 						const anim = el.animate([
 							{ maxHeight: `${currentState.height}px`, opacity: 1, margin: '0 0 12px 0' },
@@ -348,9 +347,7 @@ export class EnchantedAnimationsController {
 								ghost.classList.add('ea-ghost-tab-switcher');
 								
 								// CRITICAL: Prevent the ghost from blocking any clicks
-								ghost.style.setProperty('pointer-events', 'none', 'important');
-								ghost.style.setProperty('position', 'fixed');
-								ghost.style.setProperty('z-index', '99999');
+								ghost.setCssStyles({ pointerEvents: 'none !important', position: 'fixed', zIndex: '99999' });
 								
 								// Ensure it doesn't scroll or capture focus
 								ghost.setAttribute('aria-hidden', 'true');

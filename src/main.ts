@@ -62,15 +62,6 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		// Re-trigger note animation when switching between existing .md tabs
 		let lastActiveFile = '';
 		
-		const isWeaveActive = (): boolean => {
-			// Use Obsidian's workspace API — most reliable way to get active view type.
-			// DOM selectors like .mod-active may not be updated yet when layout-change fires.
-			try {
-				return (this.app.workspace as any).activeLeaf?.view?.getViewType() === 'weave-epub-reader';
-			} catch {
-				return false;
-			}
-		};
 
 		const blockTransitions = () => {
 			// Set internal flag instead of body class — body class changes trigger Weave's
