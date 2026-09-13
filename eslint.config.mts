@@ -17,7 +17,7 @@ export default tseslint.config(
 						'package.json'
 					]
 				},
-				tsconfigRootDir: import.meta.dirname
+				tsconfigRootDir: import.meta.dirname || process.cwd()
 			},
 		},
 	},
@@ -47,6 +47,6 @@ export default tseslint.config(
 		"eslint.config.js",
 		"version-bump.mjs",
 		"versions.json",
-		"main.js",
+		"main.js", "package.json", "manifest.json", "tsconfig.json", "*.json", "data.json",
 	]),
 );

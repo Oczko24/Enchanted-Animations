@@ -28,7 +28,9 @@ export class EnchantedAnimationsController {
 		// 1. ResizeObserver for precise FLIP animations (Inline Title & Line Numbers)
 		this.resizeObserver = new ResizeObserver((entries) => {
 			if (!this.plugin.settings.enableLayoutAnimations) return;
-			const isTransitioning = activeDocument.body.classList.contains('ea-note-transitioning');
+			// Read transition state from plugin flag (not body class) to avoid triggering
+			// Weave EPUB Reader's ThemeManager which watches body class changes.
+			const isTransitioning = this.plugin.noteTransitioning;
 			const dur = this.plugin.settings.speed * 750;
 			const ease = this.plugin.settings.easing;
 
@@ -61,7 +63,8 @@ export class EnchantedAnimationsController {
 						this.inlineTitleState.set(el, { height: currentState.height, isHidden: true });
 						
 						// Temporarily force it visible to animate it out
-						Object.assign(el.style, { cssText: el.style.cssText + ' display: block !important;', overflow: 'hidden' });
+						el.style.setProperty('display', 'block', 'important');
+						el.style.setProperty('overflow', 'hidden');
 						
 						const anim = el.animate([
 							{ maxHeight: `${currentState.height}px`, opacity: 1, margin: '0 0 12px 0' },
@@ -154,7 +157,7 @@ export class EnchantedAnimationsController {
 			for (const m of mutations) {
 				// ── Observe dynamically added Title and Gutters, and Animate Line Numbers ──
 				if (m.type === 'childList') {
-					const isTransitioning = activeDocument.body.classList.contains('ea-note-transitioning');
+					const isTransitioning = this.plugin.noteTransitioning;
 					if (this.plugin.settings.enableLayoutAnimations && !isTransitioning) {
 						for (const node of Array.from(m.addedNodes)) {
 							if (node.nodeType === 1) {
@@ -251,8 +254,8 @@ export class EnchantedAnimationsController {
 					});
 
 					const anim = el.animate([
-						{ marginInline: '0', opacity: 1, transform: 'scale(1)' },
-						{ marginInline: '-0.25em', opacity: 0, transform: 'scale(0.85)' }
+						{ opacity: 1, transform: 'scale(1)' },
+						{ opacity: 0, transform: 'scale(0.85)' }
 					], { duration: dur, easing: ease, fill: 'forwards' });
 
 					anim.onfinish = () => {
@@ -277,16 +280,9 @@ export class EnchantedAnimationsController {
 
 						const h = (node as HTMLElement).offsetHeight || 28;
 						embedBlock.animate([
-							{ transform: `translateY(-${h}px)` },
-							{ transform: 'translateY(0)' }
+							{ transform: `translateY(-${h}px)`, opacity: 0 },
+							{ transform: 'translateY(0)', opacity: 1 }
 						], { duration: dur, easing: ease });
-
-						Object.assign((node as HTMLElement).style, { overflow: 'hidden' });
-						const lineAnim = (node as HTMLElement).animate([
-							{ maxHeight: '0px', opacity: 0 },
-							{ maxHeight: h + 'px', opacity: 1 }
-						], { duration: dur, easing: ease });
-						lineAnim.onfinish = () => { (node as HTMLElement).style.removeProperty('overflow'); };
 					}
 
 					for (const node of Array.from(m.removedNodes)) {
@@ -352,11 +348,9 @@ export class EnchantedAnimationsController {
 								ghost.classList.add('ea-ghost-tab-switcher');
 								
 								// CRITICAL: Prevent the ghost from blocking any clicks
-								Object.assign(ghost.style, {
-									cssText: ghost.style.cssText + ' pointer-events: none !important;',
-									position: 'fixed',
-									zIndex: '99999'
-								});
+								ghost.style.setProperty('pointer-events', 'none', 'important');
+								ghost.style.setProperty('position', 'fixed');
+								ghost.style.setProperty('z-index', '99999');
 								
 								// Ensure it doesn't scroll or capture focus
 								ghost.setAttribute('aria-hidden', 'true');

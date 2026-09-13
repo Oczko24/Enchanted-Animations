@@ -12,22 +12,27 @@ interface SimulatedElement extends HTMLElement { _eaSimulated?: boolean; }
 
 export default class EnchantedAnimationsPlugin extends Plugin {
 	static instance: EnchantedAnimationsPlugin;
-	settings: EnchantedAnimationsSettings;
-	originalModalClose: (...args: unknown[]) => unknown;
-	originalSuggestModalClose: (...args: unknown[]) => unknown;
-	originalModalOpen: (...args: unknown[]) => unknown;
-	originalSettingClose: (...args: unknown[]) => unknown;
-	originalMenuUnload: (...args: unknown[]) => unknown;
-	originalMenuHide: (...args: unknown[]) => unknown;
-	originalNoticeHide: (...args: unknown[]) => unknown;
-	noticeObserver: MutationObserver | null;
-	modalObserver: MutationObserver | null;
-	animationsController: EnchantedAnimationsController;
-	sidebarObserver: ResizeObserver | null;
+	settings!: EnchantedAnimationsSettings;
+	originalModalClose!: (...args: unknown[]) => unknown;
+	originalSuggestModalClose!: (...args: unknown[]) => unknown;
+	originalModalOpen!: (...args: unknown[]) => unknown;
+	originalSettingClose!: (...args: unknown[]) => unknown;
+	originalMenuUnload!: (...args: unknown[]) => unknown;
+	originalMenuHide!: (...args: unknown[]) => unknown;
+	originalNoticeHide!: (...args: unknown[]) => unknown;
+	noticeObserver!: MutationObserver | null;
+	modalObserver!: MutationObserver | null;
+	animationsController!: EnchantedAnimationsController;
+	sidebarObserver!: ResizeObserver | null;
 	activeSelectMenu: Menu | null = null;
 	activeSelectMenuEl: HTMLSelectElement | null = null;
 	lastMenuClosedTime: number = 0;
 	lastMenuClosedEl: HTMLSelectElement | null = null;
+	// Internal flag replacing ea-note-transitioning body class.
+	// Body class changes trigger Weave EPUB Reader's ThemeManager to rebuild its
+	// theme signature, which fires theme-change listeners that re-apply styles on
+	// the epub render container — resetting scroll position.
+	noteTransitioning = false;
 
 	async onload() {
 		EnchantedAnimationsPlugin.instance = this;
@@ -57,10 +62,24 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		// Re-trigger note animation when switching between existing .md tabs
 		let lastActiveFile = '';
 		
+		const isWeaveActive = (): boolean => {
+			// Use Obsidian's workspace API — most reliable way to get active view type.
+			// DOM selectors like .mod-active may not be updated yet when layout-change fires.
+			try {
+				return (this.app.workspace as any).activeLeaf?.view?.getViewType() === 'weave-epub-reader';
+			} catch {
+				return false;
+			}
+		};
+
 		const blockTransitions = () => {
-			activeDocument.body.classList.add('ea-note-transitioning');
+			// Set internal flag instead of body class — body class changes trigger Weave's
+			// ThemeManager.buildThemeSignature() which detects ANY class change and fires
+			// theme listeners that re-apply styles on the epub render container, resetting
+			// epub scroll position.
+			this.noteTransitioning = true;
 			window.setTimeout(() => {
-				activeDocument.body.classList.remove('ea-note-transitioning');
+				this.noteTransitioning = false;
 			}, 400);
 		};
 
@@ -72,7 +91,11 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 				if (currentFilePath !== lastActiveFile) {
 					lastActiveFile = currentFilePath;
 					
-					if (this.settings.animateNoteOpen && currentFile) {
+					// Skip note-open animation when switching to Weave
+					const activeLeafContent = activeDocument.querySelector('.workspace-leaf.mod-active .workspace-leaf-content') as HTMLElement;
+					const isWeaveLeaf = activeLeafContent?.dataset?.type === 'weave-epub-reader';
+
+					if (this.settings.animateNoteOpen && currentFile && !isWeaveLeaf) {
 						activeDocument.body.classList.remove('animate-note-open');
 						// Force a reflow to restart CSS animations
 						void activeDocument.body.offsetWidth;

@@ -391,8 +391,10 @@ body.ea-gpu-accel .workspace-split.mod-sidedock,
 body.ea-gpu-accel .vertical-tab-content-container,
 body.ea-gpu-accel .vertical-tab-header,
 body.ea-gpu-accel .vertical-tab-content,
-body.ea-gpu-accel .markdown-reading-view,
-body.ea-gpu-accel .markdown-source-view,
+/* Excluded: weave-epub-reader — transform:translateZ(0) creates a new containing block,
+   breaking Weave's position:fixed viewport-lock mechanism (NPe/LPe/RPe) */
+body.ea-gpu-accel .workspace-leaf-content:not([data-type="weave-epub-reader"]) .markdown-reading-view,
+body.ea-gpu-accel .workspace-leaf-content:not([data-type="weave-epub-reader"]) .markdown-source-view,
 body.ea-gpu-accel .cm-formatting,
 body.ea-gpu-accel .status-bar,
 body.ea-gpu-accel .nav-files-container .tree-item-self,
@@ -575,13 +577,13 @@ body .ea-ghost-tab-switcher * {
 }
 
 @keyframes ea-formatting-push {
-  from { margin-inline: -0.25em; opacity: 0; transform: scale(0.85); }
-  to   { margin-inline: 0; opacity: 1; transform: scale(1); }
+  from { opacity: 0; transform: scale(0.85); }
+  to   { opacity: 1; transform: scale(1); }
 }
 
 @keyframes ea-formatting-push-highlight {
-  from { margin-inline: -0.25em; letter-spacing: -0.1em; opacity: 0; }
-  to   { margin-inline: 0; letter-spacing: normal; opacity: 1; }
+  from { opacity: 0; transform: scale(0.85); }
+  to   { opacity: 1; transform: scale(1); }
 }
 
 @keyframes ea-codeblock-pop {
@@ -1441,15 +1443,16 @@ body:not(.disable-formatting-animations) .markdown-reading-view a:not(.footnote-
 }
 
 /* ==================== Auto-Hide Scrollbars ==================== */
-body.ea-autohide-scrollbars *::-webkit-scrollbar,
-body.ea-autohide-scrollbars *::-webkit-scrollbar-thumb {
+/* Excluded: weave-epub-reader — its epub scroll containers need functional scrollbars */
+body.ea-autohide-scrollbars *:not(.weave-epub-view-content):not(.weave-epub-view-shell):not(.weave-epub-reader-host):not(.epub-bookshelf-root):not(.epub-reading-viewport-locked)::-webkit-scrollbar,
+body.ea-autohide-scrollbars *:not(.weave-epub-view-content):not(.weave-epub-view-shell):not(.weave-epub-reader-host):not(.epub-bookshelf-root):not(.epub-reading-viewport-locked)::-webkit-scrollbar-thumb {
   visibility: hidden;
 }
 
-body.ea-autohide-scrollbars *:hover::-webkit-scrollbar,
-body.ea-autohide-scrollbars *:hover::-webkit-scrollbar-thumb,
-body.ea-autohide-scrollbars *::-webkit-scrollbar:hover,
-body.ea-autohide-scrollbars *::-webkit-scrollbar-thumb:hover {
+body.ea-autohide-scrollbars *:not(.weave-epub-view-content):not(.weave-epub-view-shell):not(.weave-epub-reader-host):not(.epub-bookshelf-root):not(.epub-reading-viewport-locked):hover::-webkit-scrollbar,
+body.ea-autohide-scrollbars *:not(.weave-epub-view-content):not(.weave-epub-view-shell):not(.weave-epub-reader-host):not(.epub-bookshelf-root):not(.epub-reading-viewport-locked):hover::-webkit-scrollbar-thumb,
+body.ea-autohide-scrollbars *:not(.weave-epub-view-content):not(.weave-epub-view-shell):not(.weave-epub-reader-host):not(.epub-bookshelf-root):not(.epub-reading-viewport-locked)::-webkit-scrollbar:hover,
+body.ea-autohide-scrollbars *:not(.weave-epub-view-content):not(.weave-epub-view-shell):not(.weave-epub-reader-host):not(.epub-bookshelf-root):not(.epub-reading-viewport-locked)::-webkit-scrollbar-thumb:hover {
   visibility: initial;
 }
 
