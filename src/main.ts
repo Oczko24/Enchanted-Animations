@@ -59,6 +59,18 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 			this.setupNoticeObserver();
 		});
 
+		this.registerEvent(
+			this.app.workspace.on('window-open', (win) => {
+				win.doc.body.classList.add('enchanted-animations-present');
+				this.applyStyles(win.doc);
+				this.hijackSelectDropdowns(win.doc);
+				this.patchGraphControls(win.doc);
+				this.patchDocumentSearch(win.doc);
+				this.patchMobileSettingsClose(win.doc);
+			})
+		);
+
+
 		// Re-trigger note animation when switching between existing .md tabs
 		let lastActiveFile = '';
 		
@@ -626,40 +638,40 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		await this.saveData(this.settings);
 	}
 
-	applyStyles() {
-		activeDocument.body.style.setProperty('--enchanted-animations-speed-num', this.settings.speed.toString());
-		activeDocument.body.style.setProperty('--enchanted-animations-speed', `${this.settings.speed}s`);
-		activeDocument.body.style.setProperty('--enchanted-animations-easing', this.settings.easing);
+	applyStyles(doc: Document = activeDocument) {
+		doc.body.style.setProperty('--enchanted-animations-speed-num', this.settings.speed.toString());
+		doc.body.style.setProperty('--enchanted-animations-speed', `${this.settings.speed}s`);
+		doc.body.style.setProperty('--enchanted-animations-easing', this.settings.easing);
 
-		activeDocument.body.classList.toggle('animate-note-open', this.settings.animateNoteOpen);
-		activeDocument.body.classList.toggle('disable-splash-screen', !this.settings.enableSplashScreen);
-		activeDocument.body.classList.toggle('disable-header-animations', !this.settings.enableHeaderAnimations);
-		activeDocument.body.classList.toggle('disable-formatting-animations', !this.settings.enableFormattingAnimations);
-		activeDocument.body.classList.toggle('disable-modal-animation', !this.settings.enableModalAnimations);
-		activeDocument.body.classList.toggle('disable-native-animations', !this.settings.enableNativeAnimations);
-		activeDocument.body.classList.toggle('disable-animated-callouts', !this.settings.enableAnimatedCallouts);
-		activeDocument.body.classList.toggle('ea-layout-animations', this.settings.enableLayoutAnimations);
-		activeDocument.body.classList.toggle('ea-gpu-accel', this.settings.enableGpuAcceleration);
-		activeDocument.body.classList.toggle('ea-status-bar-hover', this.settings.enableStatusBarHover);
-		activeDocument.body.classList.toggle('ea-fold-hover', this.settings.enableFoldHover);
-		activeDocument.body.classList.toggle('ea-card-hover', this.settings.enableCardHover);
-		activeDocument.body.classList.toggle('ea-checkbox-animations', this.settings.enableCheckboxAnimations);
-		activeDocument.body.classList.toggle('ea-tab-animations', this.settings.enableTabAnimations);
-		activeDocument.body.classList.toggle('ea-vertical-tab-animations', this.settings.enableVerticalTabAnimations);
-		activeDocument.body.classList.toggle('ea-button-animations', this.settings.enableButtonAnimations);
-		activeDocument.body.classList.toggle('ea-link-animations', this.settings.enableLinkAnimations);
-		activeDocument.body.classList.toggle('ea-tag-animations', this.settings.enableTagAnimations);
-		activeDocument.body.classList.toggle('ea-ribbon-animations', this.settings.enableRibbonAnimations);
-		activeDocument.body.classList.toggle('ea-image-animations', this.settings.enableImageAnimations);
-		activeDocument.body.classList.toggle('ea-autohide-scrollbars', this.settings.autoHideScrollbars);
-		activeDocument.body.style.setProperty('--ea-progress-bar-speed', `${this.settings.progressBarAnimationSpeed}s`);
-		activeDocument.body.classList.toggle('ea-blockquote-animations', this.settings.enableBlockquoteAnimations);
-		activeDocument.body.classList.toggle('ea-tooltip-animations', this.settings.enableTooltipAnimations);
-		activeDocument.body.classList.toggle('ea-menu-cascade', this.settings.enableMenuCascadeAnimations);
+		doc.body.classList.toggle('animate-note-open', this.settings.animateNoteOpen);
+		doc.body.classList.toggle('disable-splash-screen', !this.settings.enableSplashScreen);
+		doc.body.classList.toggle('disable-header-animations', !this.settings.enableHeaderAnimations);
+		doc.body.classList.toggle('disable-formatting-animations', !this.settings.enableFormattingAnimations);
+		doc.body.classList.toggle('disable-modal-animation', !this.settings.enableModalAnimations);
+		doc.body.classList.toggle('disable-native-animations', !this.settings.enableNativeAnimations);
+		doc.body.classList.toggle('disable-animated-callouts', !this.settings.enableAnimatedCallouts);
+		doc.body.classList.toggle('ea-layout-animations', this.settings.enableLayoutAnimations);
+		doc.body.classList.toggle('ea-gpu-accel', this.settings.enableGpuAcceleration);
+		doc.body.classList.toggle('ea-status-bar-hover', this.settings.enableStatusBarHover);
+		doc.body.classList.toggle('ea-fold-hover', this.settings.enableFoldHover);
+		doc.body.classList.toggle('ea-card-hover', this.settings.enableCardHover);
+		doc.body.classList.toggle('ea-checkbox-animations', this.settings.enableCheckboxAnimations);
+		doc.body.classList.toggle('ea-tab-animations', this.settings.enableTabAnimations);
+		doc.body.classList.toggle('ea-vertical-tab-animations', this.settings.enableVerticalTabAnimations);
+		doc.body.classList.toggle('ea-button-animations', this.settings.enableButtonAnimations);
+		doc.body.classList.toggle('ea-link-animations', this.settings.enableLinkAnimations);
+		doc.body.classList.toggle('ea-tag-animations', this.settings.enableTagAnimations);
+		doc.body.classList.toggle('ea-ribbon-animations', this.settings.enableRibbonAnimations);
+		doc.body.classList.toggle('ea-image-animations', this.settings.enableImageAnimations);
+		doc.body.classList.toggle('ea-autohide-scrollbars', this.settings.autoHideScrollbars);
+		doc.body.style.setProperty('--ea-progress-bar-speed', `${this.settings.progressBarAnimationSpeed}s`);
+		doc.body.classList.toggle('ea-blockquote-animations', this.settings.enableBlockquoteAnimations);
+		doc.body.classList.toggle('ea-tooltip-animations', this.settings.enableTooltipAnimations);
+		doc.body.classList.toggle('ea-menu-cascade', this.settings.enableMenuCascadeAnimations);
 	}
 
-	patchGraphControls() {
-		this.registerDomEvent(activeDocument, 'click', (evt: MouseEvent) => {
+	patchGraphControls(doc: Document = activeDocument) {
+		this.registerDomEvent(doc, 'click', (evt: MouseEvent) => {
 			if (!this.settings.enableModalAnimations) return;
 
 			const target = evt.target as HTMLElement;
@@ -691,9 +703,9 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		}, true);
 	}
 
-	patchDocumentSearch() {
+	patchDocumentSearch(doc: Document = activeDocument) {
 		// Intercept clicks on the search close button
-		this.registerDomEvent(activeDocument, 'click', (evt: MouseEvent) => {
+		this.registerDomEvent(doc, 'click', (evt: MouseEvent) => {
 			if (!this.settings.enableModalAnimations) return;
 
 			const target = evt.target as HTMLElement;
@@ -725,7 +737,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		}, true);
 
 		// Intercept Escape key press inside search container
-		this.registerDomEvent(activeDocument, 'keydown', (evt: KeyboardEvent) => {
+		this.registerDomEvent(doc, 'keydown', (evt: KeyboardEvent) => {
 			if (!this.settings.enableModalAnimations) return;
 			
 			if (evt.key === 'Escape') {
@@ -762,9 +774,9 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		}, true);
 	}
 
-	patchMobileSettingsClose() {
+	patchMobileSettingsClose(doc: Document = activeDocument) {
 		// Intercept clicks on the settings close button specifically to prevent Obsidian from closing it instantly (bypassing animation)
-		this.registerDomEvent(activeDocument, 'click', (evt: MouseEvent) => {
+		this.registerDomEvent(doc, 'click', (evt: MouseEvent) => {
 			if (!this.settings.enableModalAnimations) return;
 
 			const target = evt.target as HTMLElement;
@@ -803,9 +815,9 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		}, true);
 	}
 
-	hijackSelectDropdowns() {
+	hijackSelectDropdowns(doc: Document = activeDocument) {
 		// 1. Block the native OS dropdown already on mousedown
-		this.registerDomEvent(activeDocument.body, 'mousedown', (evt: MouseEvent) => {
+		this.registerDomEvent(doc.body, 'mousedown', (evt: MouseEvent) => {
 			if (!this.settings.enableCustomDropdowns) return;
 			const target = evt.target as HTMLElement;
 			const selectElement = target.closest('select.dropdown') as HTMLSelectElement;
@@ -816,7 +828,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		}, true);
 
 		// 2. Create and show our animated menu only on a full click
-		this.registerDomEvent(activeDocument.body, 'click', (evt: MouseEvent) => {
+		this.registerDomEvent(doc.body, 'click', (evt: MouseEvent) => {
 			if (!this.settings.enableCustomDropdowns) return;
 
 			const target = evt.target as HTMLElement;
