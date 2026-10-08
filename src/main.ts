@@ -78,8 +78,9 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		}
 
 		for (const doc of docs) {
-			if (doc !== activeDocument && !doc.body.classList.contains('enchanted-animations-present')) {
+			if (doc !== activeDocument && !(doc.body as any)._eaEventRegistered) {
 				doc.body.classList.add('enchanted-animations-present');
+					(doc.body as any)._eaEventRegistered = true;
 				this.applyStyles(doc);
 				this.hijackSelectDropdowns(doc);
 				this.patchGraphControls(doc);
@@ -91,10 +92,11 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 
 		this.registerEvent(
 			this.app.workspace.on('window-open', (win) => {
-				eaLog('window-open event fired');
-
-				if (win.doc.body.classList.contains('enchanted-animations-present')) return;
+				
+				if ((win.doc.body as any)._eaEventRegistered) return;
 				win.doc.body.classList.add('enchanted-animations-present');
+				(win.doc.body as any)._eaEventRegistered = true;
+					(win.doc.body as any)._eaEventRegistered = true;
 				this.applyStyles(win.doc);
 				this.hijackSelectDropdowns(win.doc);
 				this.patchGraphControls(win.doc);
@@ -177,7 +179,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		doc.body.style.removeProperty('--enchanted-animations-speed');
 		doc.body.style.removeProperty('--enchanted-animations-easing');
 
-		doc.body.classList.remove('enchanted-animations-present');
+		doc.body.classList.remove('enchanted-animations-present'); delete (doc.body as any)._eaEventRegistered;
 		doc.body.classList.remove('animate-note-open');
 		doc.body.classList.remove('disable-splash-screen');
 		doc.body.classList.remove('disable-header-animations');
@@ -268,8 +270,9 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 				const checkDoc = () => {
 					const doc = this.containerEl?.ownerDocument;
 					if (doc && doc !== activeDocument) {
-						if (!doc.body.classList.contains('enchanted-animations-present')) {
+						if (!(doc.body as any)._eaEventRegistered) {
 							doc.body.classList.add('enchanted-animations-present');
+					(doc.body as any)._eaEventRegistered = true;
 							plugin.applyStyles(doc);
 							plugin.hijackSelectDropdowns(doc);
 							plugin.patchGraphControls(doc);
@@ -307,8 +310,9 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 				const checkDoc = () => {
 					const doc = this.containerEl?.ownerDocument;
 					if (doc && doc !== activeDocument) {
-						if (!doc.body.classList.contains('enchanted-animations-present')) {
+						if (!(doc.body as any)._eaEventRegistered) {
 							doc.body.classList.add('enchanted-animations-present');
+					(doc.body as any)._eaEventRegistered = true;
 							plugin.applyStyles(doc);
 							plugin.hijackSelectDropdowns(doc);
 							plugin.patchGraphControls(doc);
@@ -455,13 +459,13 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 							if (modal) Object.assign(modal.style, { animationName: '' });
 						}
 						originalSettingOpen.call(this);
-						eaLog('app.setting.open called');
-						let attempts = 0;
+												let attempts = 0;
 						const checkDoc = () => {
 							const doc = this.containerEl?.ownerDocument;
 							if (doc && doc !== activeDocument) {
-								if (!doc.body.classList.contains('enchanted-animations-present')) {
+								if (!(doc.body as any)._eaEventRegistered) {
 									doc.body.classList.add('enchanted-animations-present');
+					(doc.body as any)._eaEventRegistered = true;
 									plugin.applyStyles(doc);
 									plugin.hijackSelectDropdowns(doc);
 									plugin.patchGraphControls(doc);
