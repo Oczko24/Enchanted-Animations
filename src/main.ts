@@ -904,7 +904,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 				});
 
 				const rect = selectElement.getBoundingClientRect();
-				menu.showAtPosition({ x: rect.left, y: rect.bottom });
+				menu.showAtPosition({ x: rect.left, y: rect.bottom }, doc);
 
 				window.setTimeout(() => {
 					if (dom) {
