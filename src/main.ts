@@ -270,7 +270,8 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 						let attempts = 0;
 						const checkDoc = () => {
 							const doc = this.containerEl?.ownerDocument;
-							if (doc && doc !== activeDocument && doc.body) {
+							// Only process if the document is ALIVE. If it's dead, wait for Obsidian to move containerEl!
+							if (doc && doc !== activeDocument && doc.defaultView && doc.body) {
 								if (!(doc.body as any)._eaEventRegistered) {
 									doc.body.classList.add('enchanted-animations-present');
 									(doc.body as any)._eaEventRegistered = true;
@@ -280,13 +281,10 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 									plugin.patchDocumentSearch(doc);
 									plugin.patchMobileSettingsClose(doc);
 								}
-							} else if (attempts < 20) {
+							} else if (attempts < 100) {
 								attempts++;
 								window.setTimeout(checkDoc, 50);
-							} else if (attempts < 20) {
-						attempts++;
-						window.setTimeout(checkDoc, 50);
-					}
+							}
 				};
 				window.setTimeout(checkDoc, 50);
 			};
@@ -314,7 +312,8 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 						let attempts = 0;
 						const checkDoc = () => {
 							const doc = this.containerEl?.ownerDocument;
-							if (doc && doc !== activeDocument && doc.body) {
+							// Only process if the document is ALIVE. If it's dead, wait for Obsidian to move containerEl!
+							if (doc && doc !== activeDocument && doc.defaultView && doc.body) {
 								if (!(doc.body as any)._eaEventRegistered) {
 									doc.body.classList.add('enchanted-animations-present');
 									(doc.body as any)._eaEventRegistered = true;
@@ -324,13 +323,10 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 									plugin.patchDocumentSearch(doc);
 									plugin.patchMobileSettingsClose(doc);
 								}
-							} else if (attempts < 20) {
+							} else if (attempts < 100) {
 								attempts++;
 								window.setTimeout(checkDoc, 50);
-							} else if (attempts < 20) {
-						attempts++;
-						window.setTimeout(checkDoc, 50);
-					}
+							}
 				};
 				window.setTimeout(checkDoc, 50);
 			};
@@ -471,7 +467,8 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 						let attempts = 0;
 						const checkDoc = () => {
 							const doc = this.containerEl?.ownerDocument;
-							if (doc && doc !== activeDocument && doc.body) {
+							// Only process if the document is ALIVE. If it's dead, wait for Obsidian to move containerEl!
+							if (doc && doc !== activeDocument && doc.defaultView && doc.body) {
 								if (!(doc.body as any)._eaEventRegistered) {
 									doc.body.classList.add('enchanted-animations-present');
 									(doc.body as any)._eaEventRegistered = true;
@@ -481,10 +478,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 									plugin.patchDocumentSearch(doc);
 									plugin.patchMobileSettingsClose(doc);
 								}
-							} else if (attempts < 20) {
-								attempts++;
-								window.setTimeout(checkDoc, 50);
-							} else if (attempts < 20) {
+							} else if (attempts < 100) {
 								attempts++;
 								window.setTimeout(checkDoc, 50);
 							}
