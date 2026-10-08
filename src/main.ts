@@ -57,6 +57,29 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 			this.setupEditorAnimations();
 			this.hijackSelectDropdowns();
 			this.setupNoticeObserver();
+
+		const docs = new Set<Document>([activeDocument]);
+		this.app.workspace.iterateAllLeaves((leaf) => {
+			const doc = leaf.view?.containerEl?.ownerDocument;
+			if (doc && !docs.has(doc)) {
+				docs.add(doc);
+			}
+		});
+		const settingDoc = (this.app as any).setting?.containerEl?.ownerDocument;
+		if (settingDoc && !docs.has(settingDoc)) {
+			docs.add(settingDoc);
+		}
+
+		for (const doc of docs) {
+			if (doc !== activeDocument) {
+				doc.body.classList.add('enchanted-animations-present');
+				this.applyStyles(doc);
+				this.hijackSelectDropdowns(doc);
+				this.patchGraphControls(doc);
+				this.patchDocumentSearch(doc);
+				this.patchMobileSettingsClose(doc);
+			}
+		}
 		});
 
 		this.registerEvent(
@@ -139,6 +162,38 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		this.addSettingTab(new EnchantedAnimationsSettingTab(this.app, this));
 	}
 
+	
+	removeStyles(doc: Document) {
+		doc.body.style.removeProperty('--enchanted-animations-speed');
+		doc.body.style.removeProperty('--enchanted-animations-easing');
+
+		doc.body.classList.remove('enchanted-animations-present');
+		doc.body.classList.remove('animate-note-open');
+		doc.body.classList.remove('disable-splash-screen');
+		doc.body.classList.remove('disable-header-animations');
+		doc.body.classList.remove('disable-formatting-animations');
+		doc.body.classList.remove('disable-modal-animation');
+		doc.body.classList.remove('disable-native-animations');
+		doc.body.classList.remove('disable-animated-callouts');
+		doc.body.classList.remove('ea-gpu-accel');
+		doc.body.classList.remove('enchanted-animations-startup');
+		doc.body.classList.remove('ea-status-bar-hover');
+		doc.body.classList.remove('ea-fold-hover');
+		doc.body.classList.remove('ea-card-hover');
+		doc.body.classList.remove('ea-checkbox-animations');
+		doc.body.classList.remove('ea-tab-animations');
+		doc.body.classList.remove('ea-vertical-tab-animations');
+		doc.body.classList.remove('ea-button-animations');
+		doc.body.classList.remove('ea-link-animations');
+		doc.body.classList.remove('ea-tag-animations');
+		doc.body.classList.remove('ea-ribbon-animations');
+		doc.body.classList.remove('ea-image-animations');
+		doc.body.classList.remove('ea-autohide-scrollbars');
+		doc.body.classList.remove('ea-blockquote-animations');
+		doc.body.classList.remove('ea-tooltip-animations');
+		doc.body.classList.remove('ea-menu-cascade');
+	}
+
 	onunload() {
 		this.unpatchModalClose();
 		this.unpatchMenuClose();
@@ -159,34 +214,21 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 			this.sidebarObserver = null;
 		}
 
-		activeDocument.body.style.removeProperty('--enchanted-animations-speed');
-		activeDocument.body.style.removeProperty('--enchanted-animations-easing');
+		const docs = new Set<Document>([activeDocument]);
+		this.app.workspace.iterateAllLeaves((leaf) => {
+			const doc = leaf.view?.containerEl?.ownerDocument;
+			if (doc && !docs.has(doc)) {
+				docs.add(doc);
+			}
+		});
+		const settingDoc = (this.app as any).setting?.containerEl?.ownerDocument;
+		if (settingDoc && !docs.has(settingDoc)) {
+			docs.add(settingDoc);
+		}
 
-		activeDocument.body.classList.remove('enchanted-animations-present');
-		activeDocument.body.classList.remove('animate-note-open');
-		activeDocument.body.classList.remove('disable-splash-screen');
-		activeDocument.body.classList.remove('disable-header-animations');
-		activeDocument.body.classList.remove('disable-formatting-animations');
-		activeDocument.body.classList.remove('disable-modal-animation');
-		activeDocument.body.classList.remove('disable-native-animations');
-		activeDocument.body.classList.remove('disable-animated-callouts');
-		activeDocument.body.classList.remove('ea-gpu-accel');
-		activeDocument.body.classList.remove('enchanted-animations-startup');
-		activeDocument.body.classList.remove('ea-status-bar-hover');
-		activeDocument.body.classList.remove('ea-fold-hover');
-		activeDocument.body.classList.remove('ea-card-hover');
-		activeDocument.body.classList.remove('ea-checkbox-animations');
-		activeDocument.body.classList.remove('ea-tab-animations');
-		activeDocument.body.classList.remove('ea-vertical-tab-animations');
-		activeDocument.body.classList.remove('ea-button-animations');
-		activeDocument.body.classList.remove('ea-link-animations');
-		activeDocument.body.classList.remove('ea-tag-animations');
-		activeDocument.body.classList.remove('ea-ribbon-animations');
-		activeDocument.body.classList.remove('ea-image-animations');
-		activeDocument.body.classList.remove('ea-autohide-scrollbars');
-		activeDocument.body.classList.remove('ea-blockquote-animations');
-		activeDocument.body.classList.remove('ea-tooltip-animations');
-		activeDocument.body.classList.remove('ea-menu-cascade');
+		for (const doc of docs) {
+			this.removeStyles(doc);
+		}
 	}
 
 	patchModalClose() {
@@ -197,6 +239,17 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 
 		if (typeof this.originalModalOpen === 'function') {
 			Modal.prototype.open = function() {
+
+				const doc = this.containerEl?.ownerDocument;
+				if (doc && doc !== activeDocument && !doc.body.classList.contains('enchanted-animations-present')) {
+					doc.body.classList.add('enchanted-animations-present');
+					plugin.applyStyles(doc);
+					plugin.hijackSelectDropdowns(doc);
+					plugin.patchGraphControls(doc);
+					plugin.patchDocumentSearch(doc);
+					plugin.patchMobileSettingsClose(doc);
+				}
+
 				let container = this.containerEl;
 				if (container && !container.classList.contains('modal-container')) {
 					container = container.closest('.modal-container') as HTMLElement;
@@ -215,6 +268,17 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		const originalSuggestModalOpen = Reflect.get(SuggestModal.prototype, 'open');
 		if (typeof originalSuggestModalOpen === 'function') {
 			SuggestModal.prototype.open = function() {
+
+				const doc = this.containerEl?.ownerDocument;
+				if (doc && doc !== activeDocument && !doc.body.classList.contains('enchanted-animations-present')) {
+					doc.body.classList.add('enchanted-animations-present');
+					plugin.applyStyles(doc);
+					plugin.hijackSelectDropdowns(doc);
+					plugin.patchGraphControls(doc);
+					plugin.patchDocumentSearch(doc);
+					plugin.patchMobileSettingsClose(doc);
+				}
+
 				let container = this.containerEl;
 				if (container && !container.classList.contains('modal-container')) {
 					container = container.closest('.modal-container') as HTMLElement;
@@ -343,12 +407,23 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 				const originalSettingOpen = Reflect.get((this.app as unknown as AppWithSetting).setting, 'open');
 				if (originalSettingOpen) {
 					(this.app as unknown as AppWithSetting).setting.open = function(this: { open: (...args: unknown[]) => void; containerEl?: HTMLElement }) {
+
+				const doc = this.containerEl?.ownerDocument;
+				if (doc && doc !== activeDocument && !doc.body.classList.contains('enchanted-animations-present')) {
+					doc.body.classList.add('enchanted-animations-present');
+					plugin.applyStyles(doc);
+					plugin.hijackSelectDropdowns(doc);
+					plugin.patchGraphControls(doc);
+					plugin.patchDocumentSearch(doc);
+					plugin.patchMobileSettingsClose(doc);
+				}
+
 						let container = this.containerEl as HTMLElement;
 						if (container && !container.classList.contains('modal-container')) {
 							container = container.closest('.modal-container') as HTMLElement;
 						}
 						if (!container) {
-							container = activeDocument.querySelector('.modal.mod-settings')?.closest('.modal-container') as HTMLElement;
+							container = (this.containerEl?.ownerDocument || activeDocument).querySelector('.modal.mod-settings')?.closest('.modal-container') as HTMLElement;
 						}
 						if (container) {
 							container.classList.remove('is-closing');
@@ -372,7 +447,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 						container = container.closest('.modal-container') as HTMLElement;
 					}
 					if (!container) {
-						container = activeDocument.querySelector('.modal.mod-settings')?.closest('.modal-container') as HTMLElement;
+						container = (this.containerEl?.ownerDocument || activeDocument).querySelector('.modal.mod-settings')?.closest('.modal-container') as HTMLElement;
 					}
 					if (container && container.parentNode && !container.classList.contains('ea-force-hidden')) {
 						const ghost = container.cloneNode(true) as HTMLElement;
