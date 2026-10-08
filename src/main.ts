@@ -78,7 +78,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		}
 
 		for (const doc of docs) {
-			if (doc !== activeDocument && !(doc.body as any)._eaEventRegistered) {
+			if (doc !== activeDocument && doc.body && !(doc.body as any)._eaEventRegistered) {
 				doc.body.classList.add('enchanted-animations-present');
 					(doc.body as any)._eaEventRegistered = true;
 				this.applyStyles(doc);
@@ -93,7 +93,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		this.registerEvent(
 			this.app.workspace.on('window-open', (win) => {
 				
-				if ((win.doc.body as any)._eaEventRegistered) return;
+				if (!win.doc.body || (win.doc.body as any)._eaEventRegistered) return;
 				win.doc.body.classList.add('enchanted-animations-present');
 				(win.doc.body as any)._eaEventRegistered = true;
 					(win.doc.body as any)._eaEventRegistered = true;
@@ -266,20 +266,24 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 					if (modal) Object.assign(modal.style, { animationName: '' });
 				}
 				plugin.originalModalOpen.call(this);
-				let attempts = 0;
-				const checkDoc = () => {
-					const doc = this.containerEl?.ownerDocument;
-					if (doc && doc !== activeDocument) {
-						if (!(doc.body as any)._eaEventRegistered) {
-							doc.body.classList.add('enchanted-animations-present');
-					(doc.body as any)._eaEventRegistered = true;
-							plugin.applyStyles(doc);
-							plugin.hijackSelectDropdowns(doc);
-							plugin.patchGraphControls(doc);
-							plugin.patchDocumentSearch(doc);
-							plugin.patchMobileSettingsClose(doc);
-						}
-					} else if (attempts < 20) {
+				eaLog('app.setting.open started polling!');
+						let attempts = 0;
+						const checkDoc = () => {
+							const doc = this.containerEl?.ownerDocument;
+							if (doc && doc !== activeDocument && doc.body) {
+								if (!(doc.body as any)._eaEventRegistered) {
+									doc.body.classList.add('enchanted-animations-present');
+									(doc.body as any)._eaEventRegistered = true;
+									plugin.applyStyles(doc);
+									plugin.hijackSelectDropdowns(doc);
+									plugin.patchGraphControls(doc);
+									plugin.patchDocumentSearch(doc);
+									plugin.patchMobileSettingsClose(doc);
+								}
+							} else if (attempts < 20) {
+								attempts++;
+								window.setTimeout(checkDoc, 50);
+							} else if (attempts < 20) {
 						attempts++;
 						window.setTimeout(checkDoc, 50);
 					}
@@ -306,20 +310,24 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 					if (modal) Object.assign(modal.style, { animationName: '' });
 				}
 				originalSuggestModalOpen.call(this);
-				let attempts = 0;
-				const checkDoc = () => {
-					const doc = this.containerEl?.ownerDocument;
-					if (doc && doc !== activeDocument) {
-						if (!(doc.body as any)._eaEventRegistered) {
-							doc.body.classList.add('enchanted-animations-present');
-					(doc.body as any)._eaEventRegistered = true;
-							plugin.applyStyles(doc);
-							plugin.hijackSelectDropdowns(doc);
-							plugin.patchGraphControls(doc);
-							plugin.patchDocumentSearch(doc);
-							plugin.patchMobileSettingsClose(doc);
-						}
-					} else if (attempts < 20) {
+				eaLog('app.setting.open started polling!');
+						let attempts = 0;
+						const checkDoc = () => {
+							const doc = this.containerEl?.ownerDocument;
+							if (doc && doc !== activeDocument && doc.body) {
+								if (!(doc.body as any)._eaEventRegistered) {
+									doc.body.classList.add('enchanted-animations-present');
+									(doc.body as any)._eaEventRegistered = true;
+									plugin.applyStyles(doc);
+									plugin.hijackSelectDropdowns(doc);
+									plugin.patchGraphControls(doc);
+									plugin.patchDocumentSearch(doc);
+									plugin.patchMobileSettingsClose(doc);
+								}
+							} else if (attempts < 20) {
+								attempts++;
+								window.setTimeout(checkDoc, 50);
+							} else if (attempts < 20) {
 						attempts++;
 						window.setTimeout(checkDoc, 50);
 					}
@@ -459,19 +467,23 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 							if (modal) Object.assign(modal.style, { animationName: '' });
 						}
 						originalSettingOpen.call(this);
-												let attempts = 0;
+												eaLog('app.setting.open started polling!');
+						let attempts = 0;
 						const checkDoc = () => {
 							const doc = this.containerEl?.ownerDocument;
-							if (doc && doc !== activeDocument) {
+							if (doc && doc !== activeDocument && doc.body) {
 								if (!(doc.body as any)._eaEventRegistered) {
 									doc.body.classList.add('enchanted-animations-present');
-					(doc.body as any)._eaEventRegistered = true;
+									(doc.body as any)._eaEventRegistered = true;
 									plugin.applyStyles(doc);
 									plugin.hijackSelectDropdowns(doc);
 									plugin.patchGraphControls(doc);
 									plugin.patchDocumentSearch(doc);
 									plugin.patchMobileSettingsClose(doc);
 								}
+							} else if (attempts < 20) {
+								attempts++;
+								window.setTimeout(checkDoc, 50);
 							} else if (attempts < 20) {
 								attempts++;
 								window.setTimeout(checkDoc, 50);
@@ -943,8 +955,9 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 			if (!this.settings.enableCustomDropdowns) return;
 			const target = evt.target as HTMLElement;
 			const selectElement = target.closest('select.dropdown') as HTMLSelectElement;
-			
+			if (selectElement) eaLog('selectElement found!');
 			if (selectElement && evt.button === 0) {
+				eaLog('selectElement clicked!');
 				evt.preventDefault(); 
 			}
 		}, true);
@@ -952,11 +965,13 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		// 2. Create and show our animated menu only on a full click
 		this.registerDomEvent(doc.body, 'click', (evt: MouseEvent) => {
 			if (!this.settings.enableCustomDropdowns) return;
+			eaLog('CLICK event on doc.body!');
 
 			const target = evt.target as HTMLElement;
 			const selectElement = target.closest('select.dropdown') as HTMLSelectElement;
-			
+			if (selectElement) eaLog('selectElement found!');
 			if (selectElement && evt.button === 0) {
+				eaLog('selectElement clicked!');
 				evt.preventDefault();
 				evt.stopPropagation(); // Block propagation so Obsidian's background click doesn't instantly close it
 
@@ -1027,6 +1042,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 
 				const rect = selectElement.getBoundingClientRect();
 				menu.showAtPosition({ x: rect.left, y: rect.bottom }, doc);
+				eaLog('menu shown at ' + rect.left + ', ' + rect.bottom);
 
 				window.setTimeout(() => {
 					if (dom) {
