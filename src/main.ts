@@ -10,6 +10,13 @@ interface SimulatedEvent extends Event { _eaSimulated?: boolean; }
 interface SimulatedElement extends HTMLElement { _eaSimulated?: boolean; }
 
 
+
+function eaLog(msg: string) {
+	try {
+		require('fs').appendFileSync('/home/maturowski/Documents/ea_log.txt', new Date().toISOString() + ': ' + msg + '\n');
+	} catch (e) {}
+}
+
 export default class EnchantedAnimationsPlugin extends Plugin {
 	static instance: EnchantedAnimationsPlugin;
 	settings!: EnchantedAnimationsSettings;
@@ -84,6 +91,8 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 
 		this.registerEvent(
 			this.app.workspace.on('window-open', (win) => {
+				eaLog('window-open event fired');
+
 				if (win.doc.body.classList.contains('enchanted-animations-present')) return;
 				win.doc.body.classList.add('enchanted-animations-present');
 				this.applyStyles(win.doc);
@@ -255,17 +264,24 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 					if (modal) Object.assign(modal.style, { animationName: '' });
 				}
 				plugin.originalModalOpen.call(this);
-				window.setTimeout(() => {
+				let attempts = 0;
+				const checkDoc = () => {
 					const doc = this.containerEl?.ownerDocument;
-					if (doc && doc !== activeDocument && !doc.body.classList.contains('enchanted-animations-present')) {
-						doc.body.classList.add('enchanted-animations-present');
-						plugin.applyStyles(doc);
-						plugin.hijackSelectDropdowns(doc);
-						plugin.patchGraphControls(doc);
-						plugin.patchDocumentSearch(doc);
-						plugin.patchMobileSettingsClose(doc);
+					if (doc && doc !== activeDocument) {
+						if (!doc.body.classList.contains('enchanted-animations-present')) {
+							doc.body.classList.add('enchanted-animations-present');
+							plugin.applyStyles(doc);
+							plugin.hijackSelectDropdowns(doc);
+							plugin.patchGraphControls(doc);
+							plugin.patchDocumentSearch(doc);
+							plugin.patchMobileSettingsClose(doc);
+						}
+					} else if (attempts < 20) {
+						attempts++;
+						window.setTimeout(checkDoc, 50);
 					}
-				}, 50);
+				};
+				window.setTimeout(checkDoc, 50);
 			};
 		}
 		
@@ -287,17 +303,24 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 					if (modal) Object.assign(modal.style, { animationName: '' });
 				}
 				originalSuggestModalOpen.call(this);
-				window.setTimeout(() => {
+				let attempts = 0;
+				const checkDoc = () => {
 					const doc = this.containerEl?.ownerDocument;
-					if (doc && doc !== activeDocument && !doc.body.classList.contains('enchanted-animations-present')) {
-						doc.body.classList.add('enchanted-animations-present');
-						plugin.applyStyles(doc);
-						plugin.hijackSelectDropdowns(doc);
-						plugin.patchGraphControls(doc);
-						plugin.patchDocumentSearch(doc);
-						plugin.patchMobileSettingsClose(doc);
+					if (doc && doc !== activeDocument) {
+						if (!doc.body.classList.contains('enchanted-animations-present')) {
+							doc.body.classList.add('enchanted-animations-present');
+							plugin.applyStyles(doc);
+							plugin.hijackSelectDropdowns(doc);
+							plugin.patchGraphControls(doc);
+							plugin.patchDocumentSearch(doc);
+							plugin.patchMobileSettingsClose(doc);
+						}
+					} else if (attempts < 20) {
+						attempts++;
+						window.setTimeout(checkDoc, 50);
 					}
-				}, 50);
+				};
+				window.setTimeout(checkDoc, 50);
 			};
 		}
 
@@ -432,17 +455,25 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 							if (modal) Object.assign(modal.style, { animationName: '' });
 						}
 						originalSettingOpen.call(this);
-						window.setTimeout(() => {
+						eaLog('app.setting.open called');
+						let attempts = 0;
+						const checkDoc = () => {
 							const doc = this.containerEl?.ownerDocument;
-							if (doc && doc !== activeDocument && !doc.body.classList.contains('enchanted-animations-present')) {
-								doc.body.classList.add('enchanted-animations-present');
-								plugin.applyStyles(doc);
-								plugin.hijackSelectDropdowns(doc);
-								plugin.patchGraphControls(doc);
-								plugin.patchDocumentSearch(doc);
-								plugin.patchMobileSettingsClose(doc);
+							if (doc && doc !== activeDocument) {
+								if (!doc.body.classList.contains('enchanted-animations-present')) {
+									doc.body.classList.add('enchanted-animations-present');
+									plugin.applyStyles(doc);
+									plugin.hijackSelectDropdowns(doc);
+									plugin.patchGraphControls(doc);
+									plugin.patchDocumentSearch(doc);
+									plugin.patchMobileSettingsClose(doc);
+								}
+							} else if (attempts < 20) {
+								attempts++;
+								window.setTimeout(checkDoc, 50);
 							}
-						}, 50);
+						};
+						window.setTimeout(checkDoc, 50);
 					};
 				}
 
@@ -901,6 +932,8 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 	}
 
 	hijackSelectDropdowns(doc: Document = activeDocument) {
+		eaLog('hijackSelectDropdowns called for ' + (doc === activeDocument ? 'activeDoc' : 'popout'));
+
 		// 1. Block the native OS dropdown already on mousedown
 		this.registerDomEvent(doc.body, 'mousedown', (evt: MouseEvent) => {
 			if (!this.settings.enableCustomDropdowns) return;
