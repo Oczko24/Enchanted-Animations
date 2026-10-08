@@ -241,15 +241,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		if (typeof this.originalModalOpen === 'function') {
 			Modal.prototype.open = function() {
 
-				const doc = this.containerEl?.ownerDocument;
-				if (doc && doc !== activeDocument && !doc.body.classList.contains('enchanted-animations-present')) {
-					doc.body.classList.add('enchanted-animations-present');
-					plugin.applyStyles(doc);
-					plugin.hijackSelectDropdowns(doc);
-					plugin.patchGraphControls(doc);
-					plugin.patchDocumentSearch(doc);
-					plugin.patchMobileSettingsClose(doc);
-				}
+
 
 				let container = this.containerEl;
 				if (container && !container.classList.contains('modal-container')) {
@@ -263,6 +255,17 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 					if (modal) Object.assign(modal.style, { animationName: '' });
 				}
 				plugin.originalModalOpen.call(this);
+				window.setTimeout(() => {
+					const doc = this.containerEl?.ownerDocument;
+					if (doc && doc !== activeDocument && !doc.body.classList.contains('enchanted-animations-present')) {
+						doc.body.classList.add('enchanted-animations-present');
+						plugin.applyStyles(doc);
+						plugin.hijackSelectDropdowns(doc);
+						plugin.patchGraphControls(doc);
+						plugin.patchDocumentSearch(doc);
+						plugin.patchMobileSettingsClose(doc);
+					}
+				}, 50);
 			};
 		}
 		
@@ -270,15 +273,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		if (typeof originalSuggestModalOpen === 'function') {
 			SuggestModal.prototype.open = function() {
 
-				const doc = this.containerEl?.ownerDocument;
-				if (doc && doc !== activeDocument && !doc.body.classList.contains('enchanted-animations-present')) {
-					doc.body.classList.add('enchanted-animations-present');
-					plugin.applyStyles(doc);
-					plugin.hijackSelectDropdowns(doc);
-					plugin.patchGraphControls(doc);
-					plugin.patchDocumentSearch(doc);
-					plugin.patchMobileSettingsClose(doc);
-				}
+
 
 				let container = this.containerEl;
 				if (container && !container.classList.contains('modal-container')) {
@@ -292,6 +287,17 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 					if (modal) Object.assign(modal.style, { animationName: '' });
 				}
 				originalSuggestModalOpen.call(this);
+				window.setTimeout(() => {
+					const doc = this.containerEl?.ownerDocument;
+					if (doc && doc !== activeDocument && !doc.body.classList.contains('enchanted-animations-present')) {
+						doc.body.classList.add('enchanted-animations-present');
+						plugin.applyStyles(doc);
+						plugin.hijackSelectDropdowns(doc);
+						plugin.patchGraphControls(doc);
+						plugin.patchDocumentSearch(doc);
+						plugin.patchMobileSettingsClose(doc);
+					}
+				}, 50);
 			};
 		}
 
@@ -409,15 +415,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 				if (originalSettingOpen) {
 					(this.app as unknown as AppWithSetting).setting.open = function(this: { open: (...args: unknown[]) => void; containerEl?: HTMLElement }) {
 
-				const doc = this.containerEl?.ownerDocument;
-				if (doc && doc !== activeDocument && !doc.body.classList.contains('enchanted-animations-present')) {
-					doc.body.classList.add('enchanted-animations-present');
-					plugin.applyStyles(doc);
-					plugin.hijackSelectDropdowns(doc);
-					plugin.patchGraphControls(doc);
-					plugin.patchDocumentSearch(doc);
-					plugin.patchMobileSettingsClose(doc);
-				}
+
 
 						let container = this.containerEl as HTMLElement;
 						if (container && !container.classList.contains('modal-container')) {
@@ -434,6 +432,17 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 							if (modal) Object.assign(modal.style, { animationName: '' });
 						}
 						originalSettingOpen.call(this);
+						window.setTimeout(() => {
+							const doc = this.containerEl?.ownerDocument;
+							if (doc && doc !== activeDocument && !doc.body.classList.contains('enchanted-animations-present')) {
+								doc.body.classList.add('enchanted-animations-present');
+								plugin.applyStyles(doc);
+								plugin.hijackSelectDropdowns(doc);
+								plugin.patchGraphControls(doc);
+								plugin.patchDocumentSearch(doc);
+								plugin.patchMobileSettingsClose(doc);
+							}
+						}, 50);
 					};
 				}
 
