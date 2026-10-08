@@ -71,7 +71,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		}
 
 		for (const doc of docs) {
-			if (doc !== activeDocument) {
+			if (doc !== activeDocument && !doc.body.classList.contains('enchanted-animations-present')) {
 				doc.body.classList.add('enchanted-animations-present');
 				this.applyStyles(doc);
 				this.hijackSelectDropdowns(doc);
@@ -84,6 +84,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 
 		this.registerEvent(
 			this.app.workspace.on('window-open', (win) => {
+				if (win.doc.body.classList.contains('enchanted-animations-present')) return;
 				win.doc.body.classList.add('enchanted-animations-present');
 				this.applyStyles(win.doc);
 				this.hijackSelectDropdowns(win.doc);
