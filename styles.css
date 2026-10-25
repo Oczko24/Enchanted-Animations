@@ -316,8 +316,9 @@ html body:not(.disable-formatting-animations) div.app-container div.workspace di
   /* Premium marker wipe with a 300% width.
      0-33.3% is solid color (shown at end of animation).
      33.3%-36% is the soft marker bleed edge.
-     36%-100% is transparent (shown at start of animation). */
-  background-image: linear-gradient(to right, var(--text-highlight-bg, #ffd00066) 0%, var(--text-highlight-bg, #ffd00066) 33.3%, transparent 36%, transparent 100%);
+     36%-100% is transparent (shown at start of animation).
+     Uses --highlight-background to support Obsidian 1.7+ native color highlights (red, orange, green, blue, purple). */
+  background-image: linear-gradient(to right, var(--highlight-background, var(--text-highlight-bg, #ffd00066)) 0%, var(--highlight-background, var(--text-highlight-bg, #ffd00066)) 33.3%, transparent 36%, transparent 100%);
   background-size: 300% 100%;
   background-position: 100% 0;
   background-repeat: no-repeat;
@@ -331,11 +332,12 @@ html body:not(.disable-formatting-animations) div.app-container div.workspace di
 }
 
 /* Active line: CM6 recreates DOM nodes constantly, restarting ea-highlight-draw endlessly.
-   Use `background:` shorthand to wipe the animated gradient entirely and show a solid color. */
+   Use `background:` shorthand to wipe the animated gradient entirely and show a solid color.
+   Inherits --highlight-background for native color highlights on active line. */
 html body:not(.disable-formatting-animations) div.app-container div.workspace div.markdown-source-view.mod-cm6 div.cm-scroller div.cm-line.cm-active span.cm-highlight,
 html body:not(.disable-formatting-animations) div.app-container div.workspace div.markdown-source-view.mod-cm6 div.cm-scroller div.cm-line.cm-active span.cm-formatting-highlight,
 html body:not(.disable-formatting-animations) div.app-container div.workspace div.markdown-source-view.mod-cm6 div.cm-scroller div.cm-line.cm-active span.cm-formatting.cm-formatting-highlight {
-  background: var(--text-highlight-bg, #ffd00066);
+  background: var(--highlight-background, var(--text-highlight-bg, #ffd00066));
   animation: none;
 }
 
