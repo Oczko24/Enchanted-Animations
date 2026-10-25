@@ -71,6 +71,19 @@ body:not(.disable-modal-animation).is-phone .modal-container.is-closing .modal-b
   animation: ea-fade-out calc(var(--enchanted-animations-speed) * 1.2) var(--enchanted-animations-easing) forwards;
 }
 
+body:not(.disable-modal-animation) .prompt-results {
+  scroll-behavior: smooth;
+}
+
+body:not(.disable-modal-animation) .prompt-results .suggestion-item {
+  transition: transform calc(var(--enchanted-animations-speed) * 0.75) cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+body:not(.disable-modal-animation) .prompt-results .suggestion-item:hover,
+body:not(.disable-modal-animation) .prompt-results .suggestion-item.is-selected {
+  transform: translateX(5px);
+}
+
 
 /* ==================== Context Menus ==================== */
 
@@ -371,6 +384,7 @@ body:not(.disable-native-animations) {
 body.ea-gpu-accel .modal,
 body.ea-gpu-accel .modal-bg,
 body.ea-gpu-accel .prompt,
+body.ea-gpu-accel .prompt-results .suggestion-item,
 body.ea-gpu-accel .menu,
 body.ea-gpu-accel .popover,
 body.ea-gpu-accel .suggestion-container,

@@ -9,14 +9,6 @@ interface NoticeWithDelay extends Notice { _eaDelayed?: boolean; }
 interface SimulatedEvent extends Event { _eaSimulated?: boolean; }
 interface SimulatedElement extends HTMLElement { _eaSimulated?: boolean; }
 
-
-
-function eaLog(msg: string) {
-	try {
-		require('fs').appendFileSync('/home/maturowski/Documents/ea_log.txt', new Date().toISOString() + ': ' + msg + '\n');
-	} catch (e) {}
-}
-
 export default class EnchantedAnimationsPlugin extends Plugin {
 	static instance: EnchantedAnimationsPlugin;
 	settings!: EnchantedAnimationsSettings;
@@ -35,26 +27,131 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 	activeSelectMenuEl: HTMLSelectElement | null = null;
 	lastMenuClosedTime: number = 0;
 	lastMenuClosedEl: HTMLSelectElement | null = null;
+	registeredDocs = new Set<Document>();
+	originalActiveDocDescriptor?: PropertyDescriptor;
+	originalWindowOpen?: typeof window.open;
 	// Internal flag replacing ea-note-transitioning body class.
 	// Body class changes trigger Weave EPUB Reader's ThemeManager to rebuild its
 	// theme signature, which fires theme-change listeners that re-apply styles on
 	// the epub render container — resetting scroll position.
 	noteTransitioning = false;
 
+	hookWindowOpen() {
+		const origOpen = window.open;
+		this.originalWindowOpen = origOpen;
+		const plugin = this;
+
+		window.open = function(this: Window, ...args: Parameters<typeof origOpen>) {
+			const popout = origOpen.apply(this, args);
+			if (popout) {
+				const checkAndRegister = () => {
+					try {
+						if (popout.document && popout.document.body) {
+							plugin.registerDocument(popout.document);
+						}
+					} catch {
+						// Window may have closed or navigated
+					}
+				};
+				popout.addEventListener('DOMContentLoaded', checkAndRegister);
+				popout.addEventListener('load', checkAndRegister);
+				let attempts = 0;
+				const timer = window.setInterval(() => {
+					attempts++;
+					checkAndRegister();
+					if ((popout.document?.body as any)?._eaEventRegistered || attempts > 60) {
+						window.clearInterval(timer);
+					}
+				}, 50);
+			}
+			return popout;
+		};
+	}
+
+	unhookWindowOpen() {
+		if (this.originalWindowOpen) {
+			window.open = this.originalWindowOpen;
+			this.originalWindowOpen = undefined;
+		}
+	}
+
+	hookActiveDocument() {
+		let currentActiveDoc = window.activeDocument;
+		this.originalActiveDocDescriptor = Object.getOwnPropertyDescriptor(window, 'activeDocument') || {
+			get: () => currentActiveDoc,
+			set: (d: Document) => { currentActiveDoc = d; },
+			configurable: true,
+			enumerable: true
+		};
+		const origDesc = this.originalActiveDocDescriptor;
+		const plugin = this;
+
+		try {
+			Object.defineProperty(window, 'activeDocument', {
+				get() {
+					return origDesc.get ? origDesc.get.call(window) : currentActiveDoc;
+				},
+				set(newDoc: Document) {
+					if (origDesc.set) {
+						origDesc.set.call(window, newDoc);
+					} else {
+						currentActiveDoc = newDoc;
+					}
+					if (newDoc) {
+						plugin.registerDocument(newDoc);
+					}
+				},
+				configurable: true,
+				enumerable: true
+			});
+		} catch (e) {
+			console.error('Failed to define activeDocument tracker', e);
+		}
+	}
+
+	unhookActiveDocument() {
+		if (this.originalActiveDocDescriptor) {
+			try {
+				Object.defineProperty(window, 'activeDocument', this.originalActiveDocDescriptor);
+			} catch {
+				// Ignore if already restored or non-configurable
+			}
+			this.originalActiveDocDescriptor = undefined;
+		}
+	}
+
+	registerDocument(doc: Document | null | undefined) {
+		if (!doc || !doc.body || !doc.defaultView) return;
+		if (this.registeredDocs.has(doc)) return;
+		this.registeredDocs.add(doc);
+		(doc.body as any)._eaEventRegistered = true;
+
+		doc.body.classList.add('enchanted-animations-present');
+		this.applyStyles(doc);
+		this.hijackSelectDropdowns(doc);
+		this.patchGraphControls(doc);
+		this.patchDocumentSearch(doc);
+		this.patchMobileSettingsClose(doc);
+	}
+
 	async onload() {
 		EnchantedAnimationsPlugin.instance = this;
-		activeDocument.body.classList.add('enchanted-animations-present');
 		await this.loadSettings();
-		this.applyStyles();
+
+		this.hookWindowOpen();
+		this.hookActiveDocument();
+
+		this.registerDocument(window.document);
+		if (activeDocument) this.registerDocument(activeDocument);
 
 		const isFirstLoad = !this.app.workspace.layoutReady;
 		if (isFirstLoad) {
-			if (this.settings.enableSplashScreen) {
+			if (this.settings.enableSplashScreen && activeDocument?.body) {
 				activeDocument.body.classList.add('enchanted-animations-startup');
 				const animationDurationMs = Math.max(1000, this.settings.speed * 5000);
 				
 				window.setTimeout(() => {
-					activeDocument.body.classList.remove('enchanted-animations-startup');
+					activeDocument?.body?.classList.remove('enchanted-animations-startup');
 				}, animationDurationMs);
 			}
 		}
@@ -62,46 +159,23 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		this.app.workspace.onLayoutReady(() => {
 			this.setupSidebarVelocity();
 			this.setupEditorAnimations();
-			this.hijackSelectDropdowns();
 			this.setupNoticeObserver();
 
-		const docs = new Set<Document>([activeDocument]);
-		this.app.workspace.iterateAllLeaves((leaf) => {
-			const doc = leaf.view?.containerEl?.ownerDocument;
-			if (doc && !docs.has(doc)) {
-				docs.add(doc);
-			}
-		});
-		const settingDoc = (this.app as any).setting?.containerEl?.ownerDocument;
-		if (settingDoc && !docs.has(settingDoc)) {
-			docs.add(settingDoc);
-		}
+			this.registerDocument(window.document);
+			if (activeDocument) this.registerDocument(activeDocument);
 
-		for (const doc of docs) {
-			if (doc !== activeDocument && doc.body && !(doc.body as any)._eaEventRegistered) {
-				doc.body.classList.add('enchanted-animations-present');
-					(doc.body as any)._eaEventRegistered = true;
-				this.applyStyles(doc);
-				this.hijackSelectDropdowns(doc);
-				this.patchGraphControls(doc);
-				this.patchDocumentSearch(doc);
-				this.patchMobileSettingsClose(doc);
-			}
-		}
+			this.app.workspace.iterateAllLeaves((leaf) => {
+				const doc = leaf.view?.containerEl?.ownerDocument;
+				if (doc) this.registerDocument(doc);
+			});
+
+			const settingDoc = (this.app as any).setting?.containerEl?.ownerDocument;
+			if (settingDoc) this.registerDocument(settingDoc);
 		});
 
 		this.registerEvent(
 			this.app.workspace.on('window-open', (win) => {
-				
-				if (!win.doc.body || (win.doc.body as any)._eaEventRegistered) return;
-				win.doc.body.classList.add('enchanted-animations-present');
-				(win.doc.body as any)._eaEventRegistered = true;
-					(win.doc.body as any)._eaEventRegistered = true;
-				this.applyStyles(win.doc);
-				this.hijackSelectDropdowns(win.doc);
-				this.patchGraphControls(win.doc);
-				this.patchDocumentSearch(win.doc);
-				this.patchMobileSettingsClose(win.doc);
+				if (win?.doc) this.registerDocument(win.doc);
 			})
 		);
 
@@ -151,9 +225,6 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 
 		this.patchModalClose();
 		this.patchMenuClose();
-		this.patchGraphControls();
-		this.patchDocumentSearch();
-		this.patchMobileSettingsClose();
 		this.patchNotice();
 		this.addCommand({
 			id: 'show-settings',
@@ -207,6 +278,8 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 	}
 
 	onunload() {
+		this.unhookWindowOpen();
+		this.unhookActiveDocument();
 		this.unpatchModalClose();
 		this.unpatchMenuClose();
 		this.unpatchNotice();
@@ -226,21 +299,16 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 			this.sidebarObserver = null;
 		}
 
-		const docs = new Set<Document>([activeDocument]);
-		this.app.workspace.iterateAllLeaves((leaf) => {
-			const doc = leaf.view?.containerEl?.ownerDocument;
-			if (doc && !docs.has(doc)) {
-				docs.add(doc);
-			}
-		});
-		const settingDoc = (this.app as any).setting?.containerEl?.ownerDocument;
-		if (settingDoc && !docs.has(settingDoc)) {
-			docs.add(settingDoc);
-		}
-
-		for (const doc of docs) {
+		for (const doc of this.registeredDocs) {
 			this.removeStyles(doc);
 		}
+		if (activeDocument && !this.registeredDocs.has(activeDocument)) {
+			this.removeStyles(activeDocument);
+		}
+		if (window.document && !this.registeredDocs.has(window.document)) {
+			this.removeStyles(window.document);
+		}
+		this.registeredDocs.clear();
 	}
 
 	patchModalClose() {
@@ -251,9 +319,6 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 
 		if (typeof this.originalModalOpen === 'function') {
 			Modal.prototype.open = function() {
-
-
-
 				let container = this.containerEl;
 				if (container && !container.classList.contains('modal-container')) {
 					container = container.closest('.modal-container') as HTMLElement;
@@ -266,36 +331,23 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 					if (modal) Object.assign(modal.style, { animationName: '' });
 				}
 				plugin.originalModalOpen.call(this);
-				eaLog('app.setting.open started polling!');
-						let attempts = 0;
-						const checkDoc = () => {
-							const doc = this.containerEl?.ownerDocument;
-							// Only process if the document is ALIVE. If it's dead, wait for Obsidian to move containerEl!
-							if (doc && doc !== activeDocument && doc.defaultView && doc.body) {
-								if (!(doc.body as any)._eaEventRegistered) {
-									doc.body.classList.add('enchanted-animations-present');
-									(doc.body as any)._eaEventRegistered = true;
-									plugin.applyStyles(doc);
-									plugin.hijackSelectDropdowns(doc);
-									plugin.patchGraphControls(doc);
-									plugin.patchDocumentSearch(doc);
-									plugin.patchMobileSettingsClose(doc);
-								}
-							} else if (attempts < 100) {
-								attempts++;
-								window.setTimeout(checkDoc, 50);
-							}
+				let attempts = 0;
+				const checkDoc = () => {
+					const doc = this.containerEl?.ownerDocument || activeDocument;
+					if (doc && doc.defaultView && doc.body) {
+						plugin.registerDocument(doc);
+					} else if (attempts < 30) {
+						attempts++;
+						window.setTimeout(checkDoc, 50);
+					}
 				};
-				window.setTimeout(checkDoc, 50);
+				checkDoc();
 			};
 		}
 		
 		const originalSuggestModalOpen = Reflect.get(SuggestModal.prototype, 'open');
 		if (typeof originalSuggestModalOpen === 'function') {
 			SuggestModal.prototype.open = function() {
-
-
-
 				let container = this.containerEl;
 				if (container && !container.classList.contains('modal-container')) {
 					container = container.closest('.modal-container') as HTMLElement;
@@ -308,27 +360,17 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 					if (modal) Object.assign(modal.style, { animationName: '' });
 				}
 				originalSuggestModalOpen.call(this);
-				eaLog('app.setting.open started polling!');
-						let attempts = 0;
-						const checkDoc = () => {
-							const doc = this.containerEl?.ownerDocument;
-							// Only process if the document is ALIVE. If it's dead, wait for Obsidian to move containerEl!
-							if (doc && doc !== activeDocument && doc.defaultView && doc.body) {
-								if (!(doc.body as any)._eaEventRegistered) {
-									doc.body.classList.add('enchanted-animations-present');
-									(doc.body as any)._eaEventRegistered = true;
-									plugin.applyStyles(doc);
-									plugin.hijackSelectDropdowns(doc);
-									plugin.patchGraphControls(doc);
-									plugin.patchDocumentSearch(doc);
-									plugin.patchMobileSettingsClose(doc);
-								}
-							} else if (attempts < 100) {
-								attempts++;
-								window.setTimeout(checkDoc, 50);
-							}
+				let attempts = 0;
+				const checkDoc = () => {
+					const doc = this.containerEl?.ownerDocument || activeDocument;
+					if (doc && doc.defaultView && doc.body) {
+						plugin.registerDocument(doc);
+					} else if (attempts < 30) {
+						attempts++;
+						window.setTimeout(checkDoc, 50);
+					}
 				};
-				window.setTimeout(checkDoc, 50);
+				checkDoc();
 			};
 		}
 
@@ -463,27 +505,17 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 							if (modal) Object.assign(modal.style, { animationName: '' });
 						}
 						originalSettingOpen.call(this);
-												eaLog('app.setting.open started polling!');
 						let attempts = 0;
 						const checkDoc = () => {
-							const doc = this.containerEl?.ownerDocument;
-							// Only process if the document is ALIVE. If it's dead, wait for Obsidian to move containerEl!
-							if (doc && doc !== activeDocument && doc.defaultView && doc.body) {
-								if (!(doc.body as any)._eaEventRegistered) {
-									doc.body.classList.add('enchanted-animations-present');
-									(doc.body as any)._eaEventRegistered = true;
-									plugin.applyStyles(doc);
-									plugin.hijackSelectDropdowns(doc);
-									plugin.patchGraphControls(doc);
-									plugin.patchDocumentSearch(doc);
-									plugin.patchMobileSettingsClose(doc);
-								}
-							} else if (attempts < 100) {
+							const doc = this.containerEl?.ownerDocument || activeDocument;
+							if (doc && doc.defaultView && doc.body) {
+								plugin.registerDocument(doc);
+							} else if (attempts < 30) {
 								attempts++;
 								window.setTimeout(checkDoc, 50);
 							}
 						};
-						window.setTimeout(checkDoc, 50);
+						checkDoc();
 					};
 				}
 
@@ -764,7 +796,24 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		await this.saveData(this.settings);
 	}
 
-	applyStyles(doc: Document = activeDocument) {
+	applyStyles(doc?: Document) {
+		if (doc) {
+			this.applyStylesToDoc(doc);
+		} else {
+			for (const d of this.registeredDocs) {
+				this.applyStylesToDoc(d);
+			}
+			if (activeDocument && !this.registeredDocs.has(activeDocument)) {
+				this.applyStylesToDoc(activeDocument);
+			}
+			if (window.document && !this.registeredDocs.has(window.document)) {
+				this.applyStylesToDoc(window.document);
+			}
+		}
+	}
+
+	applyStylesToDoc(doc: Document) {
+		if (!doc || !doc.body) return;
 		doc.body.style.setProperty('--enchanted-animations-speed-num', this.settings.speed.toString());
 		doc.body.style.setProperty('--enchanted-animations-speed', `${this.settings.speed}s`);
 		doc.body.style.setProperty('--enchanted-animations-easing', this.settings.easing);
@@ -942,16 +991,12 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 	}
 
 	hijackSelectDropdowns(doc: Document = activeDocument) {
-		eaLog('hijackSelectDropdowns called for ' + (doc === activeDocument ? 'activeDoc' : 'popout'));
-
 		// 1. Block the native OS dropdown already on mousedown
 		this.registerDomEvent(doc.body, 'mousedown', (evt: MouseEvent) => {
 			if (!this.settings.enableCustomDropdowns) return;
 			const target = evt.target as HTMLElement;
 			const selectElement = target.closest('select.dropdown') as HTMLSelectElement;
-			if (selectElement) eaLog('selectElement found!');
-			if (selectElement && evt.button === 0) {
-				eaLog('selectElement clicked!');
+			if (selectElement && !selectElement.disabled && evt.button === 0) {
 				evt.preventDefault(); 
 			}
 		}, true);
@@ -959,13 +1004,10 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		// 2. Create and show our animated menu only on a full click
 		this.registerDomEvent(doc.body, 'click', (evt: MouseEvent) => {
 			if (!this.settings.enableCustomDropdowns) return;
-			eaLog('CLICK event on doc.body!');
 
 			const target = evt.target as HTMLElement;
 			const selectElement = target.closest('select.dropdown') as HTMLSelectElement;
-			if (selectElement) eaLog('selectElement found!');
-			if (selectElement && evt.button === 0) {
-				eaLog('selectElement clicked!');
+			if (selectElement && !selectElement.disabled && evt.button === 0) {
 				evt.preventDefault();
 				evt.stopPropagation(); // Block propagation so Obsidian's background click doesn't instantly close it
 
@@ -1036,7 +1078,6 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 
 				const rect = selectElement.getBoundingClientRect();
 				menu.showAtPosition({ x: rect.left, y: rect.bottom }, doc);
-				eaLog('menu shown at ' + rect.left + ', ' + rect.bottom);
 
 				window.setTimeout(() => {
 					if (dom) {
