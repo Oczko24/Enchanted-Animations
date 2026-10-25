@@ -3,7 +3,18 @@ import {DEFAULT_SETTINGS, EnchantedAnimationsSettings, EnchantedAnimationsSettin
 import {EnchantedAnimationsController} from "./animations";
 
 declare const activeDocument: Document;
-interface AppWithSetting { setting: { close: (...args: unknown[]) => void; open: (...args: unknown[]) => void; openTabById: (id: string) => void; containerEl?: HTMLElement }; }
+interface AppWithSetting {
+	setting: {
+		close: (...args: unknown[]) => void;
+		open: (...args: unknown[]) => void;
+		openTabById: (id: string) => void;
+		closeActiveTab?: () => void;
+		closePage?: () => void;
+		activeTab?: { id: string } | null;
+		pageStack?: unknown[];
+		containerEl?: HTMLElement;
+	};
+}
 interface MenuWithDom extends Menu { dom: HTMLElement; }
 interface NoticeWithDelay extends Notice { _eaDelayed?: boolean; }
 interface SimulatedEvent extends Event { _eaSimulated?: boolean; }
@@ -132,6 +143,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		this.patchGraphControls(doc);
 		this.patchDocumentSearch(doc);
 		this.patchMobileSettingsClose(doc);
+		this.patchMobileSettingsEscape(doc);
 	}
 
 	async onload() {
@@ -408,6 +420,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 				
 				activeDocument.body.appendChild(ghost);
 				
+				const isPhone = activeDocument.body.classList.contains('is-phone');
 				const isMobileSettings = activeDocument.body.classList.contains('is-mobile') && container.querySelector('.modal.mod-settings');
 				const durationMs = plugin.settings.speed * (isMobileSettings ? 1400 : 700);
 				
@@ -416,6 +429,10 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 				}, durationMs);
 				
 				container.classList.add('ea-force-hidden');
+
+				if (isPhone) {
+					(this as unknown as { animateClose?: () => Promise<void> }).animateClose = () => Promise.resolve();
+				}
 			}
 			plugin.originalModalClose.call(this);
 		};
@@ -480,13 +497,39 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		// Specific patch for the app.setting modal as it sometimes handles its own unmount
 		// wrapping it in a window.setTimeout for next tick in case app.setting isn't fully ready immediately.
 		window.setTimeout(() => {
-			if ((this.app as unknown as AppWithSetting).setting) {
-				this.originalSettingClose = Reflect.get((this.app as unknown as AppWithSetting).setting, 'close');
+			const setting = (this.app as unknown as AppWithSetting).setting;
+			if (setting) {
+				this.originalSettingClose = Reflect.get(setting, 'close');
+
+				// Hook Escape key in setting.scope for mobile drill-down navigation
+				const escapeEntry = (setting as any).scope?.keys?.find((k: any) => k.key === 'Escape');
+				if (escapeEntry && !escapeEntry._eaPatched) {
+					escapeEntry._eaPatched = true;
+					const origFunc = escapeEntry.func;
+					escapeEntry.func = function(this: unknown, e: KeyboardEvent) {
+						const isPhone = activeDocument?.body?.classList?.contains('is-phone');
+						if (isPhone) {
+							if (setting.pageStack && setting.pageStack.length > 0) {
+								if (typeof setting.closePage === 'function') {
+									setting.closePage();
+									return false;
+								}
+							}
+							if (setting.activeTab) {
+								if (typeof setting.closeActiveTab === 'function') {
+									setting.closeActiveTab();
+									return false;
+								}
+							}
+						}
+						return origFunc.call(this, e);
+					};
+				}
 				
 				// Patch open to clean up any left-over closing classes before it shows
-				const originalSettingOpen = Reflect.get((this.app as unknown as AppWithSetting).setting, 'open');
+				const originalSettingOpen = Reflect.get(setting, 'open');
 				if (originalSettingOpen) {
-					(this.app as unknown as AppWithSetting).setting.open = function(this: { open: (...args: unknown[]) => void; containerEl?: HTMLElement }) {
+					setting.open = function(this: { open: (...args: unknown[]) => void; containerEl?: HTMLElement }) {
 
 
 
@@ -556,6 +599,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 						activeDocument.body.appendChild(ghost);
 						
 						const isMobile = activeDocument.body.classList.contains('is-mobile');
+						const isPhone = activeDocument.body.classList.contains('is-phone');
 						const durationMs = plugin.settings.speed * (isMobile ? 1400 : 700);
 						
 						window.setTimeout(() => {
@@ -563,6 +607,10 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 						}, durationMs);
 						
 						container.classList.add('ea-force-hidden');
+
+						if (isPhone) {
+							(this as unknown as { animateClose?: () => Promise<void> }).animateClose = () => Promise.resolve();
+						}
 					}
 					plugin.originalSettingClose.call(this);
 				};
@@ -958,7 +1006,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 			if (!target) return;
 			
 			// Strict selector for the X button, completely avoiding the back button in drill-down menus
-			const closeBtn = target.closest('.is-mobile .modal.mod-settings .modal-close-button:not(.mod-back), .is-mobile .modal.mod-settings .clickable-icon.mod-close, .is-mobile .modal.mod-settings [aria-label="Close"], .is-mobile .modal.mod-settings [aria-label="Zamknij"]');
+			const closeBtn = target.closest('.is-mobile .modal.mod-settings .modal-header-button, .is-mobile .modal.mod-settings .modal-close-button:not(.mod-back), .is-mobile .modal.mod-settings .clickable-icon.mod-close, .is-mobile .modal.mod-settings [aria-label="Close"], .is-mobile .modal.mod-settings [aria-label="Zamknij"]');
 			
 			if (closeBtn) {
 				const container = closeBtn.closest('.modal-container');
@@ -986,6 +1034,49 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 						}
 					}, Math.max(0, durationMs - 10));
 				}
+			}
+		}, true);
+	}
+
+	patchMobileSettingsEscape(doc: Document = activeDocument) {
+		this.registerDomEvent(doc, 'keydown', (evt: KeyboardEvent) => {
+			if (evt.key !== 'Escape') return;
+
+			const isPhone = doc.body.classList.contains('is-phone');
+			if (!isPhone) return;
+
+			// If a popup menu or suggest is currently open, let it consume Escape first
+			if (doc.querySelector('.menu, .suggestion-container')) return;
+
+			// If search input is focused and has a value, let native handler clear the search
+			const activeEl = doc.activeElement as HTMLInputElement;
+			if (activeEl && activeEl.tagName === 'INPUT' && activeEl.type === 'search' && activeEl.value) {
+				return;
+			}
+
+			const setting = (this.app as unknown as AppWithSetting).setting;
+			const isSettingOpen = Boolean(doc.querySelector('.modal.mod-settings'));
+			if (!isSettingOpen || !setting) return;
+
+			// In mobile drill-down: 1st Escape goes back to previous page or tab header list
+			if (setting.pageStack && setting.pageStack.length > 0) {
+				evt.preventDefault();
+				evt.stopPropagation();
+				evt.stopImmediatePropagation();
+				if (typeof setting.closePage === 'function') {
+					setting.closePage();
+				}
+				return;
+			}
+
+			if (setting.activeTab) {
+				evt.preventDefault();
+				evt.stopPropagation();
+				evt.stopImmediatePropagation();
+				if (typeof setting.closeActiveTab === 'function') {
+					setting.closeActiveTab();
+				}
+				return;
 			}
 		}, true);
 	}
