@@ -12,28 +12,18 @@ export default tseslint.config(
 			parserOptions: {
 				projectService: {
 					allowDefaultProject: [
-						'eslint.config.mts',
 						'manifest.json',
 						'package.json'
 					]
 				},
-				tsconfigRootDir: import.meta.dirname || process.cwd()
+				tsconfigRootDir: process.cwd()
 			},
 		},
 	},
+	...tseslint.configs.recommendedTypeChecked,
 	...obsidianmd.configs.recommended,
 	{
 		rules: {
-			"@typescript-eslint/no-explicit-any": "off",
-			"@typescript-eslint/no-unsafe-member-access": "off",
-			"@typescript-eslint/no-unsafe-assignment": "off",
-			"@typescript-eslint/no-unsafe-call": "off",
-			"@typescript-eslint/no-unsafe-return": "off",
-			"@typescript-eslint/unbound-method": "off",
-			"@typescript-eslint/no-this-alias": "off",
-			"@typescript-eslint/no-unsafe-argument": "off",
-			"@typescript-eslint/no-unsafe-function-type": "off",
-			"@typescript-eslint/no-unused-vars": "off",
 			"no-console": "off",
 			"obsidianmd/ui/sentence-case": "off",
 			"obsidianmd/settings-tab/no-problematic-settings-headings": "off",
@@ -45,6 +35,7 @@ export default tseslint.config(
 		"dist",
 		"esbuild.config.mjs",
 		"eslint.config.js",
+		"eslint.config.mjs",
 		"version-bump.mjs",
 		"versions.json",
 		"main.js", "package.json", "manifest.json", "tsconfig.json", "*.json", "data.json",

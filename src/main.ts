@@ -1,21 +1,40 @@
-import {Plugin, Modal, SuggestModal, Menu, Notice} from 'obsidian';
+import {Plugin, Modal, SuggestModal, Menu, Notice, MenuPositionDef} from 'obsidian';
 import {DEFAULT_SETTINGS, EnchantedAnimationsSettings, EnchantedAnimationsSettingTab} from "./settings";
 import {EnchantedAnimationsController} from "./animations";
 
 declare const activeDocument: Document;
-interface AppWithSetting {
-	setting: {
-		close: (...args: unknown[]) => void;
-		open: (...args: unknown[]) => void;
-		openTabById: (id: string) => void;
-		closeActiveTab?: () => void;
-		closePage?: () => void;
-		activeTab?: { id: string } | null;
-		pageStack?: unknown[];
-		containerEl?: HTMLElement;
-	};
+
+interface ScopeKeyHandler {
+	key: string | null;
+	modifiers?: string[] | string | null;
+	func: (this: unknown, evt: KeyboardEvent) => unknown;
+	_eaPatched?: boolean;
 }
-interface MenuWithDom extends Menu { dom: HTMLElement; }
+
+interface ScopeWithKeys {
+	keys?: ScopeKeyHandler[];
+}
+
+interface AppSetting {
+	close: (...args: unknown[]) => void;
+	open: (...args: unknown[]) => void;
+	openTabById: (id: string) => void;
+	closeActiveTab?: () => void;
+	closePage?: () => void;
+	activeTab?: { id: string } | null;
+	pageStack?: unknown[];
+	containerEl?: HTMLElement;
+	scope?: ScopeWithKeys;
+}
+
+interface AppWithSetting {
+	setting: AppSetting;
+}
+interface MenuWithDom extends Menu {
+	dom: HTMLElement;
+	_eaGhost?: HTMLElement | null;
+	_eaShowing?: boolean;
+}
 interface NoticeWithDelay extends Notice { _eaDelayed?: boolean; }
 interface SimulatedEvent extends Event { _eaSimulated?: boolean; }
 interface SimulatedElement extends HTMLElement { _eaSimulated?: boolean; }
@@ -26,9 +45,10 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 	originalModalClose!: (...args: unknown[]) => unknown;
 	originalSuggestModalClose!: (...args: unknown[]) => unknown;
 	originalModalOpen!: (...args: unknown[]) => unknown;
-	originalSettingClose!: (...args: unknown[]) => unknown;
+	originalSettingClose?: (...args: unknown[]) => unknown;
 	originalMenuUnload!: (...args: unknown[]) => unknown;
 	originalMenuHide!: (...args: unknown[]) => unknown;
+	originalMenuShowAtPosition?: (position: MenuPositionDef, doc?: Document) => Menu;
 	originalNoticeHide!: (...args: unknown[]) => unknown;
 	noticeObserver!: MutationObserver | null;
 	modalObserver!: MutationObserver | null;
@@ -50,15 +70,14 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 	hookWindowOpen() {
 		const origOpen = window.open;
 		this.originalWindowOpen = origOpen;
-		const plugin = this;
 
-		window.open = function(this: Window, ...args: Parameters<typeof origOpen>) {
-			const popout = origOpen.apply(this, args);
+		window.open = (...args: Parameters<typeof origOpen>) => {
+			const popout = origOpen.apply(window, args);
 			if (popout) {
 				const checkAndRegister = () => {
 					try {
 						if (popout.document && popout.document.body) {
-							plugin.registerDocument(popout.document);
+							this.registerDocument(popout.document);
 						}
 					} catch {
 						// Window may have closed or navigated
@@ -70,7 +89,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 				const timer = window.setInterval(() => {
 					attempts++;
 					checkAndRegister();
-					if ((popout.document?.body as any)?._eaEventRegistered || attempts > 60) {
+					if (this.registeredDocs.has(popout.document) || attempts > 60) {
 						window.clearInterval(timer);
 					}
 				}, 50);
@@ -95,21 +114,24 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 			enumerable: true
 		};
 		const origDesc = this.originalActiveDocDescriptor;
-		const plugin = this;
 
 		try {
 			Object.defineProperty(window, 'activeDocument', {
-				get() {
-					return origDesc.get ? origDesc.get.call(window) : currentActiveDoc;
+				get: (): Document => {
+					if (origDesc.get) {
+						const doc = origDesc.get.call(window) as unknown;
+						if (doc instanceof Document) return doc;
+					}
+					return currentActiveDoc;
 				},
-				set(newDoc: Document) {
+				set: (newDoc: Document) => {
 					if (origDesc.set) {
 						origDesc.set.call(window, newDoc);
 					} else {
 						currentActiveDoc = newDoc;
 					}
 					if (newDoc) {
-						plugin.registerDocument(newDoc);
+						this.registerDocument(newDoc);
 					}
 				},
 				configurable: true,
@@ -135,7 +157,6 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		if (!doc || !doc.body || !doc.defaultView) return;
 		if (this.registeredDocs.has(doc)) return;
 		this.registeredDocs.add(doc);
-		(doc.body as any)._eaEventRegistered = true;
 
 		doc.body.classList.add('enchanted-animations-present');
 		this.applyStyles(doc);
@@ -181,7 +202,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 				if (doc) this.registerDocument(doc);
 			});
 
-			const settingDoc = (this.app as any).setting?.containerEl?.ownerDocument;
+			const settingDoc = (this.app as unknown as AppWithSetting).setting?.containerEl?.ownerDocument;
 			if (settingDoc) this.registerDocument(settingDoc);
 		});
 
@@ -262,7 +283,7 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		doc.body.style.removeProperty('--enchanted-animations-speed');
 		doc.body.style.removeProperty('--enchanted-animations-easing');
 
-		doc.body.classList.remove('enchanted-animations-present'); delete (doc.body as any)._eaEventRegistered;
+		doc.body.classList.remove('enchanted-animations-present');
 		doc.body.classList.remove('animate-note-open');
 		doc.body.classList.remove('disable-splash-screen');
 		doc.body.classList.remove('disable-header-animations');
@@ -499,14 +520,17 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		window.setTimeout(() => {
 			const setting = (this.app as unknown as AppWithSetting).setting;
 			if (setting) {
-				this.originalSettingClose = Reflect.get(setting, 'close');
+				const closeFn = Reflect.get(setting, 'close');
+				if (typeof closeFn === 'function') {
+					this.originalSettingClose = closeFn as (...args: unknown[]) => unknown;
+				}
 
 				// Hook Escape key in setting.scope for mobile drill-down navigation
-				const escapeEntry = (setting as any).scope?.keys?.find((k: any) => k.key === 'Escape');
+				const escapeEntry = setting.scope?.keys?.find((k) => k.key === 'Escape');
 				if (escapeEntry && !escapeEntry._eaPatched) {
 					escapeEntry._eaPatched = true;
 					const origFunc = escapeEntry.func;
-					escapeEntry.func = function(this: unknown, e: KeyboardEvent) {
+					escapeEntry.func = function(this: unknown, e: KeyboardEvent): boolean {
 						const isPhone = activeDocument?.body?.classList?.contains('is-phone');
 						if (isPhone) {
 							if (setting.pageStack && setting.pageStack.length > 0) {
@@ -522,7 +546,8 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 								}
 							}
 						}
-						return origFunc.call(this, e);
+						const res = origFunc.call(this, e);
+						return typeof res === 'boolean' ? res : false;
 					};
 				}
 				
@@ -564,7 +589,9 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 
 				(this.app as unknown as AppWithSetting).setting.close = function(this: { close: (...args: unknown[]) => void; containerEl?: HTMLElement }) {
 					if (!plugin.settings.enableModalAnimations) {
-						plugin.originalSettingClose.call(this);
+						if (plugin.originalSettingClose) {
+							plugin.originalSettingClose.call(this);
+						}
 						return;
 					}
 
@@ -612,7 +639,9 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 							(this as unknown as { animateClose?: () => Promise<void> }).animateClose = () => Promise.resolve();
 						}
 					}
-					plugin.originalSettingClose.call(this);
+					if (plugin.originalSettingClose) {
+						plugin.originalSettingClose.call(this);
+					}
 				};
 			}
 		}, 0);
@@ -636,7 +665,10 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		const createGhost = function(menuObj: MenuWithDom | Menu) {
 			if (!plugin.settings.enableModalAnimations) return;
 
-			let container = (menuObj as MenuWithDom).dom;
+			const menuWithState = menuObj as MenuWithDom;
+			if (menuWithState._eaShowing) return;
+
+			const container = menuWithState.dom;
 			if (container && container.parentNode && !container.classList.contains('is-closing')) {
 				container.classList.add('is-closing');
 				const ghost = container.cloneNode(true) as HTMLElement;
@@ -663,13 +695,25 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 				// coexist during the exit animation, doubling the blur/opacity.
 				container.classList.add('ea-force-hidden');
 				
-				activeDocument.body.appendChild(ghost);
+				if (menuWithState._eaGhost) {
+					menuWithState._eaGhost.remove();
+					menuWithState._eaGhost = null;
+				}
+				menuWithState._eaGhost = ghost;
+
+				const doc = container.ownerDocument || activeDocument || window.document;
+				doc.body.appendChild(ghost);
 				
-				const isMobile = activeDocument.body.classList.contains('is-phone');
+				const isMobile = doc.body.classList.contains('is-phone');
 				const durationMs = plugin.settings.speed * (isMobile ? 1200 : 400);
 				
 				window.setTimeout(() => {
 					ghost.remove();
+					if (menuWithState._eaGhost === ghost) {
+						menuWithState._eaGhost = null;
+					}
+					container.classList.remove('is-closing', 'ea-force-hidden');
+					Object.assign(container.style, { animationName: '' });
 				}, durationMs);
 			}
 		};
@@ -689,6 +733,36 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 				return plugin.originalMenuHide.call(this);
 			};
 		}
+
+		if (Menu.prototype.showAtPosition) {
+			this.originalMenuShowAtPosition = Reflect.get(Menu.prototype, 'showAtPosition');
+			Menu.prototype.showAtPosition = function(this: Menu, ...args: Parameters<typeof Menu.prototype.showAtPosition>) {
+				const menuWithState = this as MenuWithDom;
+				menuWithState._eaShowing = true;
+				let result: unknown;
+				try {
+					const container = menuWithState.dom;
+					if (container) {
+						container.classList.remove('is-closing', 'ea-force-hidden');
+						Object.assign(container.style, { animationName: '' });
+					}
+					if (menuWithState._eaGhost) {
+						menuWithState._eaGhost.remove();
+						menuWithState._eaGhost = null;
+					}
+					if (plugin.originalMenuShowAtPosition) {
+						result = plugin.originalMenuShowAtPosition.apply(this, args);
+					}
+				} finally {
+					menuWithState._eaShowing = false;
+					const container = menuWithState.dom;
+					if (container) {
+						container.classList.remove('is-closing', 'ea-force-hidden');
+					}
+				}
+				return (result ?? this) as Menu;
+			};
+		}
 	}
 
 	unpatchMenuClose() {
@@ -697,6 +771,9 @@ export default class EnchantedAnimationsPlugin extends Plugin {
 		}
 		if (this.originalMenuHide) {
 			(Menu.prototype as { hide?: unknown }).hide = this.originalMenuHide;
+		}
+		if (this.originalMenuShowAtPosition) {
+			Menu.prototype.showAtPosition = this.originalMenuShowAtPosition;
 		}
 	}
 

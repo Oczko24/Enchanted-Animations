@@ -29,5 +29,8 @@
 	},
 	"dependencies": {
 		"obsidian": "latest"
+	},
+	"overrides": {
+		"moment": "^2.31.0"
 	}
 }

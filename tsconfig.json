@@ -1,15 +1,15 @@
 {
     "compilerOptions": {
-        "baseUrl": "src",
         "inlineSourceMap": true,
         "inlineSources": true,
         "module": "ESNext",
         "target": "ES6",
         "allowJs": true,
+        "esModuleInterop": true,
         "noImplicitAny": true,
         "noImplicitThis": true,
         "noImplicitReturns": true,
-        "moduleResolution": "node",
+        "moduleResolution": "bundler",
         "importHelpers": true,
         "noUncheckedIndexedAccess": true,
         "isolatedModules": true,
@@ -22,8 +22,7 @@
             "ES5",
             "ES6",
             "ES7"
-        ],
-        "ignoreDeprecations": "5.0"
+        ]
     },
     "include": [
         "src/**/*.ts"
